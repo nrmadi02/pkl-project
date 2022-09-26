@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.swiper-pagination-bullet-active {
+  
+  background-color: #ED8936 !important;
+}
+
+.swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal {
+  bottom: 0px !important;
+  left: 0;
+  width: 100%;
+}
+
+.swiper-pagination-bullet {
+  transition: all 0.2s;
+}
+
+.swiper-pagination-bullet-active {
+  transition: all 0.2s;
+  border-radius: 5px !important;
+  width: 20px !important;
+}
+  
