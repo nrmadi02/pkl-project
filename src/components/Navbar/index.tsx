@@ -32,6 +32,7 @@ import NextLink from 'next/link';
 import { useState } from 'react';
 import { useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
+import ChakraNextLink from '../CakraLink';
 
 const Navbar: NextPage = () => {
   const toast = useToast()
@@ -53,7 +54,7 @@ const Navbar: NextPage = () => {
 
 
   return (
-    <div className='sticky top-0'>
+    <div className='sticky top-0 z-[99]'>
       <Flex
         bg={useColorModeValue('white', 'gray.800')}
         color={useColorModeValue('gray.600', 'white')}
@@ -154,19 +155,34 @@ const DesktopNav = () => {
       {NAV_ITEMS.map((navItem) => (
         <Box key={navItem.label}>
           <Popover trigger={'hover'} placement={'bottom-start'}>
-            <PopoverTrigger>
-              <Link
-                p={2}
-                fontSize={'sm'}
-                fontWeight={router.pathname == navItem.href ? 600 : 500}
-                color={router.pathname == navItem.href ? linkActiveColor : linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}>
-                {navItem.label}
-              </Link>
-            </PopoverTrigger>
+
+            {navItem.href == '/pelayanan' &&
+              <PopoverTrigger>
+                <Link
+                  p={2}
+                  fontSize={'sm'}
+                  fontWeight={router.pathname == navItem.href || ((router.pathname.startsWith('/bimbingan') || router.pathname.startsWith('/pinjam')) && navItem.href == "/pelayanan") ? 600 : 500}
+                  color={router.pathname == navItem.href || ((router.pathname.startsWith('/bimbingan') || router.pathname.startsWith('/pinjam')) && navItem.href == "/pelayanan") ? linkActiveColor : linkColor}
+                  _hover={{
+                    textDecoration: 'none',
+                    color: linkHoverColor,
+                  }}>
+                  {navItem.label}
+
+                </Link>
+              </PopoverTrigger>}
+            {navItem.href != '/pelayanan' && <ChakraNextLink
+              href={navItem.href}
+              p={2}
+              fontSize={'sm'}
+              fontWeight={router.pathname == navItem.href || ((router.pathname.startsWith('/bimbingan') || router.pathname.startsWith('/pinjam')) && navItem.href == "/pelayanan") ? 600 : 500}
+              color={router.pathname == navItem.href || ((router.pathname.startsWith('/bimbingan') || router.pathname.startsWith('/pinjam')) && navItem.href == "/pelayanan") ? linkActiveColor : linkColor}
+              _hover={{
+                textDecoration: 'none',
+                color: linkHoverColor,
+              }}>
+              {navItem.label}
+            </ChakraNextLink>}
 
             {navItem.children && (
               <PopoverContent
@@ -192,35 +208,36 @@ const DesktopNav = () => {
 
 const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
   return (
-    <Link
-      href={href}
-      role={'group'}
-      display={'block'}
-      p={2}
-      rounded={'md'}
-      _hover={{ bg: useColorModeValue('orange.50', 'gray.900') }}>
-      <Stack direction={'row'} align={'center'}>
-        <Box>
-          <Text
+    <NextLink href={href}>
+      <Link
+        role={'group'}
+        display={'block'}
+        p={2}
+        rounded={'md'}
+        _hover={{ bg: useColorModeValue('orange.50', 'gray.900') }}>
+        <Stack direction={'row'} align={'center'}>
+          <Box>
+            <Text
+              transition={'all .3s ease'}
+              _groupHover={{ color: 'orange.400' }}
+              fontWeight={600}>
+              {label}
+            </Text>
+            <Text fontSize={'sm'}>{subLabel}</Text>
+          </Box>
+          <Flex
             transition={'all .3s ease'}
-            _groupHover={{ color: 'orange.400' }}
-            fontWeight={600}>
-            {label}
-          </Text>
-          <Text fontSize={'sm'}>{subLabel}</Text>
-        </Box>
-        <Flex
-          transition={'all .3s ease'}
-          transform={'translateX(-10px)'}
-          opacity={0}
-          _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
-          justify={'flex-end'}
-          align={'center'}
-          flex={1}>
-          <Icon color={'orange.400'} w={5} h={5} as={ChevronRightIcon} />
-        </Flex>
-      </Stack>
-    </Link>
+            transform={'translateX(-10px)'}
+            opacity={0}
+            _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
+            justify={'flex-end'}
+            align={'center'}
+            flex={1}>
+            <Icon color={'orange.400'} w={5} h={5} as={ChevronRightIcon} />
+          </Flex>
+        </Stack>
+      </Link>
+    </NextLink>
   );
 };
 
@@ -242,30 +259,30 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
 
   return (
     <Stack spacing={4} onClick={children && onToggle}>
-      <Flex
-        py={2}
-        as={Link}
-        href={href ?? '#'}
-        justify={'space-between'}
-        align={'center'}
-        _hover={{
-          textDecoration: 'none',
-        }}>
-        <Text
-          fontWeight={600}
-          color={useColorModeValue('gray.600', 'gray.200')}>
-          {label}
-        </Text>
-        {children && (
-          <Icon
-            as={ChevronDownIcon}
-            transition={'all .25s ease-in-out'}
-            transform={isOpen ? 'rotate(180deg)' : ''}
-            w={6}
-            h={6}
-          />
-        )}
-      </Flex>
+      <NextLink href={href}>
+        <Flex
+          py={2}
+          justify={'space-between'}
+          align={'center'}
+          _hover={{
+            textDecoration: 'none',
+          }}>
+          <Text
+            fontWeight={600}
+            color={useColorModeValue('gray.600', 'gray.200')}>
+            {label}
+          </Text>
+          {children && (
+            <Icon
+              as={ChevronDownIcon}
+              transition={'all .25s ease-in-out'}
+              transform={isOpen ? 'rotate(180deg)' : ''}
+              w={6}
+              h={6}
+            />
+          )}
+        </Flex>
+      </NextLink>
 
       <Collapse in={isOpen} animateOpacity style={{ marginTop: '0!important' }}>
         <Stack
@@ -291,7 +308,7 @@ interface NavItem {
   label: string;
   subLabel?: string;
   children?: Array<NavItem>;
-  href?: string;
+  href: string;
 }
 
 const NAV_ITEMS: Array<NavItem> = [
@@ -305,22 +322,23 @@ const NAV_ITEMS: Array<NavItem> = [
       {
         label: 'Bimbingan BK',
         subLabel: 'Jadwalkan bimbingan siswa dengan BK',
-        href: '#',
+        href: '/bimbingan',
       },
       {
         label: 'Pinjam Buku',
         subLabel: 'Ajukan pinjaman buku di perpustakaan',
-        href: '#',
+        href: '/pinjam',
       },
     ],
+    href: '/pelayanan'
   },
   {
     label: 'Informasi',
-    href: '#',
+    href: '/informasi',
   },
   {
     label: 'Admin',
-    href: '#',
+    href: '/admin',
   },
 ];
 
