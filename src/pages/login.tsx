@@ -44,7 +44,7 @@ const Login: NextPage = () => {
         position: 'top-right',
         isClosable: true,
       })
-      router.replace("/")
+      router.push('/')
     }
   }, [router, toast]);
 
