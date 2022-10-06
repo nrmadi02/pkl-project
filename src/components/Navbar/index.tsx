@@ -35,6 +35,7 @@ import { useRouter } from 'next/router';
 import ChakraNextLink from '../CakraLink';
 
 const Navbar: NextPage = () => {
+  const router = useRouter()
   const toast = useToast()
   const { isOpen, onToggle } = useDisclosure();
   const { data } = useSession();
@@ -49,6 +50,7 @@ const Navbar: NextPage = () => {
       position: 'top-right',
       isClosable: true,
     })
+    router.replace('/')
     setLoading(false)
   }
 
@@ -259,7 +261,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
 
   return (
     <Stack spacing={4} onClick={children && onToggle}>
-      <NextLink href={href}>
+      {href != '/pelayanan' && <NextLink href={href}>
         <Flex
           py={2}
           justify={'space-between'}
@@ -269,7 +271,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
           }}>
           <Text
             fontWeight={600}
-            color={useColorModeValue('gray.600', 'gray.200')}>
+            color={'gray.600'}>
             {label}
           </Text>
           {children && (
@@ -282,7 +284,29 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
             />
           )}
         </Flex>
-      </NextLink>
+      </NextLink>}
+      {href == '/pelayanan' && <Flex
+        py={2}
+        justify={'space-between'}
+        align={'center'}
+        _hover={{
+          textDecoration: 'none',
+        }}>
+        <Text
+          fontWeight={600}
+          color={'gray.600'}>
+          {label}
+        </Text>
+        {children && (
+          <Icon
+            as={ChevronDownIcon}
+            transition={'all .25s ease-in-out'}
+            transform={isOpen ? 'rotate(180deg)' : ''}
+            w={6}
+            h={6}
+          />
+        )}
+      </Flex>}
 
       <Collapse in={isOpen} animateOpacity style={{ marginTop: '0!important' }}>
         <Stack
@@ -294,9 +318,9 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
           align={'start'}>
           {children &&
             children.map((child) => (
-              <Link key={child.label} py={2} href={child.href}>
+              <ChakraNextLink key={child.label} py={2} href={child.href}>
                 {child.label}
-              </Link>
+              </ChakraNextLink>
             ))}
         </Stack>
       </Collapse>
