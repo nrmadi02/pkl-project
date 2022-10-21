@@ -17,7 +17,6 @@ export const userRoutes = createRouter()
           ]
         },
       });
-
       if (exists) {
         throw new trpc.TRPCError({
           code: "CONFLICT",
@@ -25,12 +24,9 @@ export const userRoutes = createRouter()
         });
       }
       const hashedPassword = await hash(password);
-
       const result = await ctx.prisma.user.create({
         data: { email, name, nomorInduk, password: hashedPassword, role },
       }) as User;
-
-
       return {
         status: 201,
         message: "Account created successfully",
@@ -40,6 +36,26 @@ export const userRoutes = createRouter()
           nomor_induk: result.nomorInduk,
           role: result.role
         },
+      };
+    }
+  })
+  .query('getAllUsers', {
+    resolve: async ({ctx}) => {
+      const users = await ctx.prisma.user.findMany({
+        select: {
+          email: true,
+          id: true,
+          nomorInduk: true,
+          role: true,
+          updatedAt: true,
+          createdAt: true,
+          name: true
+        }
+      }) as User[]
+      return {
+        status: 200,
+        message: "Get all users",
+        result: users,
       };
     }
   })

@@ -3,7 +3,6 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { requireAuth } from "../common/requireAuth";
-import { trpc } from "../utils/trpc";
 import { useEffect } from 'react';
 import Navbar from "../components/Navbar";
 import SectionOne from "../components/Section/SectionOne";

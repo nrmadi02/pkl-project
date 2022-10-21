@@ -11,7 +11,8 @@ export const createUserSchema = object({
     'perpus',
     'wali',
     'bk',
-    'guru'
+    'guru',
+    'lab'
   ]),
 })
 
