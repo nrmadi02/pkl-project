@@ -37,7 +37,7 @@ const DataUsers: NextPage = () => {
     }),
   ]
 
-  const data = useMemo(() => getData(Users?.result), [Users]);
+  const data = useMemo(() => getData(Users?.result ? Users.result : []), [Users]);
 
   console.log(data)
 

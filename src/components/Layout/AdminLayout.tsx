@@ -58,8 +58,6 @@ const AdminLayout: NextPage<Props> = ({ children, breadcrumb, title }) => {
 
   const [loading, setLoading] = useState(false)
 
-  console.log(data)
-
   return (
     <>
       <Flex className="min-h-screen relative">
