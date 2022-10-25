@@ -11,6 +11,13 @@ export async function middleware(req: NextRequest) {
     if (!session) {
       return NextResponse.redirect(new URL('/login', req.url))
     }
+    return NextResponse.next()
+  }
+  if (req.nextUrl.pathname.startsWith('/admin')) {
+    if (!session) {
+      return NextResponse.redirect(new URL('/login', req.url))
+    }
+    return NextResponse.next()
   }
   if (req.nextUrl.pathname.startsWith('/pinjam')) {
     if (!session) {
@@ -28,5 +35,5 @@ export async function middleware(req: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/', '/login', '/bimbingan/:path*', '/pinjam/:path*'],
+  matcher: ['/', '/login', '/bimbingan/:path*', '/pinjam/:path*', '/admin/:path*'],
 }

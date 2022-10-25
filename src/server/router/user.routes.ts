@@ -1,3 +1,4 @@
+import { string, z } from 'zod';
 import { createRouter } from "./context";
 import { createUserSchema } from '../schema/user.schema';
 import { hash } from "argon2";
@@ -12,16 +13,16 @@ export const userRoutes = createRouter()
       const exists = await ctx.prisma.user.findFirst({
         where: {
           OR: [
-            {nomorInduk},
-            {email}
+            { nomorInduk },
+            { email }
           ]
         },
       });
       if (exists) {
-        throw new trpc.TRPCError({
-          code: "CONFLICT",
+        return {
+          code: "400",
           message: "User sudah terdaftar.",
-        });
+        };
       }
       const hashedPassword = await hash(password);
       const result = await ctx.prisma.user.create({
@@ -39,8 +40,25 @@ export const userRoutes = createRouter()
       };
     }
   })
+  .mutation('deleteUser', {
+    input: z.object({
+      id: z.string()
+    }),
+    resolve: async ({input, ctx}) => {
+      const deleteUser = await ctx.prisma.user.delete({
+        where: {
+          id: input.id
+        }
+      })
+      console.log(deleteUser)
+      return {
+        status: 200,
+        message: 'Success delete user',
+      }
+    }
+  })
   .query('getAllUsers', {
-    resolve: async ({ctx}) => {
+    resolve: async ({ ctx }) => {
       const users = await ctx.prisma.user.findMany({
         select: {
           email: true,

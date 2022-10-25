@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, chakra } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, chakra, Input, FormControl, FormLabel, Text, Button, Select } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import {
   useReactTable,
@@ -7,79 +7,202 @@ import {
   getCoreRowModel,
   ColumnDef,
   SortingState,
-  getSortedRowModel
+  getSortedRowModel,
+  Column,
+  Table as ReactTable,
+  ColumnFiltersState,
+  getFilteredRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFacetedMinMaxValues,
+  getPaginationRowModel,
+  sortingFns,
+  FilterFn,
+  SortingFn,
+  FilterFns,
 } from "@tanstack/react-table";
+import { useAsyncDebounce, useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from "react-table";
+import { NextPage } from "next";
+import { BeatLoader } from "react-spinners";
 
-export type DataTableProps<Data extends object> = {
-  data: Data[];
-  columns: ColumnDef<Data, any>[];
-};
+type Props = {
+  data: any
+  columns: any
+  isLoading: boolean
+}
 
-export function DataTable<Data extends object>({
+const DataTable: NextPage<Props> = ({
   data,
-  columns
-}: DataTableProps<Data>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const table = useReactTable({
-    columns,
-    data,
-    getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    state: {
-      sorting
-    }
-  });
+  columns,
+  isLoading
+}) => {
+
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    prepareRow,
+    page,
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+
+    state,
+    preGlobalFilteredRows,
+    setGlobalFilter
+  } =
+    useTable({
+      columns,
+      data,
+      initialState: {
+        pageSize: 5,
+      }
+    }, useFilters, useGlobalFilter, useSortBy, usePagination);
 
   return (
-    <Table>
-      <Thead>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <Tr key={headerGroup.id}>
-            {headerGroup.headers.map((header) => {
-              // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-              const meta: any = header.column.columnDef.meta;
-              return (
-                <Th
-                  key={header.id}
-                  onClick={header.column.getToggleSortingHandler()}
-                  isNumeric={meta?.isNumeric}
+    <div>
+      <div>
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+      </div>
+      <div className='p-5 overflow-auto mt-5 bg-white rounded shadow'>
+        <Table {...getTableProps()}>
+          <Thead>
+            {headerGroups.map((headerGroup) => (
+              <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
+                {headerGroup.headers.map((header, idx) => {
+                  // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                  return (
+                    <Th
+                      // key={idx}
+                      {...header.getHeaderProps(header.getSortByToggleProps())}
+                    >
+                      {header.render('Header')}
+                      <chakra.span pl="4">
+                        {header.isSorted ? (
+                          header.isSortedDesc ? (
+                            <TriangleDownIcon aria-label="sorted descending" />
+                          ) : (
+                            <TriangleUpIcon aria-label="sorted ascending" />
+                          )
+                        ) : null}
+                      </chakra.span>
+                    </Th>
+                  );
+                })}
+              </Tr>
+            ))}
+          </Thead>
+          <Tbody>
+            {isLoading ? (
+              <>
+                <Tr>
+                  <Td colSpan={columns?.length}>
+                    <BeatLoader color="#F6AD55" />
+                  </Td>
+                </Tr>
+              </>
+            ) : (
+              <>
+                {page.length == 0 &&
+                  <Tr>
+                    <Td textAlign={'center'} colSpan={columns?.length}>
+                      <p>Data tidak ada...</p>
+                    </Td>
+                  </Tr>}
+                {page.map((row, i) => {
+                  prepareRow(row);
+                  return (
+                    <Tr {...row.getRowProps()} key={i}>
+                      {row.cells.map((cell, idx) => {
+                        return <Td {...cell.getCellProps()} key={idx}>{cell.render("Cell")}</Td>;
+                      })}
+                    </Tr>
+                  );
+                })}
+              </>
+            )}
+          </Tbody>
+        </Table>
+      </div>
+      {page.length != 0 &&
+        <div className="pagination mt-3">
+          <div className="sm:hidden grid grid-cols-2">
+            <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">Previous</Button>
+            <Button roundedLeft={'none'} roundedRight='10px' bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => nextPage()} disabled={!canNextPage} className="cursor-pointer">Next</Button>
+          </div>
+          <div className="hidden sm:block">
+            <div className="flex justify-between">
+              <div className="flex gap-x-2 items-center">
+                <span className="text-sm w-[150px]">
+                  Page <span className="font-medium">{state.pageIndex + 1}</span> of <span className="font-medium">{pageOptions.length}</span>
+                </span>
+                <Select
+                  className="cursor-pointer"
+                  value={state.pageSize}
+                  bg='white'
+                  onChange={e => {
+                    setPageSize(Number(e.target.value))
+                  }}
                 >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-
-                  <chakra.span pl="4">
-                    {header.column.getIsSorted() ? (
-                      header.column.getIsSorted() === "desc" ? (
-                        <TriangleDownIcon aria-label="sorted descending" />
-                      ) : (
-                        <TriangleUpIcon aria-label="sorted ascending" />
-                      )
-                    ) : null}
-                  </chakra.span>
-                </Th>
-              );
-            })}
-          </Tr>
-        ))}
-      </Thead>
-      <Tbody>
-        {table.getRowModel().rows.map((row) => (
-          <Tr key={row.id}>
-            {row.getVisibleCells().map((cell) => {
-              // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-              const meta: any = cell.column.columnDef.meta;
-              return (
-                <Td key={cell.id} isNumeric={meta?.isNumeric}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </Td>
-              );
-            })}
-          </Tr>
-        ))}
-      </Tbody>
-    </Table>
+                  {[5, 10, 20].map(pageSize => (
+                    <option key={pageSize} value={pageSize}>
+                      Show {pageSize}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => gotoPage(0)} disabled={!canPreviousPage} className="cursor-pointer">«</Button>
+                <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">{'<'}</Button>
+                <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => nextPage()} disabled={!canNextPage} className="cursor-pointer">{'>'}</Button>
+                <Button roundedLeft={'none'} roundedRight='10px' rounded={'none'} bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className="cursor-pointer">»</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
   );
 }
+
+type PropsFilter = {
+  preGlobalFilteredRows: any,
+  globalFilter: any,
+  setGlobalFilter: any
+}
+
+const GlobalFilter: NextPage<PropsFilter> = ({
+  preGlobalFilteredRows,
+  globalFilter,
+  setGlobalFilter,
+}) => {
+  const count = preGlobalFilteredRows.length
+  const [value, setValue] = React.useState(globalFilter)
+  const onChange = useAsyncDebounce(value => {
+    setGlobalFilter(value || undefined)
+  }, 200)
+
+  return (
+    <>
+      <div className="flex flex-row gap-x-[20px] items-center">
+        <Text className="font-bold">Cari</Text>
+        <Input bg={'white'} borderColor={'orange.300'} borderWidth={2} w={{ base: 'full', md: '300px' }} value={value || ""} onChange={e => {
+          setValue(e.target.value);
+          onChange(e.target.value);
+        }} />
+      </div>
+    </>
+  )
+}
+
+
+export default DataTable
