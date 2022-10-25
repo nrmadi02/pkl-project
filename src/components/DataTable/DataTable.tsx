@@ -74,16 +74,17 @@ const DataTable: NextPage<Props> = ({
         />
       </div>
       <div className='p-5 overflow-auto mt-5 bg-white rounded shadow'>
-        <Table {...getTableProps()}>
-          <Thead>
-            {headerGroups.map((headerGroup) => (
-              <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
-                {headerGroup.headers.map((header, idx) => {
+        <table className="table w-full table-auto " {...getTableProps()}>
+          <thead className="text-gray-700 uppercase bg-gray-50">
+            {headerGroups.map((headerGroup, idx) => (
+              <tr {...headerGroup.getHeaderGroupProps()} key={idx}>
+                {headerGroup.headers.map((header, i) => {
                   // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                   return (
-                    <Th
-                      // key={idx}
+                    <th
+                      scope="col" className="py-3 px-6"
                       {...header.getHeaderProps(header.getSortByToggleProps())}
+                      key={header.id}
                     >
                       {header.render('Header')}
                       <chakra.span pl="4">
@@ -95,49 +96,49 @@ const DataTable: NextPage<Props> = ({
                           )
                         ) : null}
                       </chakra.span>
-                    </Th>
+                    </th>
                   );
                 })}
-              </Tr>
+              </tr>
             ))}
-          </Thead>
-          <Tbody>
+          </thead>
+          <tbody>
             {isLoading ? (
               <>
-                <Tr>
-                  <Td colSpan={columns?.length}>
+                <tr className="bg-white border-b">
+                  <td className="py-4 px-6" colSpan={columns?.length}>
                     <BeatLoader color="#F6AD55" />
-                  </Td>
-                </Tr>
+                  </td>
+                </tr>
               </>
             ) : (
               <>
                 {page.length == 0 &&
-                  <Tr>
-                    <Td textAlign={'center'} colSpan={columns?.length}>
+                  <tr className="bg-white border-b" >
+                    <td className="text-center py-4 px-6" colSpan={columns?.length}>
                       <p>Data tidak ada...</p>
-                    </Td>
-                  </Tr>}
+                    </td>
+                  </tr>}
                 {page.map((row, i) => {
                   prepareRow(row);
                   return (
-                    <Tr {...row.getRowProps()} key={i}>
+                    <tr className="bg-white border-b" {...row.getRowProps()} key={i}>
                       {row.cells.map((cell, idx) => {
-                        return <Td {...cell.getCellProps()} key={idx}>{cell.render("Cell")}</Td>;
+                        return <td className="py-4 px-6" {...cell.getCellProps()} key={idx}>{cell.render("Cell")}</td>;
                       })}
-                    </Tr>
+                    </tr>
                   );
                 })}
               </>
             )}
-          </Tbody>
-        </Table>
+          </tbody>
+        </table>
       </div>
       {page.length != 0 &&
         <div className="pagination mt-3">
           <div className="sm:hidden grid grid-cols-2">
-            <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">Previous</Button>
-            <Button roundedLeft={'none'} roundedRight='10px' bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => nextPage()} disabled={!canNextPage} className="cursor-pointer">Next</Button>
+            <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">Previous</Button>
+            <Button roundedLeft={'none'} roundedRight='10px' bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => nextPage()} disabled={!canNextPage} className="cursor-pointer">Next</Button>
           </div>
           <div className="hidden sm:block">
             <div className="flex justify-between">
@@ -161,10 +162,10 @@ const DataTable: NextPage<Props> = ({
                 </Select>
               </div>
               <div>
-                <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => gotoPage(0)} disabled={!canPreviousPage} className="cursor-pointer">«</Button>
-                <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">{'<'}</Button>
-                <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => nextPage()} disabled={!canNextPage} className="cursor-pointer">{'>'}</Button>
-                <Button roundedLeft={'none'} roundedRight='10px' rounded={'none'} bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className="cursor-pointer">»</Button>
+                <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => gotoPage(0)} disabled={!canPreviousPage} className="cursor-pointer">«</Button>
+                <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">{'<'}</Button>
+                <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => nextPage()} disabled={!canNextPage} className="cursor-pointer">{'>'}</Button>
+                <Button roundedLeft={'none'} roundedRight='10px' rounded={'none'} bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className="cursor-pointer">»</Button>
               </div>
             </div>
           </div>

@@ -80,7 +80,7 @@ const DataUsers: NextPage = () => {
     {
       Header: "Action",
       accessor: 'id',
-      Cell: (props: any) => <ActionTable value={props?.value} refetch={refetch} toast={toast} />,
+      Cell: (props: any) => <ActionTable key={props?.value} value={props?.value} refetch={refetch} toast={toast} />,
     }
   ], [Users?.result])
 
