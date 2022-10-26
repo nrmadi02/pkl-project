@@ -45,7 +45,7 @@ const Login: NextPage = () => {
         isClosable: true,
       })
       if(router.query?.referer){
-        router.push(router.query.referer?.toString() || '/')
+        router.replace(router.query.referer?.toString() || '/')
       } else {
         router.push('/')
       }
