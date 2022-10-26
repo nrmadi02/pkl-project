@@ -33,6 +33,8 @@ import { useState } from 'react';
 import { useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import ChakraNextLink from '../CakraLink';
+import Image from 'next/image';
+import Logo from '../../assets/logo/logo-smabat.png'
 
 const Navbar: NextPage = () => {
   const router = useRouter()
@@ -43,6 +45,7 @@ const Navbar: NextPage = () => {
 
   const handleLogOut = async () => {
     await signOut({ redirect: false })
+    setLoading(false)
     toast({
       title: 'Logout Berhasil',
       status: 'success',
@@ -50,8 +53,9 @@ const Navbar: NextPage = () => {
       position: 'top-right',
       isClosable: true,
     })
-    router.replace('/')
-    setLoading(false)
+    setTimeout(() => {
+      router.reload()
+    }, 1000)
   }
 
 
@@ -80,15 +84,19 @@ const Navbar: NextPage = () => {
             aria-label={'Toggle Navigation'}
           />
         </Flex>
-        <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-          <Text
-            textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-            fontFamily={'heading'}
-            color={useColorModeValue('gray.800', 'white')}
-            fontWeight={'bold'}
-          >
-            Logo
-          </Text>
+        <Flex flex={{ base: 1 }} alignItems='center' justify={{ base: 'center', md: 'start' }}>
+          <Flex alignItems='center' gap={['10px']}>
+            <Image layout='fixed' loading='lazy' width={40} height={40} src={Logo} alt="_logo" />
+            <Text
+              textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
+              fontFamily={'heading'}
+              color={useColorModeValue('gray.800', 'white')}
+              fontWeight={'bold'}
+              fontSize='20px'
+            >
+              SMABAT
+            </Text>
+          </Flex>
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={50}>
             <DesktopNav />

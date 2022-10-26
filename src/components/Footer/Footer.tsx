@@ -2,20 +2,33 @@ import {
   Box,
   chakra,
   Container,
+  Flex,
   Stack,
   Text,
+  useBreakpointValue,
   useColorModeValue,
   VisuallyHidden,
 } from '@chakra-ui/react';
 import { FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 import { ReactNode } from 'react';
 import { NextPage } from 'next';
+import Image from 'next/image';
+import LogoSmabat from '../../assets/logo/logo-smabat.png'
 
 const Logo = (props: any) => {
   return (
-    <Text fontFamily={'heading'}
-      color={useColorModeValue('gray.800', 'white')}
-      fontWeight={'bold'} >Logo</Text>
+    <Flex alignItems='center' gap={['10px']}>
+      <Image layout='fixed' loading='lazy' width={40} height={40} src={LogoSmabat} alt="_logo" />
+      {/* <Text
+        textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
+        fontFamily={'heading'}
+        color={useColorModeValue('gray.800', 'white')}
+        fontWeight={'bold'}
+        fontSize='20px'
+      >
+        SMABAT
+      </Text> */}
+    </Flex>
   );
 };
 

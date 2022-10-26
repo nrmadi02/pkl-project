@@ -44,7 +44,12 @@ const Login: NextPage = () => {
         position: 'top-right',
         isClosable: true,
       })
-      router.replace('/')
+      if(router.query?.referer){
+        router.push(router.query.referer?.toString() || '/')
+      } else {
+        router.push('/')
+      }
+      
     }
   }, [router, toast]);
 
@@ -55,6 +60,10 @@ const Login: NextPage = () => {
 
     return () => subs.unsubscribe()
   }, [watch])
+
+  useEffect(() => {
+    console.log(router.query)
+  }, [router])
 
   return (
     <>
