@@ -1,9 +1,27 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Grid, GridItem, Heading, Text } from '@chakra-ui/react';
-import { NextPage } from "next"
+import { GetServerSideProps, NextPage } from "next"
 import Head from "next/head"
 import { IoBook, IoPeople, IoSchool } from 'react-icons/io5';
 import AdminLayout from "../../components/Layout/AdminLayout"
 import { trpc } from '../../utils/trpc';
+import { getCookie } from 'cookies-next';
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const isDevelopment = process.env.NODE_ENV == "development"
+  const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', {req: ctx.req, res: ctx.res})
+  if(!token) {
+    return {
+      redirect: {
+        destination: "/login?referer=admin",
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {
+    }
+  }
+}
 
 const Admin: NextPage = () => {
   const { data: Users } = trpc.useQuery(['user.getAllUsers'])

@@ -1,8 +1,26 @@
 import { Box, Container, Divider, Flex, Heading, Image, Stack } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Navbar from "../../../components/Navbar";
+import { getCookie } from 'cookies-next';
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const isDevelopment = process.env.NODE_ENV == "development"
+  const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', {req: ctx.req, res: ctx.res})
+  if(!token) {
+    return {
+      redirect: {
+        destination: "/login?referer=pinjam",
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {
+    }
+  }
+}
 
 const DetailBuku: NextPage = () => {
   const { data } = useSession();

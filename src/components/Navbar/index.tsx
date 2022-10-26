@@ -53,9 +53,7 @@ const Navbar: NextPage = () => {
       position: 'top-right',
       isClosable: true,
     })
-    setTimeout(() => {
-      router.reload()
-    }, 1000)
+    router.replace('/')
   }
 
 

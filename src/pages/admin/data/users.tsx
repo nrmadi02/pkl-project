@@ -1,5 +1,5 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, FormControl, FormErrorMessage, FormLabel, Heading, IconButton, Input, InputGroup, InputRightElement, Select, useDisclosure, useToast } from '@chakra-ui/react';
-import { NextPage } from "next"
+import { GetServerSideProps, NextPage } from "next"
 import Head from "next/head"
 import DataTable from '../../../components/DataTable/DataTable';
 import AdminLayout from "../../../components/Layout/AdminLayout"
@@ -11,6 +11,24 @@ import DrawerForm from '../../../components/DrawerForm';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateUserInput, createUserSchema } from '../../../server/schema/user.schema';
 import { useForm } from "react-hook-form";
+import { getCookie } from 'cookies-next';
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const isDevelopment = process.env.NODE_ENV == "development"
+  const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', {req: ctx.req, res: ctx.res})
+  if(!token) {
+    return {
+      redirect: {
+        destination: "/login?referer=admin",
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {
+    }
+  }
+}
 
 const DataUsers: NextPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()

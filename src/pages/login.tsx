@@ -47,7 +47,7 @@ const Login: NextPage = () => {
       if(router.query?.referer){
         router.replace(router.query.referer?.toString() || '/')
       } else {
-        router.push('/')
+        router.replace('/')
       }
       
     }

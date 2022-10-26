@@ -1,5 +1,5 @@
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { requireAuth } from "../../common/requireAuth";
@@ -8,10 +8,28 @@ import { useEffect } from 'react';
 import Navbar from "../../components/Navbar";
 import FooterHome from "../../components/Footer/Footer";
 import SectionPinjam from "../../components/Section/SectionPinjam";
+import { getCookie } from 'cookies-next';
 
 // export const getServerSideProps = requireAuth(async (ctx) => {
 //   return { props: {} };
 // });
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const isDevelopment = process.env.NODE_ENV == "development"
+  const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', {req: ctx.req, res: ctx.res})
+  if(!token) {
+    return {
+      redirect: {
+        destination: "/login?referer=pinjam",
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {
+    }
+  }
+}
 
 
 const Pinjam: NextPage = () => {
