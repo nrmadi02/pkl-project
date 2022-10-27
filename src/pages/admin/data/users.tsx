@@ -15,8 +15,8 @@ import { getCookie } from 'cookies-next';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const isDevelopment = process.env.NODE_ENV == "development"
-  const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', {req: ctx.req, res: ctx.res})
-  if(!token) {
+  const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', { req: ctx.req, res: ctx.res })
+  if (!token) {
     return {
       redirect: {
         destination: "/login?referer=admin",
@@ -40,7 +40,9 @@ const DataUsers: NextPage = () => {
     mode: "onChange"
   });
 
-  const { data: Users, isLoading, refetch } = trpc.useQuery(['user.getAllUsers'])
+  const { data: Users, isLoading, refetch } = trpc.useQuery(['user.getAllUsers'], {
+    refetchOnWindowFocus: false
+  })
   const { mutateAsync } = trpc.useMutation(["user.create"]);
 
   const onSubmit = useCallback(
@@ -97,8 +99,9 @@ const DataUsers: NextPage = () => {
     },
     {
       Header: "Action",
-      accessor: 'id',
-      Cell: (props: any) => <ActionTable key={props?.value} value={props?.value} refetch={refetch} toast={toast} />,
+      accessor: (d: User) => {
+        return <ActionTable key={d?.id} value={d?.id} refetch={refetch} toast={toast} />
+      },
     }
   ], [Users?.result])
 
@@ -249,9 +252,9 @@ interface ActionValue {
   toast: any
 }
 
-const ActionTable = ({ value,refetch,toast }: ActionValue) => {
+const ActionTable = ({ value, refetch, toast }: ActionValue) => {
   const [delLoading, setDelLoading] = useState(false)
-  const { mutateAsync: deleteUser, isLoading: deleteLoading  } = trpc.useMutation(['user.deleteUser'])
+  const { mutateAsync: deleteUser, isLoading: deleteLoading } = trpc.useMutation(['user.deleteUser'])
 
   const handleDeleteUser = useCallback(
     async (id: string) => {
@@ -260,7 +263,7 @@ const ActionTable = ({ value,refetch,toast }: ActionValue) => {
       })
       if (delUser.status === 200) {
         toast({
-          title: 'Hapus data use berhasil',
+          title: 'Hapus data user berhasil',
           status: 'success',
           duration: 3000,
           position: 'top-right',

@@ -20,8 +20,8 @@ export const userRoutes = createRouter()
       });
       if (exists) {
         return {
-          code: "400",
-          message: "User sudah terdaftar.",
+          status: "400",
+          message: "User sudah terdaftar",
         };
       }
       const hashedPassword = await hash(password);
@@ -30,7 +30,7 @@ export const userRoutes = createRouter()
       }) as User;
       return {
         status: 201,
-        message: "Account created successfully",
+        message: "User berhasil ditambahkan",
         result: {
           email: result.email,
           nama: result.name,
@@ -50,10 +50,9 @@ export const userRoutes = createRouter()
           id: input.id
         }
       })
-      console.log(deleteUser)
       return {
         status: 200,
-        message: 'Success delete user',
+        message: 'User berhasil dihapus',
       }
     }
   })
@@ -72,7 +71,7 @@ export const userRoutes = createRouter()
       }) as User[]
       return {
         status: 200,
-        message: "Get all users",
+        message: "Get all data user berhasil",
         result: users,
       };
     }

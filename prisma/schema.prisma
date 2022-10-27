@@ -31,6 +31,24 @@ model User {
     @@map(name: "users")
 }
 
+model Kelas {
+    id String @id @default(uuid())
+    name String @db.VarChar(255)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map(name: "kelas")
+}
+
+model Periode {
+    id String @id @default(uuid())
+    periode String @unique @db.VarChar(255)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map(name: "periode")
+}
+
 enum RoleEnumType {
     siswa
     admin

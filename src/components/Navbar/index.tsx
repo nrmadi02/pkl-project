@@ -56,7 +56,6 @@ const Navbar: NextPage = () => {
     router.replace('/')
   }
 
-
   return (
     <div className='sticky top-0 z-[99]'>
       <Flex

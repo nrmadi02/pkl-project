@@ -66,7 +66,7 @@ const AdminLayout: NextPage<Props> = ({ children, breadcrumb, title }) => {
             <div className={`flex flex-col w-[300px] fixed transition-al`}>
               <div className="flex flex-col items-center relative">
                 <p className='font-bold text-[25px] mt-[20px]'>SMABAT</p>
-                <Image width={100} height={100} src={Logo} alt="_logo" />
+                <Image width={80} height={80} src={Logo} alt="_logo" />
                 <Divider mt={'20px'}></Divider>
                 <ItemSidebar />
               </div>
@@ -86,7 +86,7 @@ const AdminLayout: NextPage<Props> = ({ children, breadcrumb, title }) => {
             <DrawerBody>
               <div className="flex flex-col items-center relative">
                 <p className='font-bold text-[25px] mt-[20px]'>SMABAT</p>
-                <Image width={100} height={100} src={Logo} alt="_logo" />
+                <Image width={80} height={80} src={Logo} alt="_logo" />
                 <Divider mt={'20px'}></Divider>
                 <ItemSidebar />
               </div>

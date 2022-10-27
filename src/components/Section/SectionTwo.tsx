@@ -6,7 +6,7 @@ const SectionTwo: NextPage = () => {
     <Container maxW={'5xl'} mt={10} pb={10}>
       <Heading textAlign={'center'}>Pusat Informasi</Heading>
       <Flex flexDirection={'column'} width='full' alignItems={'center'}>
-        <SimpleGrid maxW={'2xl'} p={5} mt={{ base: 5, md: 10 }} shadow="md" rounded={8} backgroundColor={'gray.100'} columns={{ base: 1, md: 2 }} spacing={5}>
+        <SimpleGrid maxW={'2xl'} p={5} mt={{ base: 5, md: 10 }} shadow="md" rounded={8} columns={{ base: 1, md: 2 }} spacing={5}>
           <Flex>
             <Image rounded={5}
               alt={'feature image'}
@@ -45,7 +45,7 @@ const SectionTwo: NextPage = () => {
             </Flex>
           </Flex>
         </SimpleGrid>
-        <SimpleGrid maxW={'2xl'} p={5} mt={{ base: 5, md: 10 }} shadow="md" rounded={8} backgroundColor={'gray.100'} columns={{ base: 1, md: 2 }} spacing={5}>
+        <SimpleGrid maxW={'2xl'} p={5} mt={{ base: 5, md: 10 }} shadow="md" rounded={8} columns={{ base: 1, md: 2 }} spacing={5}>
           <Flex>
             <Image rounded={5}
               alt={'feature image'}
@@ -84,7 +84,7 @@ const SectionTwo: NextPage = () => {
             </Flex>
           </Flex>
         </SimpleGrid>
-        <SimpleGrid maxW={'2xl'} p={5} mt={{ base: 5, md: 10 }} shadow="md" rounded={8} backgroundColor={'gray.100'} columns={{ base: 1, md: 2 }} spacing={5}>
+        <SimpleGrid maxW={'2xl'} p={5} mt={{ base: 5, md: 10 }} shadow="md" rounded={8} columns={{ base: 1, md: 2 }} spacing={5}>
           <Flex>
             <Image rounded={5}
               alt={'feature image'}

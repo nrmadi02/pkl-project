@@ -2,7 +2,7 @@ import { Flex, Heading, Icon, Stack, Text } from "@chakra-ui/react"
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactElement } from "react";
-import { IoHome, IoPeople, IoSchool } from "react-icons/io5";
+import { IoHome, IoPeople, IoSchool, IoSettings, IoTime } from "react-icons/io5";
 
 interface FeatureProps {
   text: string;
@@ -56,11 +56,25 @@ const adminItems = [
         url: '/admin/data/guru'
       },
       {
-        icon: IoSchool,
+        icon: IoPeople,
         title: 'Siswa',
         url: '/admin/data/siswa'
       },
-
+      {
+        icon: IoSchool,
+        title: 'Kelas',
+        url: '/admin/data/kelas'
+      },
+    ]
+  },
+  {
+    heading: 'Pengaturan',
+    menu: [
+      {
+        icon: IoSettings,
+        title: 'Umum',
+        url: '/admin/pengaturan/umum'
+      },
     ]
   }
 ]
