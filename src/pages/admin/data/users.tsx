@@ -233,7 +233,7 @@ const DataUsers: NextPage = () => {
                   {/* <option value='wali'>Wali</option> */}
                 </Select>
                 <FormErrorMessage>
-                  {errors.role && "Role harus di"}
+                  {errors.role && "Role harus di isi"}
                 </FormErrorMessage>
               </FormControl>
             </form>

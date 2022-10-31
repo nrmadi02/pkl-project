@@ -25,6 +25,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
 const Admin: NextPage = () => {
   const { data: Users } = trpc.useQuery(['user.getAllUsers'])
+  const { data: Guru } = trpc.useQuery(['guru.getAll'])
 
   return (
     <AdminLayout title='Dashboard' breadcrumb={(
@@ -52,7 +53,7 @@ const Admin: NextPage = () => {
               <ItemInfo icon={<IoSchool color='white' size='25px' />} amount={'20'} title={'Total Siswa'} />
             </GridItem>
             <GridItem w='100%'>
-              <ItemInfo icon={<IoSchool color='white' size='25px' />} amount={'10'} title={'Total Guru'} />
+              <ItemInfo icon={<IoSchool color='white' size='25px' />} amount={Guru?.result.length.toString()} title={'Total Guru'} />
             </GridItem>
             <GridItem w='100%'>
               <ItemInfo icon={<IoBook color='white' size='25px' />} amount={'13'} title={'Total Buku'} />

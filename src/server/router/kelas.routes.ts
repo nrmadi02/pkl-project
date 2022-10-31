@@ -1,6 +1,6 @@
 import { Kelas } from "@prisma/client";
-import { string } from "zod";
-import { createKelasSchema } from "../schema/kelas.schema";
+import { object, string } from "zod";
+import { createKelasSchema, updateKelasSchema } from "../schema/kelas.schema";
 import { createRouter } from "./context";
 
 export const kelasRoutes = createRouter()
@@ -37,7 +37,7 @@ export const kelasRoutes = createRouter()
     })
     .mutation('delete', {
         input: string(),
-        resolve:async ({ctx, input}) => {
+        resolve: async ({ ctx, input }) => {
             const deleteKelas = await ctx.prisma.kelas.delete({
                 where: {
                     id: input
@@ -47,11 +47,30 @@ export const kelasRoutes = createRouter()
             return {
                 status: 200,
                 message: 'Kelas berhasil dihapus',
-              }
+            }
+        }
+    })
+    .mutation('update', {
+        input: updateKelasSchema,
+        resolve: async ({ ctx, input }) => {
+            const updateKelas = await ctx.prisma.kelas.update({
+                where: {
+                    id: input.id
+                },
+                data: {
+                    name: input.name
+                }
+            }) as Kelas
+
+            return {
+                status: 200,
+                message: 'Kelas berhasil diubah',
+            }
+
         }
     })
     .query('getAll', {
-        resolve:async ({ctx}) => {
+        resolve: async ({ ctx }) => {
             const allKelas = await ctx.prisma.kelas.findMany({
                 orderBy: {
                     name: 'asc'

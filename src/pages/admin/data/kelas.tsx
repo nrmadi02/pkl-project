@@ -1,14 +1,14 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, FormControl, FormErrorMessage, FormLabel, Heading, IconButton, Input, Popover, PopoverArrow, PopoverCloseButton, PopoverContent, PopoverTrigger, useDisclosure, useToast } from "@chakra-ui/react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, IconButton, Input, Popover, PopoverArrow, PopoverCloseButton, PopoverContent, PopoverTrigger, useDisclosure, useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Kelas } from "@prisma/client";
 import { NextPage } from "next";
 import Head from "next/head";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { IoAdd, IoTrash } from "react-icons/io5";
+import { IoAdd, IoPencil, IoTrash } from "react-icons/io5";
 import DataTable from "../../../components/DataTable/DataTable";
 import AdminLayout from "../../../components/Layout/AdminLayout";
-import { createKelasSchema, CreateKelasSchema } from "../../../server/schema/kelas.schema";
+import { createKelasSchema, CreateKelasSchema, UpdateKelasSchema, updateKelasSchema } from "../../../server/schema/kelas.schema";
 import { trpc } from "../../../utils/trpc";
 
 const KelasData: NextPage = () => {
@@ -66,14 +66,14 @@ const KelasData: NextPage = () => {
         {
             Header: "Action",
             accessor: (d: Kelas) => {
-                return <ActionTable key={d.id} value={d?.id} refetch={refetch} toast={toast} />
+                return <ActionTable key={d.id} value={d?.id} name={d?.name} refetch={refetch} toast={toast} />
             },
         }
     ], [Kelas?.result])
 
     const data = useMemo(() => getData(Kelas?.result ? Kelas.result : []), [Kelas])
     return (
-        <AdminLayout title='Users' breadcrumb={(
+        <AdminLayout title='Kelas' breadcrumb={(
             <Breadcrumb>
                 <BreadcrumbItem>
                     <BreadcrumbLink href='#'>Pendataan</BreadcrumbLink>
@@ -153,12 +153,50 @@ export default KelasData
 interface ActionValue {
     value: any,
     refetch: any,
-    toast: any
+    toast: any,
+    name: any
 }
 
-const ActionTable = ({ value, refetch, toast }: ActionValue) => {
+const ActionTable = ({ value, name, refetch, toast }: ActionValue) => {
+    const { onOpen, onClose, isOpen } = useDisclosure()
+    const firstFieldRef = useRef(null)
     const [delLoading, setDelLoading] = useState(false)
+    const { register, handleSubmit, watch, formState: { errors, isSubmitting, isDirty, isValid } } = useForm<UpdateKelasSchema>({
+        resolver: zodResolver(updateKelasSchema),
+        mode: "onChange"
+    });
+
     const { mutateAsync: hapusKelas, isLoading: deleteLoading } = trpc.useMutation(['kelas.delete'])
+    const { mutateAsync: ubahKelas } = trpc.useMutation(['kelas.update'])
+
+    const handleUpdateKelas = useCallback(
+        async (d: UpdateKelasSchema) => {
+            const delUser = await ubahKelas({
+                id: d.id,
+                name: d.name
+            })
+            if (delUser.status === 200) {
+                toast({
+                    title: 'Edit data kelas berhasil',
+                    status: 'success',
+                    duration: 3000,
+                    position: 'top-right',
+                    isClosable: true,
+                })
+                refetch()
+                setDelLoading(false)
+            } else {
+                toast({
+                    title: 'Edit data kelas gagal',
+                    status: 'error',
+                    duration: 3000,
+                    position: 'top-right',
+                    isClosable: true,
+                })
+                setDelLoading(false)
+            }
+        }, []
+    )
 
     const handleDeleteKelas = useCallback(
         async (id: string) => {
@@ -186,7 +224,67 @@ const ActionTable = ({ value, refetch, toast }: ActionValue) => {
         }, []
     )
     return (
-        <>
+        <Flex alignItems={'center'} gap={'2'}>
+            <Popover
+                isOpen={isOpen}
+                initialFocusRef={firstFieldRef}
+                onOpen={onOpen}
+                onClose={onClose}
+                placement='start-start'
+                closeOnBlur={false}
+            >
+                <PopoverTrigger>
+                    <IconButton
+                        isLoading={delLoading}
+                        variant='outline'
+                        colorScheme='orange'
+                        aria-label='edit'
+                        fontSize='20px'
+                        onClick={async () => {
+                            onOpen()
+                        }}
+                        icon={<IoPencil />}
+                    />
+                </PopoverTrigger>
+                <PopoverContent p={5}>
+                    <PopoverArrow />
+                    <PopoverCloseButton />
+                    <form onSubmit={handleSubmit(handleUpdateKelas)}>
+                        <Input
+                            // ref={firstFieldRef}
+                            type={'hidden'}
+                            bg={'white'} borderColor={'orange.300'} borderWidth={1}
+                            id='id'
+                            defaultValue={value}
+                            placeholder='Edit nama kelas'
+                            {...register('id')}
+                        />
+                        <FormControl isInvalid={errors.name != undefined}>
+                            <FormLabel htmlFor='name'>Nama kelas</FormLabel>
+                            <Input
+                                // ref={firstFieldRef}
+                                bg={'white'} borderColor={'orange.300'} borderWidth={1}
+                                id='name'
+                                defaultValue={name}
+                                placeholder='Edit nama kelas'
+                                {...register('name')}
+                            />
+                            <FormErrorMessage>
+                                {errors.name && errors.name.message}
+                            </FormErrorMessage>
+                        </FormControl>
+                        <Button disabled={!isValid} isLoading={isSubmitting} type='submit' fontWeight={600}
+                            color={'white'}
+                            bg={'orange.400'}
+                            _hover={{
+                                bg: 'orange.300',
+                            }} mt={'10px'}>
+                            Update
+                        </Button>
+                    </form>
+                </PopoverContent>
+            </Popover>
+
             <IconButton
                 isLoading={delLoading}
                 variant='outline'
@@ -199,6 +297,7 @@ const ActionTable = ({ value, refetch, toast }: ActionValue) => {
                 }}
                 icon={<IoTrash />}
             />
-        </>
+
+        </Flex>
     )
 }

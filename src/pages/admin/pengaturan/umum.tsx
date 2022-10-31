@@ -59,7 +59,7 @@ const PengaturanUmum: NextPage = () => {
     }, [Periode])
 
     return (
-        <AdminLayout title='Users' breadcrumb={(
+        <AdminLayout title='Umum' breadcrumb={(
             <Breadcrumb>
                 <BreadcrumbItem>
                     <BreadcrumbLink href='#'>Pengaturan</BreadcrumbLink>
@@ -96,7 +96,7 @@ const PengaturanUmum: NextPage = () => {
                                 </FormControl>
                                 <Button disabled={!isValid} isLoading={isSubmitting} type='submit' fontWeight={600}
                                     color={'white'}
-                                    bg={'orange.400'}
+                                    bg={'orange.400'} 
                                     _hover={{
                                         bg: 'orange.300',
                                     }} mt={'10px'}>
