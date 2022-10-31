@@ -27,12 +27,12 @@ const DataGuru: NextPage = () => {
     const handleChangeFile = (e: any) => {
         e.target?.files[0] && setFile(URL.createObjectURL(e.target?.files[0]))
         if (e.target?.files) {
-            var filereader = new FileReader();
+            let filereader = new FileReader();
             filereader.readAsDataURL(e.target?.files[0]);
             filereader.onload = function (evt) {
-                var base64 = evt.target?.result;
-                setImg(e.target?.files[0]!)
-                setValue("potoProfile", base64?.toString()!)
+                let base64 = evt.target?.result;
+                setImg(e.target?.files[0])
+                setValue("potoProfile", String(base64))
             }
         }
     }
