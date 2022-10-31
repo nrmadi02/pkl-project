@@ -24,20 +24,15 @@ const DataGuru: NextPage = () => {
     });
     const [onCheck, setOnCheck] = useState(false)
 
-    const handleChangeFile = (e: ChangeEvent<HTMLInputElement>) => {
-        let reader = new FileReader();
-        // @ts-ignore
+    const handleChangeFile = (e: any) => {
         e.target?.files[0] && setFile(URL.createObjectURL(e.target?.files[0]))
-        // @ts-ignore
-        if (e.target?.files[0]!) {
+        if (e.target?.files) {
             var filereader = new FileReader();
             filereader.readAsDataURL(e.target?.files[0]);
             filereader.onload = function (evt) {
                 var base64 = evt.target?.result;
-                // @ts-ignore
                 setImg(e.target?.files[0]!)
-                // @ts-ignore
-                setValue("potoProfile", base64)
+                setValue("potoProfile", base64?.toString()!)
             }
         }
     }
@@ -231,9 +226,7 @@ const DataGuru: NextPage = () => {
                                     <FormLabel htmlFor='namaKelas'>Pilih Kelas</FormLabel>
                                     <Select bg={'white'} borderColor={'orange.300'} borderWidth={1} id='namaKelas' placeholder='Pilih kelas' {...register('namaKelas')}>
                                         {dataKelas && dataKelas.result.map((itm, idx) => {
-                                            return (
-                                                <option value={itm.name}>{itm.name}</option>
-                                            )
+                                            return <option key={idx} value={itm.name}>{itm.name}</option>
                                         })}
                                     </Select>
                                     <FormErrorMessage>
