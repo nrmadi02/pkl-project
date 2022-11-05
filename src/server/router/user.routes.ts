@@ -44,12 +44,18 @@ export const userRoutes = createRouter()
     input: z.object({
       id: z.string()
     }),
-    resolve: async ({input, ctx}) => {
-      const deleteUser = await ctx.prisma.user.delete({
+    resolve: async ({ input, ctx }) => {
+      const deleteGuru = ctx.prisma.guru.deleteMany({
+        where: {
+          userID: input.id
+        }
+      })
+      const deleteUser = ctx.prisma.user.delete({
         where: {
           id: input.id
         }
       })
+      await ctx.prisma.$transaction([deleteGuru, deleteUser])
       return {
         status: 200,
         message: 'User berhasil dihapus',

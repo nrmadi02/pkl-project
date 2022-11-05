@@ -26,6 +26,7 @@ model User {
     role     RoleEnumType? @default(siswa)
 
     guru Guru?
+    siswa Siswa?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -51,6 +52,24 @@ model Guru {
     updatedAt DateTime @updatedAt
 
     @@map(name: "guru")
+}
+
+model Siswa {
+    id String @id @default(uuid())
+    nama String @db.VarChar(255)
+    nis String @unique @db.VarChar(255)
+    email String @unique @db.VarChar(255)
+    jenisKelamin String @db.VarChar(255)
+    fotoProfile String? @db.Text()
+    kelas String? @db.VarChar(255)
+
+    user   User @relation(fields: [userID], references: [id])
+    userID String  @unique
+    
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map(name: "siswa")
 }
 
 model Kelas {

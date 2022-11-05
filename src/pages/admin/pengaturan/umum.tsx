@@ -1,5 +1,5 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input, useToast } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { useForm } from "react-hook-form";
@@ -7,6 +7,24 @@ import { createPeriodeSchema, CreatePeriodeSchema } from "../../../server/schema
 import { zodResolver } from "@hookform/resolvers/zod";
 import { trpc } from "../../../utils/trpc";
 import { useCallback, useEffect } from "react";
+import { getCookie } from "cookies-next";
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+    const isDevelopment = process.env.NODE_ENV == "development"
+    const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', {req: ctx.req, res: ctx.res})
+    if(!token) {
+      return {
+        redirect: {
+          destination: "/login?referer=admin",
+          permanent: false,
+        },
+      };
+    }
+    return {
+      props: {
+      }
+    }
+  }
 
 const PengaturanUmum: NextPage = () => {
     const toast = useToast()

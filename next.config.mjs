@@ -22,7 +22,8 @@ export default defineNextConfig({
   },
   images: {
     domains: [
-      'res.cloudinary.com'
+      'res.cloudinary.com',
+      'ui-avatars.com'
     ],
 },
 });

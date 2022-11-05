@@ -1,7 +1,8 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, IconButton, Input, Popover, PopoverArrow, PopoverCloseButton, PopoverContent, PopoverTrigger, useDisclosure, useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Kelas } from "@prisma/client";
-import { NextPage } from "next";
+import { getCookie } from "cookies-next";
+import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,6 +11,23 @@ import DataTable from "../../../components/DataTable/DataTable";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { createKelasSchema, CreateKelasSchema, UpdateKelasSchema, updateKelasSchema } from "../../../server/schema/kelas.schema";
 import { trpc } from "../../../utils/trpc";
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+    const isDevelopment = process.env.NODE_ENV == "development"
+    const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', { req: ctx.req, res: ctx.res })
+    if (!token) {
+      return {
+        redirect: {
+          destination: "/login?referer=admin",
+          permanent: false,
+        },
+      };
+    }
+    return {
+      props: {
+      }
+    }
+  }
 
 const KelasData: NextPage = () => {
     const { onOpen, onClose, isOpen } = useDisclosure()
@@ -140,7 +158,7 @@ const KelasData: NextPage = () => {
                             </PopoverContent>
                         </Popover>
                     </div>
-                    <DataTable columns={columns} data={data} isLoading={isLoading} />
+                    <DataTable hiddenColumns={[]} columns={columns} data={data} isLoading={isLoading} />
                 </div>
             </>
         </AdminLayout>

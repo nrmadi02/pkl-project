@@ -143,7 +143,7 @@ const DataUsers: NextPage = () => {
               Tambah data
             </Button>
           </div>
-          <DataTable isLoading={isLoading} columns={columns} data={data} />
+          <DataTable hiddenColumns={[]} isLoading={isLoading} columns={columns} data={data} />
         </div>
         <DrawerForm btnRef={btnRef} isOpen={isOpen} onClose={onClose} bottomButtons={
           <>

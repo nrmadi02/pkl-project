@@ -1,15 +1,15 @@
 import { createGuruSchema, updateGuruSchema } from './../schema/guru.schema';
 import { createRouter } from "./context";
-import { z } from "zod";
+import { string, z } from "zod";
 import { hash } from 'argon2';
-import { Guru } from '@prisma/client';
+import { Guru, Siswa, User } from '@prisma/client';
 import cloudinary from "cloudinary"
+import { createSiswaSchema, updateSiswaSchema, uploadSiswaSchema } from '../schema/siswa.schema';
 
-export const guruRoutes = createRouter()
+export const siswaRoutes = createRouter()
     .mutation('create', {
-        input: createGuruSchema,
-        resolve: async ({ ctx, input }) => {
-
+        input: createSiswaSchema,
+        resolve: async ({ input, ctx }) => {
             cloudinary.v2.config({
                 api_key: '596333455586164',
                 cloud_name: 'dw4pgfxml',
@@ -24,60 +24,65 @@ export const guruRoutes = createRouter()
                 dataFoto = result.secure_url
             }
 
-            const existGuru = await ctx.prisma.guru.findFirst({
+            const existSiswa = await ctx.prisma.siswa.findFirst({
                 where: {
                     OR: {
-                        nip: input.nip,
+                        nis: input.nis,
                         email: input.email
                     }
                 }
             })
 
-            if (existGuru) {
+            if (existSiswa) {
                 return {
                     status: "400",
-                    message: "Guru sudah ada",
+                    message: "Siswa sudah ada",
                 };
             }
 
-            const hashedPassword = await hash(input.nip);
+            const hashedPassword = await hash(input.nis);
 
-            const tambahGuru = await ctx.prisma.guru.create({
+            const tambahSiswa = await ctx.prisma.siswa.create({
                 data: {
                     email: input.email,
-                    jenisGuru: input.jenisGuru,
                     nama: input.nama,
-                    nip: input.nip,
+                    nis: input.nis,
                     jenisKelamin: input.jenisKelamin,
-                    waliKelas: input.waliKelas,
-                    namaKelas: input.waliKelas ? input.namaKelas : "",
+                    kelas: input.kelas,
                     fotoProfile: dataFoto ? dataFoto : null,
                     user: {
                         create: {
                             email: input.email,
                             name: input.nama,
-                            nomorInduk: input.nip,
+                            nomorInduk: input.nis,
                             password: hashedPassword,
-                            role: 'guru',
+                            role: 'siswa',
                         },
                     }
                 }
-            }) as Guru
+            }) as Siswa
 
             return {
                 status: 201,
-                message: "Guru berhasil ditambahkan",
-                result: tambahGuru,
+                message: "Siswa berhasil ditambahkan",
+                result: tambahSiswa,
             };
         }
     })
     .query('getAll', {
+        input: z.string(),
         resolve: async ({ ctx, input }) => {
-            const dataGuru = await ctx.prisma.guru.findMany() as Guru[]
+            const dataSiswa = input ? await ctx.prisma.siswa.findMany({
+                where: {
+                    OR: {
+                        kelas: input
+                    }
+                }
+            }) as Siswa[] : await ctx.prisma.siswa.findMany() as Siswa[]
             return {
                 status: 200,
-                message: "Data guru berhasil diambil",
-                result: dataGuru
+                message: "Data siswa berhasil diambil",
+                result: dataSiswa
             };
         }
     })
@@ -86,45 +91,45 @@ export const guruRoutes = createRouter()
             id: z.string()
         }),
         resolve: async ({ input, ctx }) => {
-            const guruByID = await ctx.prisma.guru.findFirst({
+            const siswaByID = await ctx.prisma.siswa.findFirst({
                 where: {
                     id: input.id
                 }
             })
-            const deleteGuru = ctx.prisma.guru.delete({
+            const deleteSiswa = ctx.prisma.siswa.delete({
                 where: {
                     id: input.id
                 }
             })
             const deleteUser = ctx.prisma.user.delete({
                 where: {
-                    id: guruByID?.userID
+                    id: siswaByID?.userID
                 }
             })
-            await ctx.prisma.$transaction([deleteGuru, deleteUser])
+            await ctx.prisma.$transaction([deleteSiswa, deleteUser])
             return {
                 status: 200,
-                message: 'Guru berhasil dihapus',
+                message: 'Siswa berhasil dihapus',
             }
         }
     })
     .query('getByID', {
         input: z.string(),
         resolve: async ({ ctx, input }) => {
-            const guruByID = await ctx.prisma.guru.findFirst({
+            const siswaByID = await ctx.prisma.siswa.findFirst({
                 where: {
                     id: input
                 }
             })
             return {
                 status: 200,
-                message: "Data guru berhasil diambil",
-                result: guruByID
+                message: "Data siswa berhasil diambil",
+                result: siswaByID
             };
         }
     })
     .mutation('update', {
-        input: updateGuruSchema,
+        input: updateSiswaSchema,
         resolve: async ({ ctx, input }) => {
 
             cloudinary.v2.config({
@@ -141,43 +146,76 @@ export const guruRoutes = createRouter()
                 dataFoto = result.secure_url
             }
 
-            const existGuru = await ctx.prisma.guru.findFirst({
+            const existSiswa = await ctx.prisma.siswa.findFirst({
                 where: {
                     id: input.id
                 }
             })
 
-            const hashedPassword = await hash(input.nip);
+            const hashedPassword = await hash(input.nis);
 
-            const tambahGuru = await ctx.prisma.guru.update({
+            const updateSiswa = await ctx.prisma.siswa.update({
                 where: {
                     id: input.id
                 },
                 data: {
                     email: input.email,
-                    jenisGuru: input.jenisGuru,
                     nama: input.nama,
-                    nip: input.nip,
+                    nis: input.nis,
                     jenisKelamin: input.jenisKelamin,
-                    waliKelas: input.waliKelas,
-                    namaKelas: input.waliKelas ? input.namaKelas : "",
-                    fotoProfile: dataFoto ? dataFoto : existGuru?.fotoProfile,
+                    kelas: input.kelas,
+                    fotoProfile: dataFoto ? dataFoto : existSiswa?.fotoProfile,
                     user: {
                         update: {
                             email: input.email,
                             name: input.nama,
-                            nomorInduk: input.nip,
+                            nomorInduk: input.nis,
                             password: hashedPassword,
                         },
                     }
                 }
-            }) as Guru
+            }) as Siswa
 
             return {
                 status: 200,
-                message: "Guru berhasil diubah",
-                result: tambahGuru,
+                message: "Data siswa berhasil diubah",
+                result: updateSiswa,
             };
         }
     })
+    .mutation("createBulk", {
+        input: uploadSiswaSchema,
+        resolve: async ({ ctx, input }) => {
+            const insertData = async () => {
+                input.data.map(async (itm) => {
+                    const hashedPassword = await hash(itm.nis);
+                    const _ = await ctx.prisma.siswa.create({
+                        data: {
+                            email: itm.email,
+                            nama: itm.nama,
+                            nis: itm.nis,
+                            jenisKelamin: itm.jenisKelamin,
+                            kelas: input.kelas,
+                            fotoProfile: null,
+                            user: {
+                                create: {
+                                    email: itm.email,
+                                    name: itm.nama,
+                                    nomorInduk: itm.nis,
+                                    password: hashedPassword,
+                                    role: 'siswa',
+                                },
+                            }
+                        }
+                    })
+                })
+                Promise.resolve("sukses")
+            }
 
+            await insertData()
+            return {
+                status: 201,
+                message: "Siswa berhasil ditambahkan",
+            }
+        }
+    })

@@ -28,13 +28,15 @@ import { BeatLoader } from "react-spinners";
 type Props = {
   data: any
   columns: any
-  isLoading: boolean
+  isLoading: boolean,
+  hiddenColumns?: string[]
 }
 
 const DataTable: NextPage<Props> = ({
   data,
   columns,
-  isLoading
+  isLoading,
+  hiddenColumns
 }) => {
 
   const {
@@ -61,6 +63,7 @@ const DataTable: NextPage<Props> = ({
       data,
       initialState: {
         pageSize: 5,
+        hiddenColumns: hiddenColumns
       }
     }, useFilters, useGlobalFilter, useSortBy, usePagination);
 
@@ -76,26 +79,27 @@ const DataTable: NextPage<Props> = ({
       <div className='p-5 overflow-auto mt-5 bg-white rounded shadow'>
         <Table {...getTableProps()}>
           <Thead>
-            {headerGroups.map((headerGroup) => (
-              <Tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
-                {headerGroup.headers.map((header, i) => {
+            {headerGroups.map((headerGroup, idx) => (
+              <Tr {...headerGroup.getHeaderGroupProps()} key={idx}>
+                {headerGroup.headers.map((header, index) => {
                   // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                   return (
                     <Th
                       {...header.getHeaderProps(header.getSortByToggleProps())}
-                      key={header.id}
-                      
+                      key={index}
                     >
-                      {header.render('Header')}
-                      <chakra.span pl="4">
-                        {header.isSorted ? (
-                          header.isSortedDesc ? (
-                            <TriangleDownIcon aria-label="sorted descending" />
-                          ) : (
-                            <TriangleUpIcon aria-label="sorted ascending" />
-                          )
-                        ) : null}
-                      </chakra.span>
+                      <div className="flex flex-row items-center">
+                        {header.render('Header')}
+                        <chakra.span pl="2">
+                          {header.isSorted ? (
+                            header.isSortedDesc ? (
+                              <TriangleDownIcon aria-label="sorted descending" />
+                            ) : (
+                              <TriangleUpIcon aria-label="sorted ascending" />
+                            )
+                          ) : null}
+                        </chakra.span>
+                      </div>
                     </Th>
                   );
                 })}
@@ -137,8 +141,8 @@ const DataTable: NextPage<Props> = ({
       {page.length != 0 &&
         <div className="pagination mt-3">
           <div className="sm:hidden grid grid-cols-2">
-            <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">Previous</Button>
-            <Button roundedLeft={'none'} roundedRight='10px' bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => nextPage()} disabled={!canNextPage} className="cursor-pointer">Next</Button>
+            <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">Previous</Button>
+            <Button roundedLeft={'none'} roundedRight='10px' bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => nextPage()} disabled={!canNextPage} className="cursor-pointer">Next</Button>
           </div>
           <div className="hidden sm:block">
             <div className="flex justify-between">
@@ -162,10 +166,10 @@ const DataTable: NextPage<Props> = ({
                 </Select>
               </div>
               <div>
-                <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => gotoPage(0)} disabled={!canPreviousPage} className="cursor-pointer">«</Button>
-                <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">{'<'}</Button>
-                <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => nextPage()} disabled={!canNextPage} className="cursor-pointer">{'>'}</Button>
-                <Button roundedLeft={'none'} roundedRight='10px' rounded={'none'} bg={'orange.400'} textColor="white" _hover={{bg: 'orange.300'}} onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className="cursor-pointer">»</Button>
+                <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => gotoPage(0)} disabled={!canPreviousPage} className="cursor-pointer">«</Button>
+                <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">{'<'}</Button>
+                <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => nextPage()} disabled={!canNextPage} className="cursor-pointer">{'>'}</Button>
+                <Button roundedLeft={'none'} roundedRight='10px' rounded={'none'} bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className="cursor-pointer">»</Button>
               </div>
             </div>
           </div>
@@ -196,7 +200,7 @@ const GlobalFilter: NextPage<PropsFilter> = ({
     <>
       <div className="flex flex-row gap-x-[20px] items-center">
         <Text className="font-bold">Cari</Text>
-        <Input bg={'white'} borderColor={'orange.300'} borderWidth={2} w={{ base: 'full', md: '300px' }} value={value || ""} onChange={e => {
+        <Input bg={'white'} placeholder="cari..." borderColor={'orange.300'} borderWidth={2} w={{ base: 'full', md: '300px' }} value={value || ""} onChange={e => {
           setValue(e.target.value);
           onChange(e.target.value);
         }} />

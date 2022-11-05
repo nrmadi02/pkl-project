@@ -1,7 +1,7 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Checkbox, Flex, FormControl, FormErrorMessage, FormLabel, Heading, IconButton, Input, Popover, PopoverTrigger, Select, useDisclosure, useToast } from "@chakra-ui/react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Text, Button, Checkbox, Flex, FormControl, FormErrorMessage, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Popover, PopoverTrigger, Select, useDisclosure, useToast, Divider, Link } from "@chakra-ui/react";
 import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IoAdd, IoPencil, IoTrash } from "react-icons/io5";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { CreateGuruSchema, createGuruSchema, UpdateGuruSchema, updateGuruSchema } from "../../../server/schema/guru.schema";
@@ -10,39 +10,55 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import DrawerForm from "../../../components/DrawerForm";
 import { trpc } from "../../../utils/trpc";
 import Image from "next/image";
-import { Guru, Kelas } from "@prisma/client";
+import { Guru, Kelas, Siswa } from "@prisma/client";
 import DataTable from "../../../components/DataTable/DataTable";
+import { createSiswaSchema, CreateSiswaSchema, updateSiswaSchema, UpdateSiswaSchema, UploadSiswaSchema, uploadSiswaSchema } from "../../../server/schema/siswa.schema";
+import { FaFileExcel } from "react-icons/fa";
+import readXlsxFile from 'read-excel-file'
 import { getCookie } from "cookies-next";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const isDevelopment = process.env.NODE_ENV == "development"
     const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', { req: ctx.req, res: ctx.res })
     if (!token) {
-      return {
-        redirect: {
-          destination: "/login?referer=admin",
-          permanent: false,
-        },
-      };
+        return {
+            redirect: {
+                destination: "/login?referer=admin",
+                permanent: false,
+            },
+        };
     }
     return {
-      props: {
-      }
+        props: {
+        }
     }
-  }
+}
 
-const DataGuru: NextPage = () => {
+const DataSiswa: NextPage = () => {
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen: isOpenModal, onOpen: onOpenModal, onClose: onCloseModal } = useDisclosure()
     const btnRef = useRef<HTMLButtonElement>(null)
     const [show, setShow] = useState(false)
     const toast = useToast()
     const [file, setFile] = useState('')
     const [img, setImg] = useState()
-    const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting, isDirty, isValid } } = useForm<CreateGuruSchema>({
-        resolver: zodResolver(createGuruSchema),
+    const [selectKelas, setSelectKelas] = useState('')
+    const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting, isDirty, isValid } } = useForm<CreateSiswaSchema>({
+        resolver: zodResolver(createSiswaSchema),
         mode: "onChange"
     });
-    const [onCheck, setOnCheck] = useState(false)
+
+    const { register: registerUpload, handleSubmit: submitUpload, watch: watchUpload, setValue: setValueUpload, formState: { errors: errorsUpload, isSubmitting: isSubmitUpload, isDirty: isDirtyUpload, isValid: isValidUpload } } = useForm<UploadSiswaSchema>({
+        resolver: zodResolver(uploadSiswaSchema),
+        mode: "onChange"
+    });
+
+    const OverlayTwo = () => (
+        <ModalOverlay
+            bg='blackAlpha.300'
+            backdropFilter='blur(5px)'
+        />
+    )
 
     const handleChangeFile = (e: any) => {
         e.target?.files[0] && setFile(URL.createObjectURL(e.target?.files[0]))
@@ -57,22 +73,53 @@ const DataGuru: NextPage = () => {
         }
     }
 
+    interface DataArr {
+        nama: string;
+        nis: string;
+        email: string;
+        jenisKelamin: string;
+    }
+
+    const handleChangeUpload = async (e: any) => {
+        const arrData: DataArr[] = []
+        await readXlsxFile(e.target?.files[0]).then((rows) => {
+            // `rows` is an array of rows
+            // each row being an array of cells.
+            rows.map((itm, idx) => {
+                if (idx != 0) {
+                    const data = {
+                        nama: itm[0],
+                        nis: String(itm[2]),
+                        email: itm[1],
+                        jenisKelamin: itm[3]
+                    } as DataArr
+                    arrData.push(data)
+                }
+            })
+        })
+        setValueUpload('data', arrData)
+    }
+
     const { data: dataKelas } = trpc.useQuery(['kelas.getAll'])
-    const { mutateAsync: tambahGuru } = trpc.useMutation(['guru.create'])
-    const { data: dataGuru, isLoading, refetch } = trpc.useQuery(['guru.getAll'], {
+    const { mutateAsync: tambahSiswa } = trpc.useMutation(['siswa.create'])
+    const { data: dataSiswa, isLoading, refetch } = trpc.useQuery(['siswa.getAll', selectKelas], {
+        refetchOnWindowFocus: false
+    })
+    const { mutateAsync: uploadSiswa } = trpc.useMutation(['siswa.createBulk'])
+    const { data: Periode } = trpc.useQuery(['periode.get'], {
         refetchOnWindowFocus: false
     })
 
-    const getData = (data: Guru[] | undefined) => {
-        const dataNew = data as Guru[]
+    const getData = (data: Siswa[] | undefined) => {
+        const dataNew = data as Siswa[]
         return dataNew
     }
 
     const columns = useMemo(() => [
         {
             Header: "Nama",
-            accessor: (d: Guru) => {
-                return <InfoGuru data={d} />
+            accessor: (d: Siswa) => {
+                return <InfoSiswa data={d} />
             }
         },
         {
@@ -80,52 +127,39 @@ const DataGuru: NextPage = () => {
             accessor: "nama"
         },
         {
-            Header: "email",
-            accessor: "email"
+            Header: "Email",
+            accessor: "email",
         },
         {
             Header: "Nomor Induk",
-            accessor: "nip"
+            accessor: "nis"
         },
         {
             Header: "Jenis Kelamin",
             accessor: "jenisKelamin"
         },
         {
-            Header: "Jenis Guru",
-            accessor: "jenisGuru"
-        },
-        {
-            Header: "Wali Kelas",
-            accessor: (d: Guru) => {
-                return d.waliKelas ? <p>Ya</p> : <p>Tidak</p>
-            }
-        },
-        {
-            Header: "Nama Kelas",
-            accessor: (d: Guru) => {
-                return d.waliKelas ? <p>{d.namaKelas}</p> : <p>-</p>
-            }
+            Header: "Kelas",
+            accessor: 'kelas'
         },
         {
             Header: "Action",
-            accessor: (d: Guru) => {
+            accessor: (d: Siswa) => {
                 return <ActionTable key={d?.id} dataKelas={dataKelas?.result} value={d?.id} data={d} refetch={refetch} toast={toast} />
             },
         }
-    ], [dataGuru?.result])
+    ], [dataSiswa?.result])
 
-    const data = useMemo(() => getData(dataGuru?.result ? dataGuru.result : []), [dataGuru]);
+    const data = useMemo(() => getData(dataSiswa?.result ? dataSiswa.result : []), [dataSiswa]);
 
-    const handleAddGuru = useCallback(
-        async (data: CreateGuruSchema) => {
-            const result: any = await tambahGuru(data);
+    const handleUploadSiswa = useCallback(
+        async (data: UploadSiswaSchema) => {
+            const result: any = await uploadSiswa(data);
             if (result.status === 201) {
                 // router.push("/")
-                setFile('')
-                onClose()
+                onCloseModal()
                 toast({
-                    title: 'Tambah data guru berhasil',
+                    title: 'Upload data siswa berhasil',
                     status: 'success',
                     duration: 3000,
                     position: 'top-right',
@@ -135,7 +169,7 @@ const DataGuru: NextPage = () => {
                 // console.log(result)
             } else {
                 toast({
-                    title: 'Tambah data guru gagal',
+                    title: 'Upload data siswa gagal',
                     status: 'error',
                     duration: 3000,
                     position: 'top-right',
@@ -143,7 +177,36 @@ const DataGuru: NextPage = () => {
                 })
             }
         },
-        [tambahGuru]
+        [uploadSiswa]
+    );
+
+    const handleAddSiswa = useCallback(
+        async (data: CreateSiswaSchema) => {
+            const result: any = await tambahSiswa(data);
+            if (result.status === 201) {
+                // router.push("/")
+                setFile('')
+                onClose()
+                toast({
+                    title: 'Tambah data siswa berhasil',
+                    status: 'success',
+                    duration: 3000,
+                    position: 'top-right',
+                    isClosable: true,
+                })
+                refetch()
+                // console.log(result)
+            } else {
+                toast({
+                    title: 'Tambah data siswa gagal',
+                    status: 'error',
+                    duration: 3000,
+                    position: 'top-right',
+                    isClosable: true,
+                })
+            }
+        },
+        [tambahSiswa]
     );
 
     useEffect(() => {
@@ -155,39 +218,126 @@ const DataGuru: NextPage = () => {
     }, [watch])
 
     useEffect(() => {
+        const subs = watchUpload((e) => {
+            // console.log(e)
+        })
+
+        return () => subs.unsubscribe()
+    }, [watchUpload])
+
+    useEffect(() => {
         file == '' && setValue('potoProfile', null)
     }, [file])
 
     return (
-        <AdminLayout title='Guru' breadcrumb={(
+        <AdminLayout title='Siswa' breadcrumb={(
             <Breadcrumb>
                 <BreadcrumbItem>
                     <BreadcrumbLink href='#'>Pendataan</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href='#'>Guru</BreadcrumbLink>
+                    <BreadcrumbLink href='#'>Siswa</BreadcrumbLink>
                 </BreadcrumbItem>
             </Breadcrumb>
         )}>
             <>
                 <Head>
-                    <title>SMABAT || Guru</title>
+                    <title>SMABAT || Siswa</title>
                     <meta name="description" content="Generated by create-t3-app" />
                     <link rel="icon" href="/favicon.ico" />
                 </Head>
                 <div className="p-5">
-                    <div className='w-full mb-5 flex justify-end items-end'>
-                        <Button onClick={onOpen} ref={btnRef} leftIcon={<IoAdd />} fontWeight={600}
-                            color={'white'}
-                            bg={'orange.400'}
-                            _hover={{
-                                bg: 'orange.300',
-                            }}>
-                            Tambah data
-                        </Button>
+                    <Heading size={'md'}>Tahun Ajaran {Periode?.result ? Periode?.result : '-'}</Heading>
+                    <div className="flex mb-5 mt-5 flex-col-reverse md:flex-row items-center justify-between">
+                        <div className="flex gap-5 w-full flex-row items-center">
+                            <p>Filter</p>
+                            <Select bg={'white'} onChange={(e) => {
+                                setSelectKelas(e.target.value)
+                            }} borderColor={'orange.300'} borderWidth={1} id='kelas' placeholder='Kelas ---'>
+                                {dataKelas && dataKelas.result.map((itm, idx) => {
+                                    return <option key={idx} value={itm.name}>Kelas {itm.name}</option>
+                                })}
+                            </Select>
+                        </div>
+                        <div className='w-full mb-5 md:mb-0 flex gap-x-5 justify-end items-center'>
+                            <Button onClick={onOpenModal} ref={btnRef} leftIcon={<FaFileExcel />} fontWeight={600}
+                                color={'white'}
+                                bg={'green.400'}
+                                _hover={{
+                                    bg: 'green.300',
+                                }}>
+                                Upload
+                            </Button>
+                            <Button onClick={onOpen} ref={btnRef} leftIcon={<IoAdd />} fontWeight={600}
+                                color={'white'}
+                                bg={'orange.400'}
+                                _hover={{
+                                    bg: 'orange.300',
+                                }}>
+                                Tambah data
+                            </Button>
+                        </div>
                     </div>
-                    <DataTable hiddenColumns={['nama', 'email']} isLoading={isLoading} columns={columns} data={data} />
+                    <DataTable isLoading={isLoading} hiddenColumns={['email', 'nama']} columns={columns} data={data} />
                 </div>
+                <Modal isCentered isOpen={isOpenModal} onClose={onCloseModal}>
+                    <OverlayTwo />
+                    <ModalContent>
+                        <ModalHeader>Upload banyak siswa</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            <div>
+                                <span>Download contoh file excel : </span><Link download={true} href='../../test_excel.xlsx' color={'orange.400'}>Download</Link>
+                            </div>
+                            <Divider mt={'2'} />
+                            <Heading mt={'2'} size={'md'}>File</Heading>
+                            <form onSubmit={submitUpload(handleUploadSiswa)} id="upload-form" className="mt-2">
+                                <FormControl isInvalid={errorsUpload.data != undefined}>
+                                    {/* <FormLabel htmlFor='file'>File</FormLabel> */}
+                                    <Input
+                                        accept=".xlsx, .xls, .csv"
+                                        py={'1'}
+                                        bg={'white'} borderColor={'orange.300'} borderWidth={1}
+                                        id='file'
+                                        required={true}
+                                        placeholder='Masukan file'
+                                        type={'file'}
+                                        onChange={handleChangeUpload}
+                                    // {...register('file_excel', {
+                                    //     required: 'This is required',
+                                    // })}
+                                    />
+                                    <FormErrorMessage>
+                                        {errorsUpload.data && "data harus ada"}
+                                    </FormErrorMessage>
+                                </FormControl>
+                                <Heading mt={'3'} size={'md'}>Kelas</Heading>
+                                <FormControl mt={'2'} isInvalid={errorsUpload.kelas != undefined}>
+                                    {/* <FormLabel htmlFor='kelas'>Pilih Kelas</FormLabel> */}
+                                    <Select bg={'white'} borderColor={'orange.300'} borderWidth={1} id='kelas' placeholder='Pilih kelas' {...registerUpload('kelas')}>
+                                        {dataKelas && dataKelas.result.map((itm, idx) => {
+                                            return <option key={idx} value={itm.name}>{itm.name}</option>
+                                        })}
+                                    </Select>
+                                    <FormErrorMessage>
+                                        {errorsUpload.kelas && "kelas harus di isi"}
+                                    </FormErrorMessage>
+                                </FormControl>
+                            </form>
+                        </ModalBody>
+                        <ModalFooter gap={3}>
+                            <Button onClick={onCloseModal}>Close</Button>
+                            <Button type='submit' form='upload-form' isLoading={isSubmitUpload} fontWeight={600}
+                                color={'white'}
+                                bg={'green.400'}
+                                _hover={{
+                                    bg: 'green.300',
+                                }}>
+                                Upload
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
                 <DrawerForm btnRef={btnRef} isOpen={isOpen} onClose={() => {
                     setFile('')
                     onClose()
@@ -210,8 +360,8 @@ const DataGuru: NextPage = () => {
                     </>
                 }>
                     <div className='pt-5'>
-                        <Heading size={'lg'} mb='5'>Tambah data guru</Heading>
-                        <form id='my-form' onSubmit={handleSubmit(handleAddGuru)}>
+                        <Heading size={'lg'} mb='5'>Tambah data siswa</Heading>
+                        <form id='my-form' onSubmit={handleSubmit(handleAddSiswa)}>
                             <Flex w={'full'} flexDirection={'column'} gap={'10px'}>
                                 <FormControl isInvalid={errors.potoProfile != undefined}>
                                     <FormLabel htmlFor='foto'>Foto (optional)</FormLabel>
@@ -240,7 +390,7 @@ const DataGuru: NextPage = () => {
                                     </FormErrorMessage> */}
                                 </FormControl>
                                 <FormControl isInvalid={errors.nama != undefined}>
-                                    <FormLabel htmlFor='name'>Nama Guru</FormLabel>
+                                    <FormLabel htmlFor='name'>Nama Siswa</FormLabel>
                                     <Input
                                         bg={'white'} borderColor={'orange.300'} borderWidth={1}
                                         id='nama'
@@ -265,28 +415,16 @@ const DataGuru: NextPage = () => {
                                         {errors.email && errors.email.message}
                                     </FormErrorMessage>
                                 </FormControl>
-                                <FormControl isInvalid={errors.nip != undefined}>
+                                <FormControl isInvalid={errors.nis != undefined}>
                                     <FormLabel htmlFor='nomorInduk'>Nomor Induk</FormLabel>
                                     <Input
                                         bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                                        id='nip'
+                                        id='nis'
                                         placeholder='Masukan nomor induk'
-                                        {...register('nip')}
+                                        {...register('nis')}
                                     />
                                     <FormErrorMessage>
-                                        {errors.nip && errors.nip.message}
-                                    </FormErrorMessage>
-                                </FormControl>
-                                <FormControl isInvalid={errors.jenisGuru != undefined}>
-                                    <FormLabel htmlFor='jenisGuru'>Jenis Guru</FormLabel>
-                                    <Input
-                                        bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                                        id='jenisGuru'
-                                        placeholder='Masukan jenis guru'
-                                        {...register('jenisGuru')}
-                                    />
-                                    <FormErrorMessage>
-                                        {errors.jenisGuru && errors.jenisGuru.message}
+                                        {errors.nis && errors.nis.message}
                                     </FormErrorMessage>
                                 </FormControl>
                                 <FormControl isInvalid={errors.jenisKelamin != undefined}>
@@ -299,18 +437,17 @@ const DataGuru: NextPage = () => {
                                         {errors.jenisKelamin && "Jenis kelamin harus di isi"}
                                     </FormErrorMessage>
                                 </FormControl>
-                                <Checkbox {...register('waliKelas')} defaultChecked={onCheck} onChange={() => setOnCheck(!onCheck)}>Wali Kelas (optional)</Checkbox>
-                                {onCheck ? <FormControl isInvalid={errors.namaKelas != undefined}>
-                                    <FormLabel htmlFor='namaKelas'>Pilih Kelas</FormLabel>
-                                    <Select bg={'white'} borderColor={'orange.300'} borderWidth={1} id='namaKelas' placeholder='Pilih kelas' {...register('namaKelas')}>
+                                <FormControl isInvalid={errors.kelas != undefined}>
+                                    <FormLabel htmlFor='kelas'>Pilih Kelas</FormLabel>
+                                    <Select bg={'white'} borderColor={'orange.300'} borderWidth={1} id='kelas' placeholder='Pilih kelas' {...register('kelas')}>
                                         {dataKelas && dataKelas.result.map((itm, idx) => {
                                             return <option key={idx} value={itm.name}>{itm.name}</option>
                                         })}
                                     </Select>
                                     <FormErrorMessage>
-                                        {errors.namaKelas && "Nama kelas harus di isi"}
+                                        {errors.kelas && "kelas harus di isi"}
                                     </FormErrorMessage>
-                                </FormControl> : null}
+                                </FormControl>
                             </Flex>
                         </form>
                     </div>
@@ -320,13 +457,13 @@ const DataGuru: NextPage = () => {
     )
 }
 
-export default DataGuru
+export default DataSiswa
 
-interface InfoGuru {
-    data: Guru
+interface InfoSiswa {
+    data: Siswa
 }
 
-const InfoGuru = ({ data }: InfoGuru) => {
+const InfoSiswa = ({ data }: InfoSiswa) => {
     return (
         <div className="flex flex-row items-center gap-x-[10px]">
             <div className="w-[60px] h-[60px]">
@@ -344,7 +481,7 @@ interface ActionValue {
     value: any,
     refetch: any,
     toast: any,
-    data: Guru
+    data: Siswa
     dataKelas: Kelas[] | undefined
 }
 
@@ -356,8 +493,8 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
     const [img, setImg] = useState()
     const [onCheck, setOnCheck] = useState(false)
 
-    const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting, isDirty, isValid } } = useForm<UpdateGuruSchema>({
-        resolver: zodResolver(updateGuruSchema),
+    const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting, isDirty, isValid } } = useForm<UpdateSiswaSchema>({
+        resolver: zodResolver(updateSiswaSchema),
         mode: "onChange"
     });
 
@@ -374,15 +511,15 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
         }
     }
 
-    const { mutateAsync: hapusGuru } = trpc.useMutation(['guru.delete'])
-    const {mutateAsync: editGuru} = trpc.useMutation('guru.update')
-    
-    const handleUpdateGuru = useCallback(
-        async (d: UpdateGuruSchema) => {
-            const updateGuru = await editGuru(d)
-            if (updateGuru.status === 200) {
+    const { mutateAsync: hapusSiswa } = trpc.useMutation(['siswa.delete'])
+    const { mutateAsync: editSiswa } = trpc.useMutation('siswa.update')
+
+    const handleUpdateSiswa = useCallback(
+        async (d: UpdateSiswaSchema) => {
+            const updateSiswa = await editSiswa(d)
+            if (updateSiswa.status === 200) {
                 toast({
-                    title: 'Edit data guru berhasil',
+                    title: 'Edit data siswa berhasil',
                     status: 'success',
                     duration: 3000,
                     position: 'top-right',
@@ -393,7 +530,7 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                 onClose()
             } else {
                 toast({
-                    title: 'Edit data guru gagal',
+                    title: 'Edit data siswa gagal',
                     status: 'error',
                     duration: 3000,
                     position: 'top-right',
@@ -404,14 +541,14 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
         }, []
     )
 
-    const handleDeleteGuru = useCallback(
+    const handleDeleteSiswa = useCallback(
         async (id: string) => {
-            const delGuru = await hapusGuru({
+            const delGuru = await hapusSiswa({
                 id: id
             })
             if (delGuru.status === 200) {
                 toast({
-                    title: 'Hapus data guru berhasil',
+                    title: 'Hapus data siswa berhasil',
                     status: 'success',
                     duration: 3000,
                     position: 'top-right',
@@ -421,7 +558,7 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                 setDelLoading(false)
             } else {
                 toast({
-                    title: 'Hapus data guru gagal',
+                    title: 'Hapus data siswa gagal',
                     status: 'error',
                     duration: 3000,
                     position: 'top-right',
@@ -444,15 +581,12 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                     onOpen()
                     setValue('email', data.email)
                     setValue('id', data.id)
-                    setValue('jenisGuru', data.jenisGuru)
                     setValue('jenisKelamin', data.jenisKelamin)
                     setValue('nama', data.nama)
-                    setValue('nip', data.nip)
-                    setValue('namaKelas', data.namaKelas!)
+                    setValue('nis', data.nis)
+                    setValue('kelas', data.kelas!)
                     setValue('potoProfile', null)
-                    setValue('waliKelas', data.waliKelas)
                     data.fotoProfile ? setFile(data.fotoProfile) : setFile('')
-                    data.waliKelas ? setOnCheck(true): setOnCheck(false)
                 }}
                 icon={<IoPencil />}
             />
@@ -464,7 +598,7 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                 fontSize='20px'
                 onClick={async () => {
                     setDelLoading(true)
-                    await handleDeleteGuru(data.id)
+                    await handleDeleteSiswa(data.id)
                 }}
                 icon={<IoTrash />}
             />
@@ -488,8 +622,8 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                 </>
             }>
                 <div className='pt-5'>
-                    <Heading size={'lg'} mb='5'>Edit data guru</Heading>
-                    <form id='form-update' onSubmit={handleSubmit(handleUpdateGuru)}>
+                    <Heading size={'lg'} mb='5'>Edit data siswa</Heading>
+                    <form id='form-update' onSubmit={handleSubmit(handleUpdateSiswa)}>
                         <Flex w={'full'} flexDirection={'column'} gap={'10px'}>
                             <FormControl isInvalid={errors.potoProfile != undefined}>
                                 <FormLabel htmlFor='foto'>Foto (optional)</FormLabel>
@@ -525,7 +659,7 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                                 {...register('id')}
                             />
                             <FormControl isInvalid={errors.nama != undefined}>
-                                <FormLabel htmlFor='name'>Nama Guru</FormLabel>
+                                <FormLabel htmlFor='name'>Nama Siswa</FormLabel>
                                 <Input
                                     bg={'white'} borderColor={'orange.300'} borderWidth={1}
                                     id='nama'
@@ -550,28 +684,16 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                                     {errors.email && errors.email.message}
                                 </FormErrorMessage>
                             </FormControl>
-                            <FormControl isInvalid={errors.nip != undefined}>
+                            <FormControl isInvalid={errors.nis != undefined}>
                                 <FormLabel htmlFor='nomorInduk'>Nomor Induk</FormLabel>
                                 <Input
                                     bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                                    id='nip'
+                                    id='nis'
                                     placeholder='Masukan nomor induk'
-                                    {...register('nip')}
+                                    {...register('nis')}
                                 />
                                 <FormErrorMessage>
-                                    {errors.nip && errors.nip.message}
-                                </FormErrorMessage>
-                            </FormControl>
-                            <FormControl isInvalid={errors.jenisGuru != undefined}>
-                                <FormLabel htmlFor='jenisGuru'>Jenis Guru</FormLabel>
-                                <Input
-                                    bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                                    id='jenisGuru'
-                                    placeholder='Masukan jenis guru'
-                                    {...register('jenisGuru')}
-                                />
-                                <FormErrorMessage>
-                                    {errors.jenisGuru && errors.jenisGuru.message}
+                                    {errors.nis && errors.nis.message}
                                 </FormErrorMessage>
                             </FormControl>
                             <FormControl isInvalid={errors.jenisKelamin != undefined}>
@@ -584,18 +706,17 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                                     {errors.jenisKelamin && "Jenis kelamin harus di isi"}
                                 </FormErrorMessage>
                             </FormControl>
-                            <Checkbox {...register('waliKelas')} defaultChecked={onCheck} onChange={() => setOnCheck(!onCheck)}>Wali Kelas (optional)</Checkbox>
-                            {onCheck ? <FormControl isInvalid={errors.namaKelas != undefined}>
+                            <FormControl isInvalid={errors.kelas != undefined}>
                                 <FormLabel htmlFor='namaKelas'>Pilih Kelas</FormLabel>
-                                <Select bg={'white'} borderColor={'orange.300'} borderWidth={1} id='namaKelas' placeholder='Pilih kelas' {...register('namaKelas')}>
+                                <Select bg={'white'} borderColor={'orange.300'} borderWidth={1} id='kelas' placeholder='Pilih kelas' {...register('kelas')}>
                                     {dataKelas && dataKelas.map((itm, idx) => {
                                         return <option key={idx} value={itm.name}>{itm.name}</option>
                                     })}
                                 </Select>
                                 <FormErrorMessage>
-                                    {errors.namaKelas && "Nama kelas harus di isi"}
+                                    {errors.kelas && "Nama kelas harus di isi"}
                                 </FormErrorMessage>
-                            </FormControl> : null}
+                            </FormControl>
                         </Flex>
                     </form>
                 </div>
