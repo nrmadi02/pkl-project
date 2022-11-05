@@ -253,7 +253,7 @@ const DataSiswa: NextPage = () => {
                             <p>Filter</p>
                             <Select bg={'white'} onChange={(e) => {
                                 setSelectKelas(e.target.value)
-                            }} borderColor={'orange.300'} borderWidth={1} id='kelas' placeholder='Kelas ---'>
+                            }} borderColor={'orange.300'} borderWidth={2} id='kelas' placeholder='Kelas ---'>
                                 {dataKelas && dataKelas.result.map((itm, idx) => {
                                     return <option key={idx} value={itm.name}>Kelas {itm.name}</option>
                                 })}
