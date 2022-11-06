@@ -4,6 +4,7 @@ import { getCookie } from "cookies-next";
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next";
 import Head from "next/head";
 import AdminLayout from "../../../../components/Layout/AdminLayout";
+import prismaFront from "../../../../server/db/front";
 
 export const getServerSideProps: GetServerSideProps<{data: Siswa}> = async (ctx) => {
     const isDevelopment = process.env.NODE_ENV == "development"
@@ -17,7 +18,7 @@ export const getServerSideProps: GetServerSideProps<{data: Siswa}> = async (ctx)
         };
     }
 
-    const siswa = await prisma?.siswa.findFirst({
+    const siswa = await prismaFront.siswa.findFirst({
         where: {
             id: String(ctx.params?.idx)
         }
