@@ -38,7 +38,8 @@ const adminItems = [
       {
         icon: IoHome,
         title: 'Dashboard',
-        url: '/admin'
+        url: '/admin',
+        prefix: 'home'
       }
     ]
   },
@@ -48,22 +49,26 @@ const adminItems = [
       {
         icon: IoPeople,
         title: 'User',
-        url: '/admin/data/users'
+        url: '/admin/data/users',
+        prefix: 'users'
       },
       {
         icon: IoPeople,
         title: 'Guru',
-        url: '/admin/data/guru'
+        url: '/admin/data/guru',
+        prefix: 'guru'
       },
       {
         icon: IoPeople,
         title: 'Siswa',
-        url: '/admin/data/siswa'
+        url: '/admin/data/siswa',
+        prefix: 'siswa'
       },
       {
         icon: IoSchool,
         title: 'Kelas',
-        url: '/admin/data/kelas'
+        url: '/admin/data/kelas',
+        prefix: 'kelas'
       },
     ]
   },
@@ -73,7 +78,8 @@ const adminItems = [
       {
         icon: IoSettings,
         title: 'Umum',
-        url: '/admin/pengaturan/umum'
+        url: '/admin/pengaturan/umum',
+        prefix: 'pengaturan'
       },
     ]
   }
@@ -94,11 +100,11 @@ const ItemSidebar = () => {
                   <div key={ind}>
                     <Feature
                       icon={
-                        <Icon as={itm.icon} color={itm.url == router.pathname ? 'orange.500' : 'orange.200'} w={5} h={5} />
+                        <Icon as={itm.icon} color={itm.url == router.pathname || router.pathname.includes(itm.prefix) ? 'orange.500' : 'orange.200'} w={5} h={5} />
                       }
                       url={itm.url}
-                      active={itm.url == router.pathname}
-                      iconBg={itm.url == router.pathname && 'orange.200'}
+                      active={itm.url == router.pathname || router.pathname.includes(itm.prefix)}
+                      iconBg={itm.url == router.pathname || router.pathname.includes(itm.prefix) ? 'orange.200' : ''}
                       text={itm.title}
                     />
                   </div>

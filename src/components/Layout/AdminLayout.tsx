@@ -130,7 +130,7 @@ const AdminLayout: NextPage<Props> = ({ children, breadcrumb, title }) => {
               )}
             </div>
           </div>
-          <div className="flex bg-[#f0f0f0] mt-[185px] md:mt-[120px] flex-col">
+          <div className="flex bg-[#f0f0f0] mt-[175px] md:mt-[120px] flex-col">
             <div className="overflow-x-auto w-full flex-1">
               <div className="w-full">
                 {children}

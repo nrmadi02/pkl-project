@@ -16,6 +16,7 @@ import { createSiswaSchema, CreateSiswaSchema, updateSiswaSchema, UpdateSiswaSch
 import { FaFileExcel } from "react-icons/fa";
 import readXlsxFile from 'read-excel-file'
 import { getCookie } from "cookies-next";
+import NextLink from 'next/link'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const isDevelopment = process.env.NODE_ENV == "development"
@@ -469,10 +470,12 @@ const InfoSiswa = ({ data }: InfoSiswa) => {
             <div className="w-[60px] h-[60px]">
                 <Image className="rounded-full" width={60} height={60} alt="_profile" src={data.fotoProfile ? data.fotoProfile : `https://ui-avatars.com/api/?name=${data.nama.split(' ').join('+')}`} />
             </div>
-            <div className="flex flex-col gap-y-[5px]">
-                <p className="font-bold">{data.nama}</p>
-                <p>{data.email}</p>
-            </div>
+            <NextLink href={`/admin/data/siswa/${data.id}`}>
+                <div className="group flex cursor-pointer flex-col gap-y-[5px]">
+                    <p className="font-bold group-hover:text-orange-400 transition-all group-hover:scale-105 group-active:scale-100">{data.nama}</p>
+                    <p>{data.email}</p>
+                </div>
+            </NextLink>
         </div>
     )
 }

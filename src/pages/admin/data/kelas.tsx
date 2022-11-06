@@ -109,7 +109,7 @@ const KelasData: NextPage = () => {
                 </Head>
                 <div className="p-5">
                     <Heading size={'md'}>Tahun Ajaran {Periode?.result ? Periode?.result : '-'}</Heading>
-                    <div className='w-full mb-5 flex justify-end items-end'>
+                    <div className='w-full mb-5 mt-5 flex justify-end items-end'>
 
                         <Popover
                             isOpen={isOpen}
