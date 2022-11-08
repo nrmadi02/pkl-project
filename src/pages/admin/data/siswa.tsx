@@ -17,6 +17,7 @@ import { FaFileExcel } from "react-icons/fa";
 import readXlsxFile from 'read-excel-file'
 import { getCookie } from "cookies-next";
 import NextLink from 'next/link'
+import { useSession } from "next-auth/react";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const isDevelopment = process.env.NODE_ENV == "development"
@@ -36,6 +37,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 }
 
 const DataSiswa: NextPage = () => {
+    const { data: stateSession } = useSession();
+    // console.log(stateSession)
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isOpenModal, onOpen: onOpenModal, onClose: onCloseModal } = useDisclosure()
     const btnRef = useRef<HTMLButtonElement>(null)

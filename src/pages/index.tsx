@@ -16,7 +16,6 @@ import FooterHome from "../components/Footer/Footer";
 
 const Home: NextPage = () => {
   const { data } = useSession();
-  console.log(data)
   return (
     <>
       <Head>

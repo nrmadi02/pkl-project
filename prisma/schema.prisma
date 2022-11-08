@@ -65,6 +65,8 @@ model Siswa {
 
     user   User @relation(fields: [userID], references: [id])
     userID String  @unique
+
+    pelanggaran Pelanggaran[]
     
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -79,6 +81,21 @@ model Kelas {
     updatedAt DateTime @updatedAt
 
     @@map(name: "kelas")
+}
+
+model Pelanggaran {
+    id String @id @default(uuid())
+    type String @db.VarChar(255)
+    deskripsi String @db.Text
+    point Int @db.Int
+    pemberi String @db.VarChar(255)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    siswa   Siswa @relation(fields: [siswaID], references: [id])
+    siswaID String
+
+    @@map(name: "pelanggaran")
 }
 
 model Periode {

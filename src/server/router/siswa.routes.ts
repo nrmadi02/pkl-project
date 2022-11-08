@@ -77,8 +77,16 @@ export const siswaRoutes = createRouter()
                     OR: {
                         kelas: input
                     }
+                },
+                include: {
+                    pelanggaran: true
                 }
-            }) as Siswa[] : await ctx.prisma.siswa.findMany() as Siswa[]
+            }) as Siswa[] : await ctx.prisma.siswa.findMany({
+                include: {
+                    pelanggaran: true
+                }
+            })
+
             return {
                 status: 200,
                 message: "Data siswa berhasil diambil",

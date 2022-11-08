@@ -2,6 +2,7 @@ import { Flex, Heading, Icon, Stack, Text } from "@chakra-ui/react"
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactElement } from "react";
+import { FaPenAlt } from "react-icons/fa";
 import { IoHome, IoPeople, IoSchool, IoSettings, IoTime } from "react-icons/io5";
 
 interface FeatureProps {
@@ -69,6 +70,17 @@ const adminItems = [
         title: 'Kelas',
         url: '/admin/data/kelas',
         prefix: 'kelas'
+      },
+    ]
+  },
+  {
+    heading: 'Tata Tertib',
+    menu: [
+      {
+        icon: FaPenAlt,
+        title: 'Point',
+        url: '/admin/tatib/point',
+        prefix: 'tatib'
       },
     ]
   },
