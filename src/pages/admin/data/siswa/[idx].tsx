@@ -322,7 +322,7 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                                 {!isLoadingTindakan ? (
                                     dataTindakan?.result.length != 0 ? dataTindakan?.result.map((itm, idx) => {
                                         return (
-                                            <div className="flex flex-row items-center gap-2">
+                                            <div key={idx} className="flex flex-row items-center gap-2">
                                                 <Tooltip key={idx} label={itm.deskripsi} aria-label='A tooltip'>
                                                     <p className="cursor-pointer">- {itm.type} - {moment(itm.createdAt).format('DD/MM/YYYY')}</p>
                                                 </Tooltip>
