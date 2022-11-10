@@ -82,7 +82,7 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
     const { mutateAsync: tambahPelanggaran } = trpc.useMutation('pelanggaran.create')
     const { mutateAsync: tambahTindakan } = trpc.useMutation('tindak.create')
     const { data: dataSiswa, isLoading, refetch } = trpc.useQuery(['siswa.getByID', { id: data.id, type: selectedType, star_date: selectedDates[0] ? moment(selectedDates[0]).format('YYYY-MM-DD') : '', end_date: selectedDates[1] ? moment(selectedDates[1]).format('YYYY-MM-DD') : '' }])
-    const { data: dataTindakan, isLoading: isLoadingTindakan, refetch: refetchTindak } = trpc.useQuery(['tindak.getByIDSiswa', dataSiswa?.result?.id!])
+    const { data: dataTindakan, isLoading: isLoadingTindakan, refetch: refetchTindak } = trpc.useQuery(['tindak.getByIDSiswa', String(dataSiswa?.result?.id)])
     const { mutateAsync: hapusTindakan, isLoading: loadingDelTindakan } = trpc.useMutation('tindak.delete')
 
     const handleAddPelanggaran = useCallback(
@@ -301,16 +301,16 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                                     <tr>
                                         <td width={70} className="font-bold">Point</td>
                                         <td width={20}>:</td>
-                                        <td>{dataSiswa?.points!}</td>
+                                        <td>{dataSiswa?.points}</td>
                                     </tr>
                                     <tr>
                                         <td width={70} className="font-bold">Status</td>
                                         <td width={20}>:</td>
                                         <td>
-                                            {dataSiswa?.points! < 15 && <Aman />}
-                                            {dataSiswa?.points! >= 15 && dataSiswa?.points! < 30 && <PanggilanSatu />}
-                                            {dataSiswa?.points! >= 30 && dataSiswa?.points! < 45 && <PanggilanDua />}
-                                            {dataSiswa?.points! >= 45 && <PanggilanTiga />}
+                                            {Number(dataSiswa?.points) < 15 && <Aman />}
+                                            {Number(dataSiswa?.points) >= 15 && Number(dataSiswa?.points) < 30 && <PanggilanSatu />}
+                                            {Number(dataSiswa?.points) >= 30 && Number(dataSiswa?.points) < 45 && <PanggilanDua />}
+                                            {Number(dataSiswa?.points) >= 45 && <PanggilanTiga />}
                                         </td>
                                     </tr>
                                 </div>
@@ -351,7 +351,7 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                                 initialFocusRef={btnTindakan}
                                 onOpen={() => {
                                     onOpenTindak()
-                                    setValueTindak('siswaID', dataSiswa?.result?.id!)
+                                    setValueTindak('siswaID', String(dataSiswa?.result?.id))
                                     setValueTindak('penindak', stateSession?.user?.name ? stateSession?.user?.name : '')
                                 }}
                                 onClose={() => {
