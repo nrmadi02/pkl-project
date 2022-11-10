@@ -19,8 +19,6 @@ export const pelanggaranRoutes = createRouter()
                 }
             })
 
-            console.log(type)
-
             if(type == "Penghargaan"){
                 if(Number(point) > Number(totalPoint._sum.point)){
                     console.log(point)
@@ -43,8 +41,23 @@ export const pelanggaranRoutes = createRouter()
 
             return {
                 status: 201,
-                message: "Pelanggaran berhasil ditambahkan",
+                message: "Point berhasil ditambahkan",
                 // result: pelanggaran
+            }
+        }
+    })
+    .mutation('delete', {
+        input: string(),
+        resolve: async ({ctx, input}) => {
+            const deletePelanggaran = await ctx.prisma.pelanggaran.delete({
+                where: {
+                    id: input
+                }
+            })
+
+            return {
+                status: 200,
+                message: "Point berhasil dihapus",
             }
         }
     })

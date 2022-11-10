@@ -7,6 +7,7 @@ import Head from "next/head";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoAdd, IoPencil, IoTrash } from "react-icons/io5";
+import DeleteAlert from "../../../components/Alert/Delete";
 import DataTable from "../../../components/DataTable/DataTable";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { createKelasSchema, CreateKelasSchema, UpdateKelasSchema, updateKelasSchema } from "../../../server/schema/kelas.schema";
@@ -177,6 +178,7 @@ interface ActionValue {
 
 const ActionTable = ({ value, name, refetch, toast }: ActionValue) => {
     const { onOpen, onClose, isOpen } = useDisclosure()
+    const { onOpen: onOpenDel, onClose: onCloseDel, isOpen: isOpenDel } = useDisclosure()
     const firstFieldRef = useRef(null)
     const [delLoading, setDelLoading] = useState(false)
     const { register, handleSubmit, watch, formState: { errors, isSubmitting, isDirty, isValid } } = useForm<UpdateKelasSchema>({
@@ -229,6 +231,7 @@ const ActionTable = ({ value, name, refetch, toast }: ActionValue) => {
                 })
                 refetch()
                 setDelLoading(false)
+                onCloseDel()
             } else {
                 toast({
                     title: 'Hapus data kelas gagal',
@@ -248,7 +251,7 @@ const ActionTable = ({ value, name, refetch, toast }: ActionValue) => {
                 initialFocusRef={firstFieldRef}
                 onOpen={onOpen}
                 onClose={onClose}
-                placement='start-start'
+                placement='auto-start'
                 closeOnBlur={false}
             >
                 <PopoverTrigger>
@@ -310,12 +313,14 @@ const ActionTable = ({ value, name, refetch, toast }: ActionValue) => {
                 aria-label='delete'
                 fontSize='20px'
                 onClick={async () => {
-                    setDelLoading(true)
-                    await handleDeleteKelas(value)
+                    onOpenDel()
                 }}
                 icon={<IoTrash />}
             />
-
+            <DeleteAlert isOpen={isOpenDel} onClick={async () => {
+                setDelLoading(true)
+                await handleDeleteKelas(value)
+            }} onClose={onCloseDel} onOpen={onOpenDel} isLoading={delLoading} title={'Hapus kelas'} text={'Apa anda yakin ?'} />
         </Flex>
     )
 }

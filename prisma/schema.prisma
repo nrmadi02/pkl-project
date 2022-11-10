@@ -67,6 +67,7 @@ model Siswa {
     userID String  @unique
 
     pelanggaran Pelanggaran[]
+    tindaklanjut Tindaklanjut[]
     
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -96,6 +97,20 @@ model Pelanggaran {
     siswaID String
 
     @@map(name: "pelanggaran")
+}
+
+model Tindaklanjut {
+    id String @id @default(uuid())
+    type String @db.VarChar(255)
+    deskripsi String @db.Text
+    penindak String @db.VarChar(255)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    siswa   Siswa @relation(fields: [siswaID], references: [id])
+    siswaID String
+
+    @@map(name: "tindaklanjut")
 }
 
 model Periode {

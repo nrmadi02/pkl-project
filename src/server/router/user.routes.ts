@@ -50,12 +50,17 @@ export const userRoutes = createRouter()
           userID: input.id
         }
       })
+      const deleteSiswa = ctx.prisma.siswa.deleteMany({
+        where: {
+          userID: input.id
+        }
+      })
       const deleteUser = ctx.prisma.user.delete({
         where: {
           id: input.id
         }
       })
-      await ctx.prisma.$transaction([deleteGuru, deleteUser])
+      await ctx.prisma.$transaction([deleteGuru, deleteUser, deleteSiswa])
       return {
         status: 200,
         message: 'User berhasil dihapus',

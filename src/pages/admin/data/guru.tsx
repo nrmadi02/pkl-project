@@ -13,23 +13,24 @@ import Image from "next/image";
 import { Guru, Kelas } from "@prisma/client";
 import DataTable from "../../../components/DataTable/DataTable";
 import { getCookie } from "cookies-next";
+import DeleteAlert from "../../../components/Alert/Delete";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const isDevelopment = process.env.NODE_ENV == "development"
     const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', { req: ctx.req, res: ctx.res })
     if (!token) {
-      return {
-        redirect: {
-          destination: "/login?referer=admin",
-          permanent: false,
-        },
-      };
+        return {
+            redirect: {
+                destination: "/login?referer=admin",
+                permanent: false,
+            },
+        };
     }
     return {
-      props: {
-      }
+        props: {
+        }
     }
-  }
+}
 
 const DataGuru: NextPage = () => {
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -350,6 +351,7 @@ interface ActionValue {
 
 const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) => {
     const { onOpen, onClose, isOpen } = useDisclosure()
+    const { onOpen: onOpenDel, onClose: onCloseDel, isOpen: isOpenDel } = useDisclosure()
     const firstFieldRef = useRef(null)
     const [delLoading, setDelLoading] = useState(false)
     const [file, setFile] = useState('')
@@ -375,8 +377,8 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
     }
 
     const { mutateAsync: hapusGuru } = trpc.useMutation(['guru.delete'])
-    const {mutateAsync: editGuru} = trpc.useMutation('guru.update')
-    
+    const { mutateAsync: editGuru } = trpc.useMutation('guru.update')
+
     const handleUpdateGuru = useCallback(
         async (d: UpdateGuruSchema) => {
             const updateGuru = await editGuru(d)
@@ -419,6 +421,7 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                 })
                 refetch()
                 setDelLoading(false)
+                onCloseDel()
             } else {
                 toast({
                     title: 'Hapus data guru gagal',
@@ -452,7 +455,7 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                     setValue('potoProfile', null)
                     setValue('waliKelas', data.waliKelas)
                     data.fotoProfile ? setFile(data.fotoProfile) : setFile('')
-                    data.waliKelas ? setOnCheck(true): setOnCheck(false)
+                    data.waliKelas ? setOnCheck(true) : setOnCheck(false)
                 }}
                 icon={<IoPencil />}
             />
@@ -463,11 +466,14 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                 aria-label='delete'
                 fontSize='20px'
                 onClick={async () => {
-                    setDelLoading(true)
-                    await handleDeleteGuru(data.id)
+                    onOpenDel()
                 }}
                 icon={<IoTrash />}
             />
+            <DeleteAlert isOpen={isOpenDel} onClick={async () => {
+                setDelLoading(true)
+                await handleDeleteGuru(data.id)
+            }} onClose={onCloseDel} onOpen={onOpenDel} isLoading={delLoading} title={'Hapus guru'} text={'Apa anda yakin ?'} />
             <DrawerForm btnRef={firstFieldRef} isOpen={isOpen} onClose={() => {
                 onClose()
             }} bottomButtons={

@@ -1,6 +1,6 @@
 import { createGuruSchema, updateGuruSchema } from './../schema/guru.schema';
 import { createRouter } from "./context";
-import { string, z } from "zod";
+import { object, string, z } from "zod";
 import { hash } from 'argon2';
 import { Guru, Siswa, User } from '@prisma/client';
 import cloudinary from "cloudinary"
@@ -122,17 +122,51 @@ export const siswaRoutes = createRouter()
         }
     })
     .query('getByID', {
-        input: z.string(),
+        input: object({
+            id: string(),
+            star_date: string(),
+            end_date: string(),
+            type: string()
+        }),
         resolve: async ({ ctx, input }) => {
             const siswaByID = await ctx.prisma.siswa.findFirst({
                 where: {
-                    id: input
+                    id: input.id
+                }
+            })
+            const pelanggaran = await ctx.prisma.pelanggaran.findMany({
+                where: {
+                    siswaID: input.id,
+                    type: {
+                        contains: input.type
+                    },
+                    AND: [
+                        input.star_date != "" && input.end_date != "" ? {
+                            createdAt: {
+                                lte: new Date(input.end_date),
+                                gte: new Date(input.star_date),
+                            }
+                        } : {}
+                    ]
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            })
+            const points = await ctx.prisma.pelanggaran.aggregate({
+                where: {
+                    siswaID: input.id
+                },
+                _sum: {
+                    point: true
                 }
             })
             return {
                 status: 200,
                 message: "Data siswa berhasil diambil",
-                result: siswaByID
+                result: siswaByID,
+                points: points._sum.point,
+                pelanggaran: pelanggaran
             };
         }
     })

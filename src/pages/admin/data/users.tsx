@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateUserInput, createUserSchema } from '../../../server/schema/user.schema';
 import { useForm } from "react-hook-form";
 import { getCookie } from 'cookies-next';
+import DeleteAlert from '../../../components/Alert/Delete';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const isDevelopment = process.env.NODE_ENV == "development"
@@ -255,6 +256,7 @@ interface ActionValue {
 const ActionTable = ({ value, refetch, toast }: ActionValue) => {
   const [delLoading, setDelLoading] = useState(false)
   const { mutateAsync: deleteUser, isLoading: deleteLoading } = trpc.useMutation(['user.deleteUser'])
+  const { onOpen: onOpenDel, onClose: onCloseDel, isOpen: isOpenDel } = useDisclosure()
 
   const handleDeleteUser = useCallback(
     async (id: string) => {
@@ -271,6 +273,7 @@ const ActionTable = ({ value, refetch, toast }: ActionValue) => {
         })
         refetch()
         setDelLoading(false)
+        onCloseDel()
       } else {
         toast({
           title: 'Hapus data user gagal',
@@ -292,11 +295,14 @@ const ActionTable = ({ value, refetch, toast }: ActionValue) => {
         aria-label='delete'
         fontSize='20px'
         onClick={async () => {
-          setDelLoading(true)
-          await handleDeleteUser(value)
+          onOpenDel()
         }}
         icon={<IoTrash />}
       />
+      <DeleteAlert isOpen={isOpenDel} onClick={async () => {
+        setDelLoading(true)
+        await handleDeleteUser(value)
+      }} onClose={onCloseDel} onOpen={onOpenDel} isLoading={delLoading} title={'Hapus siswa'} text={'Apa anda yakin ?'} />
     </>
   )
 }

@@ -293,7 +293,7 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
                 onClose()
                 reset()
                 toast({
-                    title: 'Tambah pelanggaran siswa berhasil',
+                    title: 'Tambah Point siswa berhasil',
                     status: 'success',
                     duration: 3000,
                     position: 'top-right',
@@ -310,7 +310,7 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
                 })
             } else {
                 toast({
-                    title: 'Tambah pelanggaran siswa gagal',
+                    title: 'Tambah Point siswa gagal',
                     status: 'error',
                     duration: 3000,
                     position: 'top-right',

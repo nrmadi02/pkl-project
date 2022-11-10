@@ -18,6 +18,7 @@ import readXlsxFile from 'read-excel-file'
 import { getCookie } from "cookies-next";
 import NextLink from 'next/link'
 import { useSession } from "next-auth/react";
+import DeleteAlert from "../../../components/Alert/Delete";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const isDevelopment = process.env.NODE_ENV == "development"
@@ -493,6 +494,7 @@ interface ActionValue {
 
 const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) => {
     const { onOpen, onClose, isOpen } = useDisclosure()
+    const { onOpen: onOpenDel, onClose: onCloseDel, isOpen: isOpenDel } = useDisclosure()
     const firstFieldRef = useRef(null)
     const [delLoading, setDelLoading] = useState(false)
     const [file, setFile] = useState('')
@@ -562,6 +564,7 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                 })
                 refetch()
                 setDelLoading(false)
+                onCloseDel()
             } else {
                 toast({
                     title: 'Hapus data siswa gagal',
@@ -603,11 +606,14 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                 aria-label='delete'
                 fontSize='20px'
                 onClick={async () => {
-                    setDelLoading(true)
-                    await handleDeleteSiswa(data.id)
+                    onOpenDel()
                 }}
                 icon={<IoTrash />}
             />
+            <DeleteAlert isOpen={isOpenDel} onClick={async () => {
+                setDelLoading(true)
+                await handleDeleteSiswa(data.id)
+            }} onClose={onCloseDel} onOpen={onOpenDel} isLoading={delLoading} title={'Hapus siswa'} text={'Apa anda yakin ?'} />
             <DrawerForm btnRef={firstFieldRef} isOpen={isOpen} onClose={() => {
                 onClose()
             }} bottomButtons={
