@@ -187,7 +187,7 @@ const DataGuru: NextPage = () => {
                             Tambah data
                         </Button>
                     </div>
-                    <DataTable hiddenColumns={['nama', 'email']} isLoading={isLoading} columns={columns} data={data} />
+                    <DataTable isSearch sizeSet hiddenColumns={['nama', 'email']} isLoading={isLoading} columns={columns} data={data} />
                 </div>
                 <DrawerForm btnRef={btnRef} isOpen={isOpen} onClose={() => {
                     setFile('')

@@ -159,7 +159,7 @@ const KelasData: NextPage = () => {
                             </PopoverContent>
                         </Popover>
                     </div>
-                    <DataTable hiddenColumns={[]} columns={columns} data={data} isLoading={isLoading} />
+                    <DataTable isSearch sizeSet hiddenColumns={[]} columns={columns} data={data} isLoading={isLoading} />
                 </div>
             </>
         </AdminLayout>

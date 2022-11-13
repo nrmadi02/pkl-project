@@ -68,6 +68,7 @@ model Siswa {
 
     pelanggaran Pelanggaran[]
     tindaklanjut Tindaklanjut[]
+    panggil_ortu Panggilortu[]
     
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -104,6 +105,9 @@ model Tindaklanjut {
     type String @db.VarChar(255)
     deskripsi String @db.Text
     penindak String @db.VarChar(255)
+    penanganan String @db.Text 
+    tindakan String @db.Text
+    tanggal DateTime
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -111,6 +115,27 @@ model Tindaklanjut {
     siswaID String
 
     @@map(name: "tindaklanjut")
+}
+
+model Panggilortu {
+    id String @id @default(uuid())
+    no_surat String @db.VarChar(255)
+    perihal String @db.VarChar(255)
+    nama_ortu String @db.VarChar(255)
+    wali_kelas String @db.VarChar(255)
+    nip_wali String @db.VarChar(255)
+    nama_bk String @db.VarChar(255)
+    nip_bk String @db.VarChar(255)
+    tanggal DateTime
+    waktu DateTime
+    tempat String @db.VarChar(255)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    siswa   Siswa @relation(fields: [siswaID], references: [id])
+    siswaID String
+
+    @@map(name: "panggil_ortu")
 }
 
 model Periode {

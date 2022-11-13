@@ -30,13 +30,17 @@ type Props = {
   columns: any
   isLoading: boolean,
   hiddenColumns?: string[]
+  pagination?: boolean,
+  isSearch?: boolean,
+  sizeSet?: boolean
 }
 
 const DataTable: NextPage<Props> = ({
   data,
   columns,
   isLoading,
-  hiddenColumns
+  hiddenColumns,
+  isSearch, pagination, sizeSet
 }) => {
 
   const {
@@ -72,11 +76,11 @@ const DataTable: NextPage<Props> = ({
   return (
     <div>
       <div>
-        <GlobalFilter
+        {isSearch ? <GlobalFilter
           preGlobalFilteredRows={preGlobalFilteredRows}
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
-        />
+        /> : null}
       </div>
       <div className='p-5 overflow-auto mt-5 bg-white rounded shadow'>
         <Table {...getTableProps()}>
@@ -148,7 +152,7 @@ const DataTable: NextPage<Props> = ({
           </div>
           <div className="hidden sm:block">
             <div className="flex justify-between">
-              <div className="flex gap-x-2 items-center">
+              {sizeSet ? <div className="flex gap-x-2 items-center">
                 <span className="text-sm w-[150px]">
                   Page <span className="font-medium">{state.pageIndex + 1}</span> of <span className="font-medium">{pageOptions.length}</span>
                 </span>
@@ -166,7 +170,7 @@ const DataTable: NextPage<Props> = ({
                     </option>
                   ))}
                 </Select>
-              </div>
+              </div> : null}
               <div>
                 <Button roundedLeft={'10px'} roundedRight='none' bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => gotoPage(0)} disabled={!canPreviousPage} className="cursor-pointer">«</Button>
                 <Button rounded={'none'} bg={'orange.400'} textColor="white" _hover={{ bg: 'orange.300' }} onClick={() => previousPage()} disabled={!canPreviousPage} className="cursor-pointer">{'<'}</Button>

@@ -283,7 +283,7 @@ const DataSiswa: NextPage = () => {
                             </Button>
                         </div>
                     </div>
-                    <DataTable isLoading={isLoading} hiddenColumns={['email', 'nama']} columns={columns} data={data} />
+                    <DataTable isSearch sizeSet isLoading={isLoading} hiddenColumns={['email', 'nama']} columns={columns} data={data} />
                 </div>
                 <Modal isCentered isOpen={isOpenModal} onClose={onCloseModal}>
                     <OverlayTwo />

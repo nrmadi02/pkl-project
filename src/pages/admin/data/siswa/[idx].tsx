@@ -1,7 +1,7 @@
-import { CalendarIcon, DeleteIcon } from "@chakra-ui/icons";
-import { Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, IconButton, Input, Popover, PopoverArrow, PopoverCloseButton, PopoverContent, PopoverTrigger, Select, Spinner, Textarea, Tooltip, useDisclosure, useToast } from "@chakra-ui/react";
+import { CalendarIcon, DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
+import { Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Popover, PopoverArrow, PopoverCloseButton, PopoverContent, PopoverTrigger, Select, Spinner, Textarea, Tooltip, useDisclosure, useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Pelanggaran, Siswa } from "@prisma/client";
+import { Pelanggaran, Siswa, Tindaklanjut } from "@prisma/client";
 import { RangeDatepicker } from "chakra-dayzed-datepicker";
 import { getCookie } from "cookies-next";
 import moment from "moment";
@@ -23,6 +23,7 @@ import prismaFront from "../../../../server/db/front";
 import { CreatePelanggaranSchema, createPelanggaranSchema } from "../../../../server/schema/pelanggaran.schema";
 import { createTindakSchema, CreateTindakSchema } from "../../../../server/schema/tindak.schema";
 import { trpc } from "../../../../utils/trpc";
+import 'moment/locale/id'
 
 export const getServerSideProps: GetServerSideProps<{ data: Siswa }> = async (ctx) => {
     const isDevelopment = process.env.NODE_ENV == "development"
@@ -64,7 +65,7 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
     const firstFieldRef = useRef(null)
     const { onOpen: onOpenTindak, onClose: onCloseTindak, isOpen: isOpenTindak } = useDisclosure()
     const btnTindakan = useRef(null)
-    const { onOpen: onOpenDelTindak, onClose: onCloseDelTindak, isOpen: isOpenDelTindak } = useDisclosure()
+    const { onOpen: onOpenPanggil, onClose: onClosePanggil, isOpen: isOpenPanggil } = useDisclosure()
     const toast = useToast()
     const [selectedDates, setSelectedDates] = useState<Date[]>([]);
     const [selectedType, setSelectedType] = useState('')
@@ -79,11 +80,17 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
         mode: "onChange"
     });
 
+    const OverlayTwo = () => (
+        <ModalOverlay
+            bg='blackAlpha.300'
+            backdropFilter='blur(5px)'
+        />
+    )
+
     const { mutateAsync: tambahPelanggaran } = trpc.useMutation('pelanggaran.create')
     const { mutateAsync: tambahTindakan } = trpc.useMutation('tindak.create')
     const { data: dataSiswa, isLoading, refetch } = trpc.useQuery(['siswa.getByID', { id: data.id, type: selectedType, star_date: selectedDates[0] ? moment(selectedDates[0]).format('YYYY-MM-DD') : '', end_date: selectedDates[1] ? moment(selectedDates[1]).format('YYYY-MM-DD') : '' }])
     const { data: dataTindakan, isLoading: isLoadingTindakan, refetch: refetchTindak } = trpc.useQuery(['tindak.getByIDSiswa', String(dataSiswa?.result?.id)])
-    const { mutateAsync: hapusTindakan, isLoading: loadingDelTindakan } = trpc.useMutation('tindak.delete')
 
     const handleAddPelanggaran = useCallback(
         async (data: CreatePelanggaranSchema) => {
@@ -147,33 +154,6 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
         [tambahPelanggaran]
     );
 
-    const handleDeleteTindakan = useCallback(
-        async (id: string) => {
-            const delTindak = await hapusTindakan(id)
-            if (delTindak.status === 200) {
-                toast({
-                    title: 'Hapus data tindakan berhasil',
-                    status: 'success',
-                    duration: 3000,
-                    position: 'top-right',
-                    isClosable: true,
-                })
-                refetchTindak()
-                onCloseDelTindak()
-                // setDelLoading(false)
-            } else {
-                toast({
-                    title: 'Hapus data tindakan gagal',
-                    status: 'error',
-                    duration: 3000,
-                    position: 'top-right',
-                    isClosable: true,
-                })
-                // setDelLoading(false)
-            }
-        }, []
-    )
-
     const PanggilanSatu = () => {
         return (
             <>
@@ -208,6 +188,11 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
 
     const getData = (data: Pelanggaran[] | undefined) => {
         const dataNew = data as Pelanggaran[]
+        return dataNew
+    }
+
+    const getDataTindak = (data: Tindaklanjut[] | undefined) => {
+        const dataNew = data as Tindaklanjut[]
         return dataNew
     }
 
@@ -253,7 +238,56 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
         }
     ], [dataSiswa?.pelanggaran])
 
+    const columnsPanggil = useMemo(() => [
+        {
+            Header: "Hari, Tanggall",
+            accessor: (d: Tindaklanjut) => {
+                const date = moment(d.tanggal).format("dddd, DD/MM/YYYY")
+                return (
+                    <p>{date}</p>
+                )
+            }
+        },
+        {
+            Header: "Bidang Bimbingan",
+            accessor: "type"
+        },
+        {
+            Header: "Permasalahan",
+            accessor: (d: Tindaklanjut) => {
+                return (
+                    <p className="whitespace-pre-wrap w-[150px]">{d.deskripsi}</p>
+                )
+            }
+        },
+        {
+            Header: "Penanganan",
+            accessor: (d: Tindaklanjut) => {
+                return (
+                    <p className="whitespace-pre-wrap w-[150px]">{d.penanganan}</p>
+                )
+            }
+        },
+        {
+            Header: "Tindak Lanjut",
+            accessor: (d: Tindaklanjut) => {
+                return (
+                    <p className="whitespace-pre-wrap w-[150px]">{d.tindakan}</p>
+                )
+            }
+        },
+        {
+            Header: "Action",
+            accessor: (d: Tindaklanjut) => {
+
+                return <ActionTableTindak
+                    key={d?.id} value={d?.id} data={d} refetch={refetchTindak} toast={toast} />
+            },
+        }
+    ], [dataTindakan?.result])
+
     const dataPelanggaran = useMemo(() => getData(dataSiswa?.pelanggaran ? dataSiswa.pelanggaran : []), [dataSiswa]);
+    const dataPanggil = useMemo(() => getDataTindak(dataTindakan?.result ? dataTindakan.result : []), [dataTindakan]);
 
     return (
         <AdminLayout title='Detail Siswa' breadcrumb={(
@@ -318,114 +352,134 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                         </div>
                         <div className="md:mt-5">
                             <Heading size={'md'}>Tindak Lanjut</Heading>
-                            <div className="flex flex-col gap-2 mt-5">
-                                {!isLoadingTindakan ? (
-                                    dataTindakan?.result.length != 0 ? dataTindakan?.result.map((itm, idx) => {
-                                        return (
-                                            <div key={idx} className="flex flex-row items-center gap-2">
-                                                <Tooltip key={idx} label={itm.deskripsi} aria-label='A tooltip'>
-                                                    <p className="cursor-pointer">- {itm.type} - {moment(itm.createdAt).format('DD/MM/YYYY')}</p>
-                                                </Tooltip>
-                                                <IconButton
-                                                    variant='ghost'
-                                                    size={'sm'}
-                                                    colorScheme={'orange'}
-                                                    aria-label='update'
-                                                    fontSize='18px'
-                                                    onClick={async () => {
-                                                        onOpenDelTindak()
-                                                    }}
-                                                    icon={<DeleteIcon />}
-                                                />
-                                                <DeleteAlert isOpen={isOpenDelTindak} onClick={async () => {
-                                                    // setDelLoading(true)
-                                                    await handleDeleteTindakan(itm.id)
-                                                }} onClose={onCloseDelTindak} onOpen={onOpenDelTindak} isLoading={loadingDelTindakan} title={'Hapus tindak lanjut'} text={'Apa anda yakin ?'} />
-                                            </div>
-                                        )
-                                    }) : <p>-</p>
-                                ) : <Spinner color='orange.500' />}
+                            <div className="flex flex-row gap-5 items-center">
+                                <Button fontWeight={600}
+                                    color={'white'}
+                                    bg={'orange.400'}
+                                    onClick={() => {
+                                        onOpenTindak()
+                                        setValueTindak('siswaID', String(dataSiswa?.result?.id))
+                                        setValueTindak('penindak', stateSession?.user?.name ? stateSession?.user?.name : '')
+                                    }}
+                                    _hover={{
+                                        bg: 'orange.300',
+                                    }} mt={'10px'}>
+                                    Panggil siswa
+                                </Button>
+                                <Button fontWeight={600}
+                                    color={'white'}
+                                    bg={'red.400'}
+                                    _hover={{
+                                        bg: 'red.300',
+                                    }} mt={'10px'}>
+                                    Panggilan Orang Tua
+                                </Button>
                             </div>
-                            <Popover
-                                isOpen={isOpenTindak}
-                                initialFocusRef={btnTindakan}
-                                onOpen={() => {
-                                    onOpenTindak()
-                                    setValueTindak('siswaID', String(dataSiswa?.result?.id))
-                                    setValueTindak('penindak', stateSession?.user?.name ? stateSession?.user?.name : '')
-                                }}
-                                onClose={() => {
-                                    onCloseTindak()
-                                    resetTindak()
-                                }}
-                                placement={'auto-start'}
-                                closeOnBlur={false}
-                            >
-                                <PopoverTrigger>
-                                    <Button fontWeight={600}
-                                        color={'white'}
-                                        bg={'orange.400'}
-                                        _hover={{
-                                            bg: 'orange.300',
-                                        }} mt={'10px'}>
-                                        Beri tindakan
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent p={5}>
-                                    <PopoverArrow />
-                                    <PopoverCloseButton />
-                                    <form onSubmit={submitTindak(handleAddTindakan)}>
-                                        <Flex w={'full'} flexDirection={'column'} gap={'10px'}>
-                                            <Input
-                                                bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                                                id='id'
-                                                type={'hidden'}
-                                                // placeholder='Masukan nama guru'
-                                                {...registerTindak('siswaID')}
-                                            />
-                                            <Input
-                                                bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                                                id='id'
-                                                type={'hidden'}
-                                                // placeholder='Masukan nama guru'
-                                                {...registerTindak('penindak')}
-                                            />
-                                            <FormControl isInvalid={errorsTindak.type != undefined}>
-                                                <FormLabel htmlFor='type'>Jenis Tindakan</FormLabel>
+                            <Modal isCentered isOpen={isOpenTindak} onClose={() => {
+                                onCloseTindak()
+                                resetTindak()
+                            }}>
+                                <OverlayTwo />
+                                <ModalContent>
+                                    <ModalHeader>Panggil Siswa</ModalHeader>
+                                    <ModalCloseButton />
+                                    <ModalBody>
+                                        <form id="form-tindak" onSubmit={submitTindak(handleAddTindakan)}>
+                                            <Flex w={'full'} flexDirection={'column'} gap={'10px'}>
                                                 <Input
                                                     bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                                                    id='type'
-                                                    placeholder='Masukan jenis tindakan'
-                                                    {...registerTindak('type')}
+                                                    id='id'
+                                                    type={'hidden'}
+                                                    // placeholder='Masukan nama guru'
+                                                    {...registerTindak('siswaID')}
                                                 />
-                                                <FormErrorMessage>
-                                                    {errorsTindak.type && errorsTindak.type.message}
-                                                </FormErrorMessage>
-                                            </FormControl>
-                                            <FormControl isInvalid={errorsTindak.deskripsi != undefined}>
-                                                <FormLabel htmlFor='deskripsi'>Deskripsi</FormLabel>
-                                                <Textarea
+                                                <Input
                                                     bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                                                    id='deskripsi'
-                                                    placeholder='Masukan deskripsi'
-                                                    {...registerTindak('deskripsi')}
+                                                    id='id'
+                                                    type={'hidden'}
+                                                    // placeholder='Masukan nama guru'
+                                                    {...registerTindak('penindak')}
                                                 />
-                                                <FormErrorMessage>
-                                                    {errorsTindak.deskripsi && errorsTindak.deskripsi.message}
-                                                </FormErrorMessage>
-                                            </FormControl>
-                                        </Flex>
-                                        <Button disabled={!isValidTindak} isLoading={isSubmitTindak} type='submit' fontWeight={600}
+                                                <FormControl isInvalid={errorsTindak.type != undefined}>
+                                                    <FormLabel htmlFor='type'>Jenis Bidang</FormLabel>
+                                                    <Select bg={'white'} borderColor={'orange.300'} borderWidth={1} id='type' placeholder='Pilih...' {...registerTindak('type')}>
+                                                        <option value={'Pribadi'}>Pribadi</option>
+                                                        <option value={'Sosial'}>Sosial</option>
+                                                        {/* <option value={'Kerapian'}>Kerapian</option>
+                                                        <option value={'Penghargaan'}>Penghargaan</option> */}
+                                                    </Select>
+                                                    <FormErrorMessage>
+                                                        {errorsTindak.type && "Jenis tata tertib harus di pilih"}
+                                                    </FormErrorMessage>
+                                                </FormControl>
+                                                <FormControl isInvalid={errorsTindak.deskripsi != undefined}>
+                                                    <FormLabel htmlFor='deskripsi'>Permasalahan</FormLabel>
+                                                    <Textarea
+                                                        bg={'white'} borderColor={'orange.300'} borderWidth={1}
+                                                        id='deskripsi'
+                                                        placeholder='Masukan permasalahan'
+                                                        {...registerTindak('deskripsi')}
+                                                    />
+                                                    <FormErrorMessage>
+                                                        {errorsTindak.deskripsi && errorsTindak.deskripsi.message}
+                                                    </FormErrorMessage>
+                                                </FormControl>
+                                                <FormControl isInvalid={errorsTindak.penanganan != undefined}>
+                                                    <FormLabel htmlFor='deskripsi'>Penanganan</FormLabel>
+                                                    <Textarea
+                                                        bg={'white'} borderColor={'orange.300'} borderWidth={1}
+                                                        id='penanganan'
+                                                        placeholder='Masukan penanganan'
+                                                        {...registerTindak('penanganan')}
+                                                    />
+                                                    <FormErrorMessage>
+                                                        {errorsTindak.penanganan && errorsTindak.penanganan.message}
+                                                    </FormErrorMessage>
+                                                </FormControl>
+                                                <FormControl isInvalid={errorsTindak.tindakan != undefined}>
+                                                    <FormLabel htmlFor='deskripsi'>Tindak Lanjut</FormLabel>
+                                                    <Textarea
+                                                        bg={'white'} borderColor={'orange.300'} borderWidth={1}
+                                                        id='tindakan'
+                                                        placeholder='Masukan tindak lanjut'
+                                                        {...registerTindak('tindakan')}
+                                                    />
+                                                    <FormErrorMessage>
+                                                        {errorsTindak.tindakan && errorsTindak.tindakan.message}
+                                                    </FormErrorMessage>
+                                                </FormControl>
+                                                <FormControl isInvalid={errorsTindak.tanggal != undefined}>
+                                                    <FormLabel htmlFor='deskripsi'>Tanggal Penanganan</FormLabel>
+                                                    <Input
+                                                        bg={'white'} borderColor={'orange.300'} borderWidth={1}
+                                                        id='tanggal'
+                                                        type={'date'}
+                                                        placeholder='Masukan tindak lanjut'
+                                                        {...registerTindak('tanggal')}
+                                                    />
+                                                    <FormErrorMessage>
+                                                        {errorsTindak.tanggal && errorsTindak.tanggal.message}
+                                                    </FormErrorMessage>
+                                                </FormControl>
+                                            </Flex>
+                                        </form>
+                                    </ModalBody>
+                                    <ModalFooter gap={3}>
+                                        <Button onClick={() => {
+                                            onCloseTindak()
+                                            resetTindak()
+                                        }}>Batal</Button>
+                                        <Button isLoading={isSubmitTindak} disabled={!isValidTindak} type='submit' form='form-tindak' fontWeight={600}
                                             color={'white'}
                                             bg={'orange.400'}
                                             _hover={{
                                                 bg: 'orange.300',
-                                            }} mt={'10px'}>
-                                            Tambah
+                                            }}>
+                                            Panggil
                                         </Button>
-                                    </form>
-                                </PopoverContent>
-                            </Popover>
+                                    </ModalFooter>
+                                </ModalContent>
+                            </Modal>
 
                         </div>
                     </div>
@@ -587,7 +641,44 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                                 </form>
                             </div>
                         </DrawerForm>
-                        <DataTable isLoading={isLoading} hiddenColumns={['type', 'point']} columns={columns} data={dataPelanggaran} />
+                        <DataTable isSearch sizeSet isLoading={isLoading} hiddenColumns={['type', 'point']} columns={columns} data={dataPelanggaran} />
+                        <div className="flex md:flex-row flex-col gap-2 md:gap-5 items-center">
+                            <Button fontWeight={600}
+                                width={'full'}
+                                color={'white'}
+                                bg={'green.400'}
+                                leftIcon={<DownloadIcon />}
+                                _hover={{
+                                    bg: 'green.300',
+                                }} mt={'10px'}>
+                                Penghargaan
+                            </Button>
+                            <Button fontWeight={600}
+                                width={'full'}
+                                color={'white'}
+                                bg={'red.400'}
+                                leftIcon={<DownloadIcon />}
+                                _hover={{
+                                    bg: 'red.300',
+                                }} mt={'10px'}>
+                                Pelanggaran
+                            </Button>
+                        </div>
+
+                        <Heading mt={5} size={'md'}>Kartu Bimbingan Siswa</Heading>
+                        <div className="text-[14px]">
+                        <DataTable isLoading={isLoadingTindakan} hiddenColumns={[]} columns={columnsPanggil} data={dataPanggil} />
+                        </div>
+                        <Button fontWeight={600}
+                                width={'full'}
+                                color={'white'}
+                                bg={'green.400'}
+                                leftIcon={<DownloadIcon />}
+                                _hover={{
+                                    bg: 'green.300',
+                                }} mt={'10px'}>
+                                Download Bimbingan
+                            </Button>
                     </div>
                 </div>
             </>
@@ -655,6 +746,61 @@ const ActionTable = ({ value, data, refetch, toast }: ActionValue) => {
                 setDelLoading(true)
                 await handleDeletePoint(value)
             }} onClose={onClose} onOpen={onOpen} isLoading={delLoading} title={'Hapus point'} text={'Apa anda yakin ?'} />
+        </>
+    )
+}
+
+const ActionTableTindak = ({ value, data, refetch, toast }: ActionValue) => {
+    const { data: stateSession } = useSession();
+    const { onOpen, onClose, isOpen } = useDisclosure()
+    const [delLoading, setDelLoading] = useState(false)
+
+    const { mutateAsync: hapusTindak } = trpc.useMutation(['tindak.delete'])
+
+    const handleDeleteTindak = useCallback(
+        async (id: string) => {
+            const delPoint = await hapusTindak(id)
+            if (delPoint.status === 200) {
+                toast({
+                    title: 'Hapus data berhasil',
+                    status: 'success',
+                    duration: 3000,
+                    position: 'top-right',
+                    isClosable: true,
+                })
+                refetch()
+                setDelLoading(false)
+                onClose()
+            } else {
+                toast({
+                    title: 'Hapus data gagal',
+                    status: 'error',
+                    duration: 3000,
+                    position: 'top-right',
+                    isClosable: true,
+                })
+                setDelLoading(false)
+            }
+        }, []
+    )
+
+    return (
+        <>
+            <IconButton
+                isLoading={delLoading}
+                variant='outline'
+                colorScheme='red'
+                aria-label='delete'
+                fontSize='20px'
+                onClick={async () => {
+                    onOpen()
+                }}
+                icon={<IoTrash />}
+            />
+            <DeleteAlert isOpen={isOpen} onClick={async () => {
+                setDelLoading(true)
+                await handleDeleteTindak(value)
+            }} onClose={onClose} onOpen={onOpen} isLoading={delLoading} title={'Hapus data'} text={'Apa anda yakin ?'} />
         </>
     )
 }
