@@ -1,5 +1,5 @@
 import { CalendarIcon, DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
-import { Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Popover, PopoverArrow, PopoverCloseButton, PopoverContent, PopoverTrigger, Select, Spinner, Textarea, Tooltip, useDisclosure, useToast } from "@chakra-ui/react";
+import { Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Icon, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Popover, PopoverArrow, PopoverCloseButton, PopoverContent, PopoverTrigger, Select, Spinner, Textarea, Tooltip, useDisclosure, useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pelanggaran, Siswa, Tindaklanjut } from "@prisma/client";
 import { RangeDatepicker } from "chakra-dayzed-datepicker";
@@ -24,6 +24,7 @@ import { CreatePelanggaranSchema, createPelanggaranSchema } from "../../../../se
 import { createTindakSchema, CreateTindakSchema } from "../../../../server/schema/tindak.schema";
 import { trpc } from "../../../../utils/trpc";
 import 'moment/locale/id'
+import { FaEye } from "react-icons/fa";
 
 export const getServerSideProps: GetServerSideProps<{ data: Siswa }> = async (ctx) => {
     const isDevelopment = process.env.NODE_ENV == "development"
@@ -89,8 +90,10 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
 
     const { mutateAsync: tambahPelanggaran } = trpc.useMutation('pelanggaran.create')
     const { mutateAsync: tambahTindakan } = trpc.useMutation('tindak.create')
+    const { mutateAsync: hapusPanggil, isLoading: isLoadingDelPanggil } = trpc.useMutation(['panggil.delete'])
     const { data: dataSiswa, isLoading, refetch } = trpc.useQuery(['siswa.getByID', { id: data.id, type: selectedType, star_date: selectedDates[0] ? moment(selectedDates[0]).format('YYYY-MM-DD') : '', end_date: selectedDates[1] ? moment(selectedDates[1]).format('YYYY-MM-DD') : '' }])
     const { data: dataTindakan, isLoading: isLoadingTindakan, refetch: refetchTindak } = trpc.useQuery(['tindak.getByIDSiswa', String(dataSiswa?.result?.id)])
+    const { data: dataPanggilortu, isLoading: isLoadingPanggil, refetch: refetchPanggil } = trpc.useQuery(['panggil.getAllByIDSiswa', String(dataSiswa?.result?.id)])
 
     const handleAddPelanggaran = useCallback(
         async (data: CreatePelanggaranSchema) => {
@@ -366,14 +369,16 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                                     }} mt={'10px'}>
                                     Panggil siswa
                                 </Button>
-                                <Button fontWeight={600}
-                                    color={'white'}
-                                    bg={'red.400'}
-                                    _hover={{
-                                        bg: 'red.300',
-                                    }} mt={'10px'}>
-                                    Panggilan Orang Tua
-                                </Button>
+                                <Link href={`/admin/data/siswa/panggil/${data.id}`}>
+                                    <Button fontWeight={600}
+                                        color={'white'}
+                                        bg={'red.400'}
+                                        _hover={{
+                                            bg: 'red.300',
+                                        }} mt={'10px'}>
+                                        Panggilan Orang Tua
+                                    </Button>
+                                </Link>
                             </div>
                             <Modal isCentered isOpen={isOpenTindak} onClose={() => {
                                 onCloseTindak()
@@ -484,6 +489,48 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                         </div>
                     </div>
                     <div className="mt-5 flex flex-col gap-3">
+                        <Heading size={'md'}>Data Panggilan Orang tua</Heading>
+                        <div className='p-5 overflow-auto my-5 bg-white rounded shadow'>
+                            {dataPanggilortu && dataPanggilortu.result.map((item, idx) => {
+                                return (
+                                    <div className="flex gap-2 items-center" key={idx}>
+                                        <p>{idx + 1}.</p>
+                                        <p>{item.perihal}</p>
+                                        <p>-</p>
+                                        <Link href={`/admin/data/siswa/panggil/detail/${item.id}`}>
+                                            <IconButton color={'orange.300'} size={'sm'} variant={'ghost'} aria-label={""}>
+                                                <FaEye />
+                                            </IconButton>
+                                        </Link>
+                                        <IconButton onClick={onOpenPanggil} size={'sm'} colorScheme={'red'} variant={'ghost'} aria-label={""}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                        <DeleteAlert isOpen={isOpenPanggil} onClick={async () => {
+                                            const delPanggil = await hapusPanggil(item.id)
+                                            if (delPanggil.status === 200) {
+                                                toast({
+                                                    title: 'Hapus data berhasil',
+                                                    status: 'success',
+                                                    duration: 3000,
+                                                    position: 'top-right',
+                                                    isClosable: true,
+                                                })
+                                                refetchPanggil()
+                                                onClosePanggil()
+                                            } else {
+                                                toast({
+                                                    title: 'Hapus data gagal',
+                                                    status: 'error',
+                                                    duration: 3000,
+                                                    position: 'top-right',
+                                                    isClosable: true,
+                                                })
+                                            }
+                                        }} onClose={onClosePanggil} onOpen={onOpenPanggil} isLoading={isLoadingDelPanggil} title={'Hapus Panggilan'} text={'Apa anda yakin ?'} />
+                                    </div>
+                                )
+                            })}
+                        </div>
                         <Heading size={'md'}>Data Point Siswa</Heading>
                         <div className='w-full mb-3 flex justify-end items-end'>
                             <Button onClick={() => {
@@ -641,7 +688,9 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                                 </form>
                             </div>
                         </DrawerForm>
-                        <DataTable isSearch sizeSet isLoading={isLoading} hiddenColumns={['type', 'point']} columns={columns} data={dataPelanggaran} />
+                        <div className="text-[14px]">
+                            <DataTable isSearch sizeSet isLoading={isLoading} hiddenColumns={['type', 'point']} columns={columns} data={dataPelanggaran} />
+                        </div>
                         <div className="flex md:flex-row flex-col gap-2 md:gap-5 items-center">
                             <Button fontWeight={600}
                                 width={'full'}
@@ -667,18 +716,18 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
 
                         <Heading mt={5} size={'md'}>Kartu Bimbingan Siswa</Heading>
                         <div className="text-[14px]">
-                        <DataTable isLoading={isLoadingTindakan} hiddenColumns={[]} columns={columnsPanggil} data={dataPanggil} />
+                            <DataTable isLoading={isLoadingTindakan} hiddenColumns={[]} columns={columnsPanggil} data={dataPanggil} />
                         </div>
                         <Button fontWeight={600}
-                                width={'full'}
-                                color={'white'}
-                                bg={'green.400'}
-                                leftIcon={<DownloadIcon />}
-                                _hover={{
-                                    bg: 'green.300',
-                                }} mt={'10px'}>
-                                Download Bimbingan
-                            </Button>
+                            width={'full'}
+                            color={'white'}
+                            bg={'green.400'}
+                            leftIcon={<DownloadIcon />}
+                            _hover={{
+                                bg: 'green.300',
+                            }} mt={'10px'}>
+                            Download Bimbingan
+                        </Button>
                     </div>
                 </div>
             </>

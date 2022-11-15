@@ -127,7 +127,7 @@ model Panggilortu {
     nama_bk String @db.VarChar(255)
     nip_bk String @db.VarChar(255)
     tanggal DateTime
-    waktu DateTime
+    waktu String @db.VarChar(255)
     tempat String @db.VarChar(255)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
