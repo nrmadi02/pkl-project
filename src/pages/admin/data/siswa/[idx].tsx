@@ -491,8 +491,8 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                     <div className="mt-5 flex flex-col gap-3">
                         <Heading size={'md'}>Data Panggilan Orang tua</Heading>
                         <div className='p-5 overflow-auto my-5 bg-white rounded shadow'>
-                            {dataPanggilortu && dataPanggilortu.result.map((item, idx) => {
-                                return (
+                            {dataPanggilortu ? dataPanggilortu.result.map((item, idx) => {
+                                return item ? (
                                     <div className="flex gap-2 items-center" key={idx}>
                                         <p>{idx + 1}.</p>
                                         <p>{item.perihal}</p>
@@ -528,8 +528,8 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                                             }
                                         }} onClose={onClosePanggil} onOpen={onOpenPanggil} isLoading={isLoadingDelPanggil} title={'Hapus Panggilan'} text={'Apa anda yakin ?'} />
                                     </div>
-                                )
-                            })}
+                                ) : <p key={idx}>-</p>
+                            }) : <Spinner color="orange.400" />}
                         </div>
                         <Heading size={'md'}>Data Point Siswa</Heading>
                         <div className='w-full mb-3 flex justify-end items-end'>
