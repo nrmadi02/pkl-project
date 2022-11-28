@@ -70,7 +70,7 @@ export const tindaklanjutRoutes = createRouter()
                     siswaID: input,
                     tanggal: {
                         gte: new Date(moment().startOf('month').format('YYYY-MM-DD')),
-                        lte: new Date(moment().format('YYYY-MM-DD'))
+                        lte: new Date(moment().endOf('month').format('YYYY-MM-DD'))
                     }
                 }
             })

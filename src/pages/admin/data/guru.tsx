@@ -93,7 +93,7 @@ const DataGuru: NextPage = () => {
             accessor: "jenisKelamin"
         },
         {
-            Header: "Jenis Guru",
+            Header: "Jabatan",
             accessor: "jenisGuru"
         },
         {
@@ -187,7 +187,9 @@ const DataGuru: NextPage = () => {
                             Tambah data
                         </Button>
                     </div>
-                    <DataTable isSearch sizeSet hiddenColumns={['nama', 'email']} isLoading={isLoading} columns={columns} data={data} />
+                    <div className="text-[14px]">
+                        <DataTable isSearch sizeSet hiddenColumns={['nama', 'email']} isLoading={isLoading} columns={columns} data={data} />
+                    </div>
                 </div>
                 <DrawerForm btnRef={btnRef} isOpen={isOpen} onClose={() => {
                     setFile('')
@@ -279,7 +281,7 @@ const DataGuru: NextPage = () => {
                                     </FormErrorMessage>
                                 </FormControl>
                                 <FormControl isInvalid={errors.jenisGuru != undefined}>
-                                    <FormLabel htmlFor='jenisGuru'>Jenis Guru</FormLabel>
+                                    <FormLabel htmlFor='jenisGuru'>Jabatan</FormLabel>
                                     <Input
                                         bg={'white'} borderColor={'orange.300'} borderWidth={1}
                                         id='jenisGuru'
@@ -569,7 +571,7 @@ const ActionTable = ({ value, data, refetch, toast, dataKelas }: ActionValue) =>
                                 </FormErrorMessage>
                             </FormControl>
                             <FormControl isInvalid={errors.jenisGuru != undefined}>
-                                <FormLabel htmlFor='jenisGuru'>Jenis Guru</FormLabel>
+                                <FormLabel htmlFor='jenisGuru'>Jabatan</FormLabel>
                                 <Input
                                     bg={'white'} borderColor={'orange.300'} borderWidth={1}
                                     id='jenisGuru'

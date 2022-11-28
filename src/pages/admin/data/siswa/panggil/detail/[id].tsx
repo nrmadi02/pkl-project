@@ -99,7 +99,7 @@ const PanggilOrangTua: NextPage<InferGetServerSidePropsType<typeof getServerSide
 
                     {/* <Heading mt={'4'} size={'md'}>Detail Panggilan</Heading> */}
                     {/* {isServer && <Scrollbars ref={ref} style={{ width: '800px', height: "1000px" }}> */}
-                    <div className='p-5 md:p-20 min-w-[800px] overflow-auto my-5 bg-white rounded shadow'>
+                    <div className='p-5 md:p-10 min-w-[800px] overflow-auto my-5 bg-white rounded shadow'>
                         <SuratPanggilanOrtu ref={componentRef} data={dataPanggilan?.result} />
                     </div>
                     {/* </Scrollbars>} */}

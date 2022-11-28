@@ -11,6 +11,8 @@ import { guruRoutes } from "./guru.routes";
 import { siswaRoutes } from "./siswa.routes";
 import { tindaklanjutRoutes } from './tindak.routes';
 import { panggilRoutes } from './panggil.routes';
+import { labRoutes } from './lab.routes';
+import { informasiRoutes } from './informasi.routes';
 
 export const appRouter = createRouter()
   .transformer(superjson)
@@ -23,6 +25,8 @@ export const appRouter = createRouter()
   .merge("pelanggaran.", pelanggaranRoutes)
   .merge("tindak.", tindaklanjutRoutes)
   .merge("panggil.", panggilRoutes)
+  .merge("lab.", labRoutes)
+  .merge("informasi.", informasiRoutes)
 
 // export type definition of API
 export type AppRouter = typeof appRouter;

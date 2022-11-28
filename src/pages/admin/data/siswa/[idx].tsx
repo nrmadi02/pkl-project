@@ -25,6 +25,8 @@ import { createTindakSchema, CreateTindakSchema } from "../../../../server/schem
 import { trpc } from "../../../../utils/trpc";
 import 'moment/locale/id'
 import { FaEye } from "react-icons/fa";
+import * as FileSaver from "file-saver";
+import * as XLSX from "xlsx";
 
 export const getServerSideProps: GetServerSideProps<{ data: Siswa }> = async (ctx) => {
     const isDevelopment = process.env.NODE_ENV == "development"
@@ -71,6 +73,18 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
     const [selectedDates, setSelectedDates] = useState<Date[]>([]);
     const [selectedType, setSelectedType] = useState('')
 
+    const fileType =
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+    const fileExtension = ".xlsx";
+
+    const exportToCSV = (apiData: any, fileName: any) => {
+        const ws = XLSX.utils.json_to_sheet(apiData);
+        const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+        const data = new Blob([excelBuffer], { type: fileType });
+        FileSaver.saveAs(data, fileName + fileExtension);
+    };
+
     const { register, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting, isDirty, isValid } } = useForm<CreatePelanggaranSchema>({
         resolver: zodResolver(createPelanggaranSchema),
         mode: "onChange"
@@ -94,6 +108,8 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
     const { data: dataSiswa, isLoading, refetch } = trpc.useQuery(['siswa.getByID', { id: data.id, type: selectedType, star_date: selectedDates[0] ? moment(selectedDates[0]).format('YYYY-MM-DD') : '', end_date: selectedDates[1] ? moment(selectedDates[1]).format('YYYY-MM-DD') : '' }])
     const { data: dataTindakan, isLoading: isLoadingTindakan, refetch: refetchTindak } = trpc.useQuery(['tindak.getByIDSiswa', String(dataSiswa?.result?.id)])
     const { data: dataPanggilortu, isLoading: isLoadingPanggil, refetch: refetchPanggil } = trpc.useQuery(['panggil.getAllByIDSiswa', String(dataSiswa?.result?.id)])
+    const {data: dataDownloadPenghargaan} = trpc.useQuery(['pelanggaran.downloadByType', "Penghargaan"])
+    const {data: dataDownloadPelanggaran} = trpc.useQuery(['pelanggaran.downloadPelanggaran'])
 
     const handleAddPelanggaran = useCallback(
         async (data: CreatePelanggaranSchema) => {
@@ -243,7 +259,7 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
 
     const columnsPanggil = useMemo(() => [
         {
-            Header: "Hari, Tanggall",
+            Header: "Hari, Tanggal",
             accessor: (d: Tindaklanjut) => {
                 const date = moment(d.tanggal).format("dddd, DD/MM/YYYY")
                 return (
@@ -497,6 +513,7 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                                         <p>{idx + 1}.</p>
                                         <p>{item.perihal}</p>
                                         <p>-</p>
+                                        <p>{moment(item.tanggal).format("DD/MM/YYYY")}</p>
                                         <Link href={`/admin/data/siswa/panggil/detail/${item.id}`}>
                                             <IconButton color={'orange.300'} size={'sm'} variant={'ghost'} aria-label={""}>
                                                 <FaEye />
@@ -697,6 +714,9 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                                 color={'white'}
                                 bg={'green.400'}
                                 leftIcon={<DownloadIcon />}
+                                onClick={async () => {
+                                    exportToCSV(dataDownloadPenghargaan?.result, `penghargaan_${dataSiswa?.result?.nama}`)
+                                }}
                                 _hover={{
                                     bg: 'green.300',
                                 }} mt={'10px'}>
@@ -706,6 +726,9 @@ const DetailSiswa: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                                 width={'full'}
                                 color={'white'}
                                 bg={'red.400'}
+                                onClick={async () => {
+                                    exportToCSV(dataDownloadPelanggaran?.result, `pelanggaran_${dataSiswa?.result?.nama}`)
+                                }}
                                 leftIcon={<DownloadIcon />}
                                 _hover={{
                                     bg: 'red.300',

@@ -9,7 +9,7 @@ export const pelanggaranRoutes = createRouter()
         input: createPelanggaranSchema,
         resolve: async ({ ctx, input }) => {
             const { deskripsi, pemeberi, point, siswaID, type } = input
-            
+
             const totalPoint = await ctx.prisma.pelanggaran.aggregate({
                 where: {
                     siswaID: siswaID
@@ -19,8 +19,8 @@ export const pelanggaranRoutes = createRouter()
                 }
             })
 
-            if(type == "Penghargaan"){
-                if(Number(point) > Number(totalPoint._sum.point)){
+            if (type == "Penghargaan") {
+                if (Number(point) > Number(totalPoint._sum.point)) {
                     console.log(point)
                     return {
                         status: 400,
@@ -48,7 +48,7 @@ export const pelanggaranRoutes = createRouter()
     })
     .mutation('delete', {
         input: string(),
-        resolve: async ({ctx, input}) => {
+        resolve: async ({ ctx, input }) => {
             const deletePelanggaran = await ctx.prisma.pelanggaran.delete({
                 where: {
                     id: input
@@ -60,4 +60,49 @@ export const pelanggaranRoutes = createRouter()
                 message: "Point berhasil dihapus",
             }
         }
+    })
+    .query('downloadByType', {
+        input: string(),
+        resolve: async ({ ctx, input }) => {
+            const dataDownload = await ctx.prisma.pelanggaran.findMany({
+                where: {
+                    type: input
+                },
+                select: {
+                    pemberi: true,
+                    deskripsi: true,
+                    point: true,
+                    type: true
+                }
+            })
+            return {
+                status: 200,
+                message: "Point berhasil didownload",
+                result: dataDownload
+            }
+        }
+
+    })
+    .query('downloadPelanggaran', {
+        resolve: async ({ ctx }) => {
+            const dataDownload = await ctx.prisma.pelanggaran.findMany({
+                where: {
+                    type: {
+                        not: "Penghargaan"
+                    }
+                },
+                select: {
+                    pemberi: true,
+                    deskripsi: true,
+                    point: true,
+                    type: true
+                }
+            })
+            return {
+                status: 200,
+                message: "Point berhasil didownload",
+                result: dataDownload
+            }
+        }
+
     })

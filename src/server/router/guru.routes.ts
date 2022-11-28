@@ -180,4 +180,19 @@ export const guruRoutes = createRouter()
             };
         }
     })
+    .query('getByUserID', {
+        input: z.string(),
+        resolve: async ({ ctx, input }) => {
+            const guruByUserID = await ctx.prisma.guru.findFirst({
+                where: {
+                    userID: input
+                }
+            })
+            return {
+                status: 200,
+                message: "Data guru berhasil diambil",
+                result: guruByUserID
+            };
+        }
+    })
 

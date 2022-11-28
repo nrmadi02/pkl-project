@@ -70,7 +70,8 @@ const DataTable: NextPage<Props> = ({
         hiddenColumns: hiddenColumns
       },
       autoResetPage: false,
-      autoResetFilters: false
+      autoResetFilters: false,
+      autoResetSortBy: false
     }, useFilters, useGlobalFilter, useSortBy, usePagination);
 
   return (

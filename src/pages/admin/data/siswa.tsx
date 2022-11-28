@@ -19,6 +19,9 @@ import { getCookie } from "cookies-next";
 import NextLink from 'next/link'
 import { useSession } from "next-auth/react";
 import DeleteAlert from "../../../components/Alert/Delete";
+import * as FileSaver from "file-saver";
+import * as XLSX from "xlsx";
+import { DownloadIcon } from "@chakra-ui/icons";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const isDevelopment = process.env.NODE_ENV == "development"
@@ -64,6 +67,18 @@ const DataSiswa: NextPage = () => {
             backdropFilter='blur(5px)'
         />
     )
+
+    const fileType =
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+    const fileExtension = ".xlsx";
+
+    const exportToCSV = (apiData: any, fileName: any) => {
+        const ws = XLSX.utils.json_to_sheet(apiData);
+        const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+        const data = new Blob([excelBuffer], { type: fileType });
+        FileSaver.saveAs(data, fileName + fileExtension);
+    };
 
     const handleChangeFile = (e: any) => {
         e.target?.files[0] && setFile(URL.createObjectURL(e.target?.files[0]))
@@ -283,7 +298,22 @@ const DataSiswa: NextPage = () => {
                             </Button>
                         </div>
                     </div>
-                    <DataTable isSearch sizeSet isLoading={isLoading} hiddenColumns={['email', 'nama']} columns={columns} data={data} />
+                    <div className="text-[14px]">
+                        <DataTable isSearch sizeSet isLoading={isLoading} hiddenColumns={['email', 'nama']} columns={columns} data={data} />
+                    </div>
+                    <Button fontWeight={600}
+                        width={'full'}
+                        color={'white'}
+                        bg={'green.400'}
+                        onClick={async () => {
+                            exportToCSV(dataSiswa?.result, `data_siswa ${selectKelas ? 'kelas ' + selectKelas : ''}`)
+                        }}
+                        leftIcon={<DownloadIcon />}
+                        _hover={{
+                            bg: 'green.300',
+                        }} mt={'10px'}>
+                            {selectKelas ? `Download data siswa kelas ${selectKelas}` : 'Download data siswa'}
+                    </Button>
                 </div>
                 <Modal isCentered isOpen={isOpenModal} onClose={onCloseModal}>
                     <OverlayTwo />

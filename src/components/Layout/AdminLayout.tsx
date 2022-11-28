@@ -9,6 +9,7 @@ import {
 } from 'react-icons/io5';
 import ItemSidebar from '../Sidebar/ItemSidebar';
 import Logo from '../../assets/logo/logo-smabat.png'
+import Link from 'next/link';
 
 type Props = {
   children: JSX.Element
@@ -115,7 +116,9 @@ const AdminLayout: NextPage<Props> = ({ children, breadcrumb, title }) => {
                         {loading && <Spinner color='orange.500' />}
                       </MenuButton>
                       <MenuList>
-                        <MenuItem _focus={{ color: "orange.500" }}>Home</MenuItem>
+                        <Link href={'/'}>
+                          <MenuItem _focus={{ color: "orange.500" }}>Home</MenuItem>
+                        </Link>
                         <MenuItem onClick={() => {
                           setLoading(true)
                           handleLogOut()

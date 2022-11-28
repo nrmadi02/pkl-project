@@ -27,6 +27,7 @@ model User {
 
     guru Guru?
     siswa Siswa?
+    informasi Informasi[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -47,6 +48,8 @@ model Guru {
 
     user   User @relation(fields: [userID], references: [id])
     userID String  @unique
+
+    pengajuan_lab Lab[]
     
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -145,6 +148,40 @@ model Periode {
     updatedAt DateTime @updatedAt
 
     @@map(name: "periode")
+}
+
+model Lab {
+    id String @id @default(uuid())
+    type String @db.VarChar(255)
+    deskripsi String @db.VarChar(255)
+    start_jam String @db.VarChar(255)
+    end_jam String @db.VarChar(255)
+    tanggal String @db.VarChar(255)
+    status String @db.VarChar(255)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    guru   Guru @relation(fields: [guruID], references: [id])
+    guruID String
+
+    @@map(name: "lab")
+}
+
+model Informasi {
+    id String @id @default(uuid())
+    judul String @db.Text
+    deskripsi String @db.Text
+    isi String @db.LongText
+    pembuat String @db.Char(255)
+    sampul String? @db.Text
+    status String @db.Char(255)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user   User @relation(fields: [userID], references: [id])
+    userID String 
+
+    @@map(name: "informasi")
 }
 
 enum RoleEnumType {

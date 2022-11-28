@@ -18,7 +18,7 @@ export type Ref = HTMLDivElement;
 
 const Surat = (props: Props, ref: LegacyRef<Ref>) => {
     return (
-        <div className="font-surat p-5" ref={ref}>
+        <div className="font-surat p-10" ref={ref}>
             <div className="flex justify-center flex-row gap-3">
                 <div>
                     <Image src={LogoKALSEL} alt="_logo" width={100} height={120} />
