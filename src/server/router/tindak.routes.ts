@@ -65,15 +65,7 @@ export const tindaklanjutRoutes = createRouter()
     .query('getByIDSiswa', {
         input: string(),
         resolve: async ({ctx, input}) => {
-            const tindakan = await ctx.prisma.tindaklanjut.findMany({
-                where: {
-                    siswaID: input,
-                    tanggal: {
-                        gte: new Date(moment().startOf('month').format('YYYY-MM-DD')),
-                        lte: new Date(moment().endOf('month').format('YYYY-MM-DD'))
-                    }
-                }
-            })
+            const tindakan = await ctx.prisma.tindaklanjut.findMany()
 
             return {
                 status: 200,

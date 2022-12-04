@@ -13,7 +13,7 @@ import {
   IoSettings,
   IoTime,
 } from "react-icons/io5";
-import { MdComputer } from "react-icons/md";
+import { MdComputer, MdDoNotTouch } from "react-icons/md";
 
 interface FeatureProps {
   text: string;
@@ -97,7 +97,13 @@ const adminItems = [
         icon: FaPenAlt,
         title: "Point",
         url: "/admin/tatib/point",
-        prefix: "tatib",
+        prefix: "point",
+      },
+      {
+        icon: MdDoNotTouch,
+        title: "Terlambat",
+        url: "/admin/tatib/terlambat",
+        prefix: "terlambat",
       },
     ],
   },

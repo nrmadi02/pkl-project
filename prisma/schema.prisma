@@ -25,8 +25,8 @@ model User {
     password String
     role     RoleEnumType? @default(siswa)
 
-    guru Guru?
-    siswa Siswa?
+    guru      Guru?
+    siswa     Siswa?
     informasi Informasi[]
 
     createdAt DateTime @default(now())
@@ -36,21 +36,21 @@ model User {
 }
 
 model Guru {
-    id String @id @default(uuid())
-    nama String @db.VarChar(255)
-    nip String @unique @db.VarChar(255)
-    email String @unique @db.VarChar(255)
-    jenisKelamin String @db.VarChar(255)
-    jenisGuru String @db.VarChar(255)
-    fotoProfile String? @db.Text()
-    waliKelas Boolean @default(false)
-    namaKelas String? @db.VarChar(255)
+    id           String  @id @default(uuid())
+    nama         String  @db.VarChar(255)
+    nip          String  @unique @db.VarChar(255)
+    email        String  @unique @db.VarChar(255)
+    jenisKelamin String  @db.VarChar(255)
+    jenisGuru    String  @db.VarChar(255)
+    fotoProfile  String? @db.Text()
+    waliKelas    Boolean @default(false)
+    namaKelas    String? @db.VarChar(255)
 
-    user   User @relation(fields: [userID], references: [id])
-    userID String  @unique
+    user   User   @relation(fields: [userID], references: [id])
+    userID String @unique
 
     pengajuan_lab Lab[]
-    
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -58,21 +58,22 @@ model Guru {
 }
 
 model Siswa {
-    id String @id @default(uuid())
-    nama String @db.VarChar(255)
-    nis String @unique @db.VarChar(255)
-    email String @unique @db.VarChar(255)
-    jenisKelamin String @db.VarChar(255)
-    fotoProfile String? @db.Text()
-    kelas String? @db.VarChar(255)
+    id           String  @id @default(uuid())
+    nama         String  @db.VarChar(255)
+    nis          String  @unique @db.VarChar(255)
+    email        String  @unique @db.VarChar(255)
+    jenisKelamin String  @db.VarChar(255)
+    fotoProfile  String? @db.Text()
+    kelas        String? @db.VarChar(255)
 
-    user   User @relation(fields: [userID], references: [id])
-    userID String  @unique
+    user   User   @relation(fields: [userID], references: [id])
+    userID String @unique
 
-    pelanggaran Pelanggaran[]
+    pelanggaran  Pelanggaran[]
     tindaklanjut Tindaklanjut[]
     panggil_ortu Panggilortu[]
-    
+    terlambat    Terlambat[]
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -80,8 +81,8 @@ model Siswa {
 }
 
 model Kelas {
-    id String @id @default(uuid())
-    name String @db.VarChar(255)
+    id        String   @id @default(uuid())
+    name      String   @db.VarChar(255)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -89,61 +90,80 @@ model Kelas {
 }
 
 model Pelanggaran {
-    id String @id @default(uuid())
-    type String @db.VarChar(255)
-    deskripsi String @db.Text
-    point Int @db.Int
-    pemberi String @db.VarChar(255)
+    id        String   @id @default(uuid())
+    type      String   @db.VarChar(255)
+    deskripsi String   @db.Text
+    point     Int      @db.Int
+    pemberi   String   @db.VarChar(255)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    siswa   Siswa @relation(fields: [siswaID], references: [id])
+    siswa   Siswa  @relation(fields: [siswaID], references: [id])
     siswaID String
 
     @@map(name: "pelanggaran")
+    @@index([siswaID])
+}
+
+model Terlambat {
+    id        String   @id @default(uuid())
+    waktu     Int      @db.Int
+    point     Int      @db.Int
+    pencatat  String   @db.VarChar(255)
+    akumulasi Boolean
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    siswa   Siswa  @relation(fields: [siswaID], references: [id])
+    siswaID String
+
+    @@map(name: "terlambat")
+    @@index([siswaID])
 }
 
 model Tindaklanjut {
-    id String @id @default(uuid())
-    type String @db.VarChar(255)
-    deskripsi String @db.Text
-    penindak String @db.VarChar(255)
-    penanganan String @db.Text 
-    tindakan String @db.Text
-    tanggal DateTime
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id         String   @id @default(uuid())
+    type       String   @db.VarChar(255)
+    deskripsi  String   @db.Text
+    penindak   String   @db.VarChar(255)
+    penanganan String   @db.Text
+    tindakan   String   @db.Text
+    tanggal    DateTime
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 
-    siswa   Siswa @relation(fields: [siswaID], references: [id])
+    siswa   Siswa  @relation(fields: [siswaID], references: [id])
     siswaID String
 
     @@map(name: "tindaklanjut")
+    @@index([siswaID])
 }
 
 model Panggilortu {
-    id String @id @default(uuid())
-    no_surat String @db.VarChar(255)
-    perihal String @db.VarChar(255)
-    nama_ortu String @db.VarChar(255)
-    wali_kelas String @db.VarChar(255)
-    nip_wali String @db.VarChar(255)
-    nama_bk String @db.VarChar(255)
-    nip_bk String @db.VarChar(255)
-    tanggal DateTime
-    waktu String @db.VarChar(255)
-    tempat String @db.VarChar(255)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id         String   @id @default(uuid())
+    no_surat   String   @db.VarChar(255)
+    perihal    String   @db.VarChar(255)
+    nama_ortu  String   @db.VarChar(255)
+    wali_kelas String   @db.VarChar(255)
+    nip_wali   String   @db.VarChar(255)
+    nama_bk    String   @db.VarChar(255)
+    nip_bk     String   @db.VarChar(255)
+    tanggal    DateTime
+    waktu      String   @db.VarChar(255)
+    tempat     String   @db.VarChar(255)
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 
-    siswa   Siswa @relation(fields: [siswaID], references: [id])
+    siswa   Siswa  @relation(fields: [siswaID], references: [id])
     siswaID String
 
     @@map(name: "panggil_ortu")
+    @@index([siswaID])
 }
 
 model Periode {
-    id String @id @default(uuid())
-    periode String @unique @db.VarChar(255)
+    id        String   @id @default(uuid())
+    periode   String   @unique @db.VarChar(255)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -151,37 +171,39 @@ model Periode {
 }
 
 model Lab {
-    id String @id @default(uuid())
-    type String @db.VarChar(255)
-    deskripsi String @db.VarChar(255)
-    start_jam String @db.VarChar(255)
-    end_jam String @db.VarChar(255)
-    tanggal String @db.VarChar(255)
-    status String @db.VarChar(255)
+    id        String   @id @default(uuid())
+    type      String   @db.VarChar(255)
+    deskripsi String   @db.VarChar(255)
+    start_jam String   @db.VarChar(255)
+    end_jam   String   @db.VarChar(255)
+    tanggal   String   @db.VarChar(255)
+    status    String   @db.VarChar(255)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    guru   Guru @relation(fields: [guruID], references: [id])
+    guru   Guru   @relation(fields: [guruID], references: [id])
     guruID String
 
     @@map(name: "lab")
+    @@index([guruID])
 }
 
 model Informasi {
-    id String @id @default(uuid())
-    judul String @db.Text
-    deskripsi String @db.Text
-    isi String @db.LongText
-    pembuat String @db.Char(255)
-    sampul String? @db.Text
-    status String @db.Char(255)
+    id        String   @id @default(uuid())
+    judul     String   @db.Text
+    deskripsi String   @db.Text
+    isi       String   @db.LongText
+    pembuat   String   @db.Char(255)
+    sampul    String?  @db.Text
+    status    String   @db.Char(255)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    user   User @relation(fields: [userID], references: [id])
-    userID String 
+    user   User   @relation(fields: [userID], references: [id])
+    userID String
 
     @@map(name: "informasi")
+    @@index([userID])
 }
 
 enum RoleEnumType {
