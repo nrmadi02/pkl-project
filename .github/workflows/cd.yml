@@ -46,7 +46,7 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           port: ${{ secrets.DEPLOY_PORT }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
+          password: ${{ secrets.PASSWORD }}
           envs: GITHUB_USERNAME, TOKEN
           script: |
             docker login ghcr.io -u $GITHUB_USERNAME -p $TOKEN
