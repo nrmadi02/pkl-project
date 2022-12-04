@@ -17,7 +17,7 @@ RUN echo "DATABASE_URL=$NEXT_PUBLIC_DATABASE_URL"
 
 FROM node:18-alpine as deploy
 WORKDIR /app
-ENV NODE_ENV production
+ENV NODE_ENV="production"
 ENV DATABASE_URL="mysql://nrmadi02:Ulalaa2202@103.13.207.10:3306/db_pkl"
 ENV TZ Asia/Kuala_Lumpur
 
