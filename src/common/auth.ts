@@ -61,7 +61,7 @@ export const nextAuthOptions: NextAuthOptions = {
       if (token) {
         session.id = tokenUser.id;
         session.email = tokenUser.email;
-        session.nomor_induk = tokenUser.nomorInduk,
+        session.nomorInduk = tokenUser.nomorInduk,
         session.role = tokenUser.role
       }
 
