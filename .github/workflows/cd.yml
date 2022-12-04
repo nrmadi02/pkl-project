@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       logLevel:
-        description: "Log level"
+        description: 'Log level'
         required: true
-        default: "warning"
+        default: 'warning'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -23,24 +23,19 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-      - name: Build and push
-        uses: docker/build-push-action@v2
+      - uses: actions/checkout@v2
+      - name: Build and Publish to Github Packages Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         with:
-          push: true
-          tags: nrmadi02/pkl:latest
+          name: nrmadi02/pkl-project/pkl
+          registry: ghcr.io
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.TOKEN }}
           dockerfile: Dockerfile
-          buildargs: DATABASE_URLt
+          buildargs: DATABASE_URL
+          tags: latest
 
       - name: Deploy package to VPS
         uses: appleboy/ssh-action@master
@@ -54,7 +49,8 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           envs: GITHUB_USERNAME, TOKEN
           script: |
-            docker pull nrmadi02/pkl:latest
+            docker login ghcr.io -u $GITHUB_USERNAME -p $TOKEN
+            docker pull ghcr.io/nrmadi02/pkl-project/pkl:latest
             docker stop pkl
             docker system prune -f
-            docker run --name pkl -dit -p 3000:3000 nrmadi02/pkl:latest
+            docker run --name pkl -dit -p 3000:3000 ghcr.io/nrmadi02/pkl-project/pkl:latest
