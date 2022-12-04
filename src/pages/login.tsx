@@ -62,7 +62,7 @@ const Login: NextPage = () => {
   }, [watch])
 
   useEffect(() => {
-    console.log(router.query)
+    console.log(process.env.NODE_ENV)
   }, [router])
 
   return (
