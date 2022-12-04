@@ -76,5 +76,4 @@ export const nextAuthOptions: NextAuthOptions = {
     signIn: "/login",
     // newUser: "/sign-up",
   },
-  useSecureCookies: true
 };
