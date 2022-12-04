@@ -16,7 +16,7 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV TZ Asia/Kuala_Lumpur
 
-COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/next.config.mjs ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/.next/standalone ./
