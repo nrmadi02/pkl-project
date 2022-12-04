@@ -41,7 +41,7 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           GITHUB_USERNAME: ${{ secrets.USERNAME }}
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          TOKEN: ${{ secrets.TOKEN }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           port: ${{ secrets.DEPLOY_PORT }}
