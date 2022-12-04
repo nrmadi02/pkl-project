@@ -37,7 +37,7 @@ jobs:
           buildargs: DATABASE_URL
           tags: latest
 
-      - name: Deploy package to digitalocean
+      - name: Deploy package to VPS
         uses: appleboy/ssh-action@master
         env:
           GITHUB_USERNAME: ${{ secrets.USERNAME }}
