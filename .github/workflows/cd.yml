@@ -27,14 +27,14 @@ jobs:
       - name: Build and Publish to Github Packages Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         env:
-          ARG_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_DATABASE_URL: ${{ secrets.DATABASE_URL }}
         with:
           name: nrmadi02/pkl-project/pkl
           registry: ghcr.io
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.TOKEN }}
           dockerfile: Dockerfile
-          buildargs: ARG_DATABASE_URL
+          buildargs: NEXT_PUBLIC_DATABASE_URL
           tags: latest
 
       - name: Deploy package to VPS

@@ -5,8 +5,8 @@ COPY prisma ./prisma
 RUN npm install --save --legacy-peer-deps
 
 FROM node:18-alpine as builder
-ARG ARG_DATABASE_URL
-ENV DATABASE_URL=$ARG_DATABASE_URL
+ARG NEXT_PUBLIC_DATABASE_URL
+ENV DATABASE_URL=$NEXT_PUBLIC_DATABASE_URL
 WORKDIR /app
 COPY . .
 COPY --from=dependencies /app/node_modules ./node_modules
@@ -15,7 +15,6 @@ RUN npm run build
 
 # debug
 RUN echo "DATABASE_URL=$DATABASE_URL"
-RUN echo "NEXTAUTH_URL=$NEXTAUTH_URL"
 
 FROM node:18-alpine as deploy
 WORKDIR /app
