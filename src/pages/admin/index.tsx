@@ -16,7 +16,6 @@ import { getCookie } from "cookies-next";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
-  console.log(proto)
   const token = getCookie(
     proto == "http" ? "next-auth.session-token" : "__Secure-next-auth.session-token",
     { req: ctx.req, res: ctx.res }

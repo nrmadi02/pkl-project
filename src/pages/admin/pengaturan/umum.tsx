@@ -1,132 +1,170 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Input, useToast } from "@chakra-ui/react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading,
+  Input,
+  useToast,
+} from "@chakra-ui/react";
 import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { useForm } from "react-hook-form";
-import { createPeriodeSchema, CreatePeriodeSchema } from "../../../server/schema/periode.schema";
+import {
+  createPeriodeSchema,
+  CreatePeriodeSchema,
+} from "../../../server/schema/periode.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { trpc } from "../../../utils/trpc";
 import { useCallback, useEffect } from "react";
 import { getCookie } from "cookies-next";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    const isDevelopment = process.env.NODE_ENV == "development"
-    const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', {req: ctx.req, res: ctx.res})
-    if(!token) {
-      return {
-        redirect: {
-          destination: "/login?referer=admin",
-          permanent: false,
-        },
-      };
-    }
+  const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
+  const token = getCookie(
+    proto == "http"
+      ? "next-auth.session-token"
+      : "__Secure-next-auth.session-token",
+    { req: ctx.req, res: ctx.res }
+  );
+  if (!token) {
     return {
-      props: {
-      }
-    }
+      redirect: {
+        destination: "/login?referer=admin",
+        permanent: false,
+      },
+    };
   }
+  return {
+    props: {},
+  };
+};
 
 const PengaturanUmum: NextPage = () => {
-    const toast = useToast()
-    const { register, setValue, handleSubmit, watch, formState: { errors, isSubmitting, isDirty, isValid } } = useForm<CreatePeriodeSchema>({
-        resolver: zodResolver(createPeriodeSchema),
-        mode: "onChange"
-    });
+  const toast = useToast();
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting, isDirty, isValid },
+  } = useForm<CreatePeriodeSchema>({
+    resolver: zodResolver(createPeriodeSchema),
+    mode: "onChange",
+  });
 
-    const { data: Periode, refetch } = trpc.useQuery(['periode.get'], {
-        refetchOnWindowFocus: false
-    })
-    const { mutateAsync: aturPeriode } = trpc.useMutation('periode.createOrUpdate')
+  const { data: Periode, refetch } = trpc.useQuery(["periode.get"], {
+    refetchOnWindowFocus: false,
+  });
+  const { mutateAsync: aturPeriode } = trpc.useMutation(
+    "periode.createOrUpdate"
+  );
 
-    const handleChangePeriode = useCallback(
-        async (e: CreatePeriodeSchema) => {
-            const result = await aturPeriode(e)
-            if (result.status === 201) {
-                toast({
-                    title: 'Atur periode berhasil',
-                    status: 'success',
-                    duration: 3000,
-                    position: 'top-right',
-                    isClosable: true,
-                })
-                refetch()
-            } else if (result.status == 200) {
-                toast({
-                    title: 'Atur periode berhasil',
-                    status: 'success',
-                    duration: 3000,
-                    position: 'top-right',
-                    isClosable: true,
-                })
-                refetch()
-            } else {
-                toast({
-                    title: 'Atur periode gagal',
-                    status: 'error',
-                    duration: 3000,
-                    position: 'top-right',
-                    isClosable: true,
-                })
-            }
-        }
-        , [])
+  const handleChangePeriode = useCallback(async (e: CreatePeriodeSchema) => {
+    const result = await aturPeriode(e);
+    if (result.status === 201) {
+      toast({
+        title: "Atur periode berhasil",
+        status: "success",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+      refetch();
+    } else if (result.status == 200) {
+      toast({
+        title: "Atur periode berhasil",
+        status: "success",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+      refetch();
+    } else {
+      toast({
+        title: "Atur periode gagal",
+        status: "error",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+    }
+  }, []);
 
-    useEffect(() => {
-        console.log(Periode?.result)
-        Periode?.result && setValue('periode', Periode?.result)
-    }, [Periode])
+  useEffect(() => {
+    console.log(Periode?.result);
+    Periode?.result && setValue("periode", Periode?.result);
+  }, [Periode]);
 
-    return (
-        <AdminLayout title='Umum' breadcrumb={(
-            <Breadcrumb>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href='#'>Pengaturan</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href='#'>Umum</BreadcrumbLink>
-                </BreadcrumbItem>
-            </Breadcrumb>
-        )}>
-            <>
-                <Head>
-                    <title>SMABAT || Pengaturan Umum</title>
-                    <meta name="description" content="Generated by create-t3-app" />
-                    <link rel="icon" href="/favicon.ico" />
-                </Head>
-                <div className="p-5">
-                    <div>
-                        <Heading size={'md'}>Periode</Heading>
-                        <form onSubmit={handleSubmit(handleChangePeriode)}>
-                            <Flex alignItems={'center'} justifyContent='space-between'>
-                                <FormControl isInvalid={errors.periode != undefined}>
-                                    <FormLabel htmlFor='periode'>Periode sekarang {Periode?.result ? Periode.result : '-'}</FormLabel>
-                                    <Input
-                                        // ref={firstFieldRef}
-                                        w={{ base: '80%', md: '50%' }}
-                                        bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                                        id='periode'
-                                        placeholder='Masukan periode'
-                                        {...register('periode')}
-                                    />
-                                    <FormErrorMessage>
-                                        {errors.periode && errors.periode.message}
-                                    </FormErrorMessage>
-                                </FormControl>
-                                <Button disabled={!isValid} isLoading={isSubmitting} type='submit' fontWeight={600}
-                                    color={'white'}
-                                    bg={'orange.400'} 
-                                    _hover={{
-                                        bg: 'orange.300',
-                                    }} mt={'10px'}>
-                                    Simpan
-                                </Button>
-                            </Flex>
-                        </form>
-                    </div>
-                </div>
-            </>
-        </AdminLayout>
-    )
-}
+  return (
+    <AdminLayout
+      title="Umum"
+      breadcrumb={
+        <Breadcrumb>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">Pengaturan</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">Umum</BreadcrumbLink>
+          </BreadcrumbItem>
+        </Breadcrumb>
+      }
+    >
+      <>
+        <Head>
+          <title>SMABAT || Pengaturan Umum</title>
+          <meta name="description" content="Generated by create-t3-app" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div className="p-5">
+          <div>
+            <Heading size={"md"}>Periode</Heading>
+            <form onSubmit={handleSubmit(handleChangePeriode)}>
+              <Flex alignItems={"center"} justifyContent="space-between">
+                <FormControl isInvalid={errors.periode != undefined}>
+                  <FormLabel htmlFor="periode">
+                    Periode sekarang {Periode?.result ? Periode.result : "-"}
+                  </FormLabel>
+                  <Input
+                    // ref={firstFieldRef}
+                    w={{ base: "80%", md: "50%" }}
+                    bg={"white"}
+                    borderColor={"orange.300"}
+                    borderWidth={1}
+                    id="periode"
+                    placeholder="Masukan periode"
+                    {...register("periode")}
+                  />
+                  <FormErrorMessage>
+                    {errors.periode && errors.periode.message}
+                  </FormErrorMessage>
+                </FormControl>
+                <Button
+                  disabled={!isValid}
+                  isLoading={isSubmitting}
+                  type="submit"
+                  fontWeight={600}
+                  color={"white"}
+                  bg={"orange.400"}
+                  _hover={{
+                    bg: "orange.300",
+                  }}
+                  mt={"10px"}
+                >
+                  Simpan
+                </Button>
+              </Flex>
+            </form>
+          </div>
+        </div>
+      </>
+    </AdminLayout>
+  );
+};
 
-export default PengaturanUmum
+export default PengaturanUmum;

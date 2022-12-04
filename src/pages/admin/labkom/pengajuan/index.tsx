@@ -17,8 +17,14 @@ import 'moment/locale/id'
 import DeleteAlert from "../../../../components/Alert/Delete";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    const isDevelopment = process.env.NODE_ENV == "development"
-    const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', { req: ctx.req, res: ctx.res })
+    
+    const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
+    const token = getCookie(
+      proto == "http"
+        ? "next-auth.session-token"
+        : "__Secure-next-auth.session-token",
+      { req: ctx.req, res: ctx.res }
+    );
     if (!token) {
         return {
             redirect: {

@@ -73,9 +73,9 @@ import * as XLSX from "xlsx";
 export const getServerSideProps: GetServerSideProps<{ data: Siswa }> = async (
   ctx
 ) => {
-  const isDevelopment = process.env.NODE_ENV == "development";
+  const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
   const token = getCookie(
-    isDevelopment
+    proto == "http"
       ? "next-auth.session-token"
       : "__Secure-next-auth.session-token",
     { req: ctx.req, res: ctx.res }

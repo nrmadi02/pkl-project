@@ -1,14 +1,27 @@
-import { Box, Container, Divider, Flex, Heading, Image, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Divider,
+  Flex,
+  Heading,
+  Image,
+  Stack,
+} from "@chakra-ui/react";
 import { GetServerSideProps, NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Navbar from "../../../components/Navbar";
-import { getCookie } from 'cookies-next';
+import { getCookie } from "cookies-next";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const isDevelopment = process.env.NODE_ENV == "development"
-  const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', {req: ctx.req, res: ctx.res})
-  if(!token) {
+  const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
+  const token = getCookie(
+    proto == "http"
+      ? "next-auth.session-token"
+      : "__Secure-next-auth.session-token",
+    { req: ctx.req, res: ctx.res }
+  );
+  if (!token) {
     return {
       redirect: {
         destination: "/login?referer=pinjam",
@@ -17,10 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
   return {
-    props: {
-    }
-  }
-}
+    props: {},
+  };
+};
 
 const DetailBuku: NextPage = () => {
   const { data } = useSession();
@@ -33,32 +45,30 @@ const DetailBuku: NextPage = () => {
       </Head>
       <Box>
         <Navbar />
-        <Container maxW={'5xl'} py={10}>
+        <Container maxW={"5xl"} py={10}>
           <Heading>Judul Buku</Heading>
           <Flex className="items-center justify-center">
             <Image
               mt={5}
               rounded={8}
               height={{ base: 300, md: 400, lg: 500 }}
-              width={{base: 'full', md: 500, lg: 600}}
-              maxW={{base: 250 ,md:500,lg: 600}}
+              width={{ base: "full", md: 500, lg: 600 }}
+              maxW={{ base: 250, md: 500, lg: 600 }}
               minHeight={120}
-              alt={'feature image'}
+              alt={"feature image"}
               src={
-                'https://images.unsplash.com/photo-1554200876-56c2f25224fa?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+                "https://images.unsplash.com/photo-1554200876-56c2f25224fa?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
               }
-              objectFit={'cover'} />
+              objectFit={"cover"}
+            />
           </Flex>
           <Divider my={5}></Divider>
-          <Stack>
-
-          </Stack>
+          <Stack></Stack>
         </Container>
         {/* <FooterHome /> */}
       </Box>
     </>
+  );
+};
 
-  )
-}
-
-export default DetailBuku
+export default DetailBuku;

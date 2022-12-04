@@ -61,9 +61,9 @@ import {
 import { useSession } from "next-auth/react";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const isDevelopment = process.env.NODE_ENV == "development";
+  const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
   const token = getCookie(
-    isDevelopment
+    proto == "http"
       ? "next-auth.session-token"
       : "__Secure-next-auth.session-token",
     { req: ctx.req, res: ctx.res }
@@ -83,7 +83,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
 const Pelanggaran: NextPage = () => {
   const { data: stateSession } = useSession();
-  console.log(stateSession);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isOpenModal,

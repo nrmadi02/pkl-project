@@ -1,22 +1,46 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, FormControl, FormErrorMessage, FormLabel, Heading, IconButton, Input, InputGroup, InputRightElement, Select, useDisclosure, useToast } from '@chakra-ui/react';
-import { GetServerSideProps, NextPage } from "next"
-import Head from "next/head"
-import DataTable from '../../../components/DataTable/DataTable';
-import AdminLayout from "../../../components/Layout/AdminLayout"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading,
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Select,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
+import { GetServerSideProps, NextPage } from "next";
+import Head from "next/head";
+import DataTable from "../../../components/DataTable/DataTable";
+import AdminLayout from "../../../components/Layout/AdminLayout";
 import { trpc } from "../../../utils/trpc";
-import { User } from '@prisma/client';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { IoAdd, IoRemove, IoTrash } from 'react-icons/io5';
-import DrawerForm from '../../../components/DrawerForm';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { CreateUserInput, createUserSchema } from '../../../server/schema/user.schema';
+import { User } from "@prisma/client";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { IoAdd, IoRemove, IoTrash } from "react-icons/io5";
+import DrawerForm from "../../../components/DrawerForm";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  CreateUserInput,
+  createUserSchema,
+} from "../../../server/schema/user.schema";
 import { useForm } from "react-hook-form";
-import { getCookie } from 'cookies-next';
-import DeleteAlert from '../../../components/Alert/Delete';
+import { getCookie } from "cookies-next";
+import DeleteAlert from "../../../components/Alert/Delete";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const isDevelopment = process.env.NODE_ENV == "development"
-  const token = getCookie(isDevelopment ? 'next-auth.session-token' : '__Secure-next-auth.session-token', { req: ctx.req, res: ctx.res })
+  const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
+  const token = getCookie(
+    proto == "http"
+      ? "next-auth.session-token"
+      : "__Secure-next-auth.session-token",
+    { req: ctx.req, res: ctx.res }
+  );
   if (!token) {
     return {
       redirect: {
@@ -26,24 +50,32 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
   return {
-    props: {
-    }
-  }
-}
+    props: {},
+  };
+};
 
 const DataUsers: NextPage = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const btnRef = useRef<HTMLButtonElement>(null)
-  const [show, setShow] = useState(false)
-  const toast = useToast()
-  const { register, handleSubmit, watch, formState: { errors, isSubmitting, isDirty, isValid } } = useForm<CreateUserInput>({
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [show, setShow] = useState(false);
+  const toast = useToast();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting, isDirty, isValid },
+  } = useForm<CreateUserInput>({
     resolver: zodResolver(createUserSchema),
-    mode: "onChange"
+    mode: "onChange",
   });
 
-  const { data: Users, isLoading, refetch } = trpc.useQuery(['user.getAllUsers'], {
-    refetchOnWindowFocus: false
-  })
+  const {
+    data: Users,
+    isLoading,
+    refetch,
+  } = trpc.useQuery(["user.getAllUsers"], {
+    refetchOnWindowFocus: false,
+  });
   const { mutateAsync } = trpc.useMutation(["user.create"]);
 
   const onSubmit = useCallback(
@@ -51,82 +83,98 @@ const DataUsers: NextPage = () => {
       const result: any = await mutateAsync(data);
       if (result.status === 201) {
         // router.push("/")
-        onClose()
+        onClose();
         toast({
-          title: 'Tambah data user berhasil',
-          status: 'success',
+          title: "Tambah data user berhasil",
+          status: "success",
           duration: 3000,
-          position: 'top-right',
+          position: "top-right",
           isClosable: true,
-        })
-        refetch()
+        });
+        refetch();
         // console.log(result)
       } else {
         toast({
-          title: 'Tambah data user gagal',
-          status: 'error',
+          title: "Tambah data user gagal",
+          status: "error",
           duration: 3000,
-          position: 'top-right',
+          position: "top-right",
           isClosable: true,
-        })
+        });
       }
     },
     [mutateAsync]
   );
 
   const getData = (data: User[] | undefined) => {
-    const dataNew = data as User[]
-    return dataNew
-  }
+    const dataNew = data as User[];
+    return dataNew;
+  };
 
-  const handleClick = () => setShow(!show)
+  const handleClick = () => setShow(!show);
 
-  const columns = useMemo(() => [
-    {
-      Header: "Nama",
-      accessor: "name"
-    },
-    {
-      Header: "Email",
-      accessor: "email"
-    },
-    {
-      Header: "Role",
-      accessor: "role"
-    },
-    {
-      Header: "Nomor Induk",
-      accessor: "nomorInduk"
-    },
-    {
-      Header: "Action",
-      accessor: (d: User) => {
-        return <ActionTable key={d?.id} value={d?.id} refetch={refetch} toast={toast} />
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Nama",
+        accessor: "name",
       },
-    }
-  ], [Users?.result])
+      {
+        Header: "Email",
+        accessor: "email",
+      },
+      {
+        Header: "Role",
+        accessor: "role",
+      },
+      {
+        Header: "Nomor Induk",
+        accessor: "nomorInduk",
+      },
+      {
+        Header: "Action",
+        accessor: (d: User) => {
+          return (
+            <ActionTable
+              key={d?.id}
+              value={d?.id}
+              refetch={refetch}
+              toast={toast}
+            />
+          );
+        },
+      },
+    ],
+    [Users?.result]
+  );
 
-  const data = useMemo(() => getData(Users?.result ? Users.result : []), [Users]);
+  const data = useMemo(
+    () => getData(Users?.result ? Users.result : []),
+    [Users]
+  );
 
   useEffect(() => {
     const subs = watch((e) => {
       // console.log(e)
-    })
+    });
 
-    return () => subs.unsubscribe()
-  }, [watch])
+    return () => subs.unsubscribe();
+  }, [watch]);
 
   return (
-    <AdminLayout title='Users' breadcrumb={(
-      <Breadcrumb>
-        <BreadcrumbItem>
-          <BreadcrumbLink href='#'>Pendataan</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href='#'>Users</BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
-    )}>
+    <AdminLayout
+      title="Users"
+      breadcrumb={
+        <Breadcrumb>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">Pendataan</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">Users</BreadcrumbLink>
+          </BreadcrumbItem>
+        </Breadcrumb>
+      }
+    >
       <>
         <Head>
           <title>SMABAT || Users</title>
@@ -134,56 +182,85 @@ const DataUsers: NextPage = () => {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <div className="p-5">
-          <div className='w-full mb-5 flex justify-end items-end'>
-            <Button onClick={onOpen} ref={btnRef} leftIcon={<IoAdd />} fontWeight={600}
-              color={'white'}
-              bg={'orange.400'}
+          <div className="w-full mb-5 flex justify-end items-end">
+            <Button
+              onClick={onOpen}
+              ref={btnRef}
+              leftIcon={<IoAdd />}
+              fontWeight={600}
+              color={"white"}
+              bg={"orange.400"}
               _hover={{
-                bg: 'orange.300',
-              }}>
+                bg: "orange.300",
+              }}
+            >
               Tambah data
             </Button>
           </div>
-          <DataTable isSearch sizeSet hiddenColumns={[]} isLoading={isLoading} columns={columns} data={data} />
+          <DataTable
+            isSearch
+            sizeSet
+            hiddenColumns={[]}
+            isLoading={isLoading}
+            columns={columns}
+            data={data}
+          />
         </div>
-        <DrawerForm btnRef={btnRef} isOpen={isOpen} onClose={onClose} bottomButtons={
-          <>
-            <Button variant='outline' mr={3} onClick={onClose}>
-              Batal
-            </Button>
-            <Button disabled={!isValid} isLoading={isSubmitting} type='submit' form='my-form' fontWeight={600}
-              color={'white'}
-              bg={'orange.400'}
-              _hover={{
-                bg: 'orange.300',
-              }}>
-              Simpan
-            </Button>
-          </>
-        }>
-          <div className='pt-5'>
-            <Heading size={'lg'} mb='5'>Tambah data user</Heading>
-            <form id='my-form' onSubmit={handleSubmit(onSubmit)}>
+        <DrawerForm
+          btnRef={btnRef}
+          isOpen={isOpen}
+          onClose={onClose}
+          bottomButtons={
+            <>
+              <Button variant="outline" mr={3} onClick={onClose}>
+                Batal
+              </Button>
+              <Button
+                disabled={!isValid}
+                isLoading={isSubmitting}
+                type="submit"
+                form="my-form"
+                fontWeight={600}
+                color={"white"}
+                bg={"orange.400"}
+                _hover={{
+                  bg: "orange.300",
+                }}
+              >
+                Simpan
+              </Button>
+            </>
+          }
+        >
+          <div className="pt-5">
+            <Heading size={"lg"} mb="5">
+              Tambah data user
+            </Heading>
+            <form id="my-form" onSubmit={handleSubmit(onSubmit)}>
               <FormControl isInvalid={errors.name != undefined}>
-                <FormLabel htmlFor='name'>Nama</FormLabel>
+                <FormLabel htmlFor="name">Nama</FormLabel>
                 <Input
-                  bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                  id='name'
-                  placeholder='Masukan nama'
-                  {...register('name')}
+                  bg={"white"}
+                  borderColor={"orange.300"}
+                  borderWidth={1}
+                  id="name"
+                  placeholder="Masukan nama"
+                  {...register("name")}
                 />
                 <FormErrorMessage>
                   {errors.name && errors.name.message}
                 </FormErrorMessage>
               </FormControl>
               <FormControl isInvalid={errors.email != undefined}>
-                <FormLabel htmlFor='email'>Email</FormLabel>
+                <FormLabel htmlFor="email">Email</FormLabel>
                 <Input
-                  bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                  id='email'
-                  placeholder='Masukan email'
-                  {...register('email', {
-                    required: 'This is required',
+                  bg={"white"}
+                  borderColor={"orange.300"}
+                  borderWidth={1}
+                  id="email"
+                  placeholder="Masukan email"
+                  {...register("email", {
+                    required: "This is required",
                   })}
                 />
                 <FormErrorMessage>
@@ -191,30 +268,34 @@ const DataUsers: NextPage = () => {
                 </FormErrorMessage>
               </FormControl>
               <FormControl isInvalid={errors.nomorInduk != undefined}>
-                <FormLabel htmlFor='nomorInduk'>Nomor Induk</FormLabel>
+                <FormLabel htmlFor="nomorInduk">Nomor Induk</FormLabel>
                 <Input
-                  bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                  id='nomorInduk'
-                  placeholder='Masukan nomor induk'
-                  {...register('nomorInduk')}
+                  bg={"white"}
+                  borderColor={"orange.300"}
+                  borderWidth={1}
+                  id="nomorInduk"
+                  placeholder="Masukan nomor induk"
+                  {...register("nomorInduk")}
                 />
                 <FormErrorMessage>
                   {errors.nomorInduk && errors.nomorInduk.message}
                 </FormErrorMessage>
               </FormControl>
               <FormControl isInvalid={errors.password != undefined}>
-                <FormLabel htmlFor='password'>Password</FormLabel>
-                <InputGroup size='md'>
+                <FormLabel htmlFor="password">Password</FormLabel>
+                <InputGroup size="md">
                   <Input
-                    bg={'white'} borderColor={'orange.300'} borderWidth={1}
-                    type={show ? 'text' : 'password'}
-                    id='password'
-                    placeholder='Masukan password'
-                    {...register('password')}
+                    bg={"white"}
+                    borderColor={"orange.300"}
+                    borderWidth={1}
+                    type={show ? "text" : "password"}
+                    id="password"
+                    placeholder="Masukan password"
+                    {...register("password")}
                   />
-                  <InputRightElement width='4.5rem'>
-                    <Button h='1.75rem' size='sm' onClick={handleClick}>
-                      {show ? 'Hide' : 'Show'}
+                  <InputRightElement width="4.5rem">
+                    <Button h="1.75rem" size="sm" onClick={handleClick}>
+                      {show ? "Hide" : "Show"}
                     </Button>
                   </InputRightElement>
                 </InputGroup>
@@ -223,14 +304,21 @@ const DataUsers: NextPage = () => {
                 </FormErrorMessage>
               </FormControl>
               <FormControl isInvalid={errors.role != undefined}>
-                <FormLabel htmlFor='role'>Role</FormLabel>
-                <Select bg={'white'} borderColor={'orange.300'} borderWidth={1} id='role' placeholder='Pilih role' {...register('role')}>
-                  <option value='admin'>Admin</option>
-                  <option value='bk'>BK</option>
+                <FormLabel htmlFor="role">Role</FormLabel>
+                <Select
+                  bg={"white"}
+                  borderColor={"orange.300"}
+                  borderWidth={1}
+                  id="role"
+                  placeholder="Pilih role"
+                  {...register("role")}
+                >
+                  <option value="admin">Admin</option>
+                  <option value="bk">BK</option>
                   {/* <option value='guru'>Guru</option> */}
                   {/* <option value='siswa'>Siswa</option> */}
-                  <option value='perpus'>Perpus</option>
-                  <option value='lab'>Lab</option>
+                  <option value="perpus">Perpus</option>
+                  <option value="lab">Lab</option>
                   {/* <option value='wali'>Wali</option> */}
                 </Select>
                 <FormErrorMessage>
@@ -242,67 +330,78 @@ const DataUsers: NextPage = () => {
         </DrawerForm>
       </>
     </AdminLayout>
-  )
-}
+  );
+};
 
-export default DataUsers
+export default DataUsers;
 
 interface ActionValue {
-  value: any,
-  refetch: any,
-  toast: any
+  value: any;
+  refetch: any;
+  toast: any;
 }
 
 const ActionTable = ({ value, refetch, toast }: ActionValue) => {
-  const [delLoading, setDelLoading] = useState(false)
-  const { mutateAsync: deleteUser, isLoading: deleteLoading } = trpc.useMutation(['user.deleteUser'])
-  const { onOpen: onOpenDel, onClose: onCloseDel, isOpen: isOpenDel } = useDisclosure()
+  const [delLoading, setDelLoading] = useState(false);
+  const { mutateAsync: deleteUser, isLoading: deleteLoading } =
+    trpc.useMutation(["user.deleteUser"]);
+  const {
+    onOpen: onOpenDel,
+    onClose: onCloseDel,
+    isOpen: isOpenDel,
+  } = useDisclosure();
 
-  const handleDeleteUser = useCallback(
-    async (id: string) => {
-      const delUser = await deleteUser({
-        id: id
-      })
-      if (delUser.status === 200) {
-        toast({
-          title: 'Hapus data user berhasil',
-          status: 'success',
-          duration: 3000,
-          position: 'top-right',
-          isClosable: true,
-        })
-        refetch()
-        setDelLoading(false)
-        onCloseDel()
-      } else {
-        toast({
-          title: 'Hapus data user gagal',
-          status: 'error',
-          duration: 3000,
-          position: 'top-right',
-          isClosable: true,
-        })
-        setDelLoading(false)
-      }
-    }, []
-  )
+  const handleDeleteUser = useCallback(async (id: string) => {
+    const delUser = await deleteUser({
+      id: id,
+    });
+    if (delUser.status === 200) {
+      toast({
+        title: "Hapus data user berhasil",
+        status: "success",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+      refetch();
+      setDelLoading(false);
+      onCloseDel();
+    } else {
+      toast({
+        title: "Hapus data user gagal",
+        status: "error",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+      setDelLoading(false);
+    }
+  }, []);
   return (
     <>
       <IconButton
         isLoading={delLoading}
-        variant='outline'
-        colorScheme='red'
-        aria-label='delete'
-        fontSize='20px'
+        variant="outline"
+        colorScheme="red"
+        aria-label="delete"
+        fontSize="20px"
         onClick={async () => {
-          onOpenDel()
+          onOpenDel();
         }}
         icon={<IoTrash />}
       />
-      <DeleteAlert isOpen={isOpenDel} onClick={async () => {
-        setDelLoading(true)
-        await handleDeleteUser(value)
-      }} onClose={onCloseDel} onOpen={onOpenDel} isLoading={delLoading} title={'Hapus siswa'} text={'Apa anda yakin ?'} />
+      <DeleteAlert
+        isOpen={isOpenDel}
+        onClick={async () => {
+          setDelLoading(true);
+          await handleDeleteUser(value);
+        }}
+        onClose={onCloseDel}
+        onOpen={onOpenDel}
+        isLoading={delLoading}
+        title={"Hapus siswa"}
+        text={"Apa anda yakin ?"}
+      />
     </>
-  )
-}
+  );
+};
