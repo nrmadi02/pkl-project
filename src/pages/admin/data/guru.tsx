@@ -290,7 +290,7 @@ const DataGuru: NextPage = () => {
                                     <Input
                                         bg={'white'} borderColor={'orange.300'} borderWidth={1}
                                         id='jenisGuru'
-                                        placeholder='Masukan jenis guru'
+                                        placeholder='Masukan jabatan guru'
                                         {...register('jenisGuru')}
                                     />
                                     <FormErrorMessage>

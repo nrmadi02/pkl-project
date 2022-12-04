@@ -186,7 +186,7 @@ const PengajuanLab: NextPage = () => {
                             }}>
                             Ajukan
                         </Button>
-                        <Button onClick={onOpen} ref={btnRef} leftIcon={<IoDownload />} fontWeight={600}
+                        <Button ref={btnRef} leftIcon={<IoDownload />} fontWeight={600}
                             color={'white'}
                             bg={'green.400'}
                             _hover={{

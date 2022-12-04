@@ -434,7 +434,7 @@ const DataSiswa: NextPage = () => {
                                     <Input
                                         bg={'white'} borderColor={'orange.300'} borderWidth={1}
                                         id='nama'
-                                        placeholder='Masukan nama guru'
+                                        placeholder='Masukan nama siswa'
                                         {...register('nama')}
                                     />
                                     <FormErrorMessage>

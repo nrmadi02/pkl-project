@@ -137,11 +137,17 @@ const DetailSiswa: NextPage<
   const fileExtension = ".xlsx";
 
   const exportToCSV = (apiData: any, fileName: any) => {
-    const ws = XLSX.utils.json_to_sheet(apiData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const data = new Blob([excelBuffer], { type: fileType });
-    FileSaver.saveAs(data, fileName + fileExtension);
+    const worksheet = XLSX.utils.json_to_sheet(apiData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    //let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+    //XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
+    // const ws = XLSX.utils.json_to_sheet(apiData);
+    // const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+    // const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    // const data = new Blob([excelBuffer], { type: fileType });
+    // FileSaver.saveAs(data, fileName + fileExtension);
   };
 
   const {
