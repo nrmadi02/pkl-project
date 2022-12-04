@@ -139,9 +139,11 @@ const DetailSiswa: NextPage<
   const exportToCSV = async (apiData: any, fileName: any) => {
     const ws = XLSX.utils.json_to_sheet(apiData);
     const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "buffer" });
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const data = new Blob([excelBuffer], { type: fileType });
-    FileSaver.saveAs(data, fileName + fileExtension);
+    await setTimeout(() => {
+      FileSaver.saveAs(data, fileName + fileExtension);
+    }, 3000)
   };
 
   const {
