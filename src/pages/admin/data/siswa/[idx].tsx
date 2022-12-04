@@ -136,18 +136,12 @@ const DetailSiswa: NextPage<
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
 
-  const exportToCSV = (apiData: any, fileName: any) => {
-    const worksheet = XLSX.utils.json_to_sheet(apiData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    //let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
-    //XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
-    XLSX.writeFile(workbook, `${fileName}.xlsx`);
-    // const ws = XLSX.utils.json_to_sheet(apiData);
-    // const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    // const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    // const data = new Blob([excelBuffer], { type: fileType });
-    // FileSaver.saveAs(data, fileName + fileExtension);
+  const exportToCSV = async (apiData: any, fileName: any) => {
+    const ws = XLSX.utils.json_to_sheet(apiData);
+    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "buffer" });
+    const data = new Blob([excelBuffer], { type: fileType });
+    FileSaver.saveAs(data, fileName + fileExtension);
   };
 
   const {
@@ -1025,7 +1019,7 @@ const DetailSiswa: NextPage<
                 bg={"green.400"}
                 leftIcon={<DownloadIcon />}
                 onClick={async () => {
-                  exportToCSV(
+                  await exportToCSV(
                     dataDownloadPenghargaan?.result,
                     `penghargaan_${dataSiswa?.result?.nama}`
                   );
@@ -1043,7 +1037,7 @@ const DetailSiswa: NextPage<
                 color={"white"}
                 bg={"red.400"}
                 onClick={async () => {
-                  exportToCSV(
+                  await exportToCSV(
                     dataDownloadPelanggaran?.result,
                     `pelanggaran_${dataSiswa?.result?.nama}`
                   );
@@ -1075,7 +1069,7 @@ const DetailSiswa: NextPage<
               color={"white"}
               bg={"green.400"}
               onClick={async () => {
-                exportToCSV(
+                await exportToCSV(
                   dataPanggil,
                   `kartu_bimbingan_${dataSiswa?.result?.nama}`
                 );
