@@ -141,7 +141,7 @@ const PengajuanLab: NextPage = () => {
                     return dataColor[data]
                 }
                 return (
-                    <Badge colorScheme={ColorSchema(d.status)}>{d.status}</Badge>
+                    <Badge size={'sm'} colorScheme={ColorSchema(d.status)}>{d.status}</Badge>
                 )
             }
         },
@@ -195,7 +195,7 @@ const PengajuanLab: NextPage = () => {
                             Download
                         </Button>
                     </div>
-                    <div className="text-[14px]">
+                    <div className="text-[12px]">
                         <DataTable isSearch sizeSet hiddenColumns={['status']} isLoading={isLoading} columns={columns} data={data} />
                     </div>
                 </div>

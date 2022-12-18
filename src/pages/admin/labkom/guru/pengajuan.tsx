@@ -190,7 +190,7 @@ const GuruPengajuanLab: NextPage = () => {
                         </Button>
                     </div>
                     <Heading size={'md'}>Pengajuan Anda</Heading>
-                    <div className="text-[14px] mt-5">
+                    <div className="text-[12px] mt-5">
                         <DataTable isSearch sizeSet hiddenColumns={['status']} isLoading={isLoading} columns={columns} data={data} />
                     </div>
                 </div>

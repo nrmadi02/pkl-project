@@ -21,5 +21,11 @@ export const updateInformasiSchema = object({
     id: string().min(1, "ID harus diisi")
 })
 
+export const updateStatusInformasiSchema = object({
+  status: string().min(1, "Status harus diisi"),
+  id: string().min(1, "ID harus diisi"),
+});
+
 export type CreateInformasiSchema = TypeOf<typeof createInformasiSchema>
 export type UpdateInformasiSchema = TypeOf<typeof updateInformasiSchema>
+export type UpdateStatusInformasiSchema = TypeOf<typeof updateStatusInformasiSchema>;

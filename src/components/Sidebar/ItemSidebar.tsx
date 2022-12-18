@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import Scrollbars from "react-custom-scrollbars-2";
-import { FaPenAlt } from "react-icons/fa";
+import { FaPenAlt, FaServicestack } from "react-icons/fa";
 import {
   IoHome,
   IoInformation,
@@ -13,7 +13,7 @@ import {
   IoSettings,
   IoTime,
 } from "react-icons/io5";
-import { MdComputer, MdDoNotTouch } from "react-icons/md";
+import { MdComputer, MdDoNotTouch, MdHomeRepairService, MdMedicalServices, MdRoomService } from "react-icons/md";
 
 interface FeatureProps {
   text: string;
@@ -104,6 +104,17 @@ const adminItems = [
         title: "Terlambat",
         url: "/admin/tatib/terlambat",
         prefix: "terlambat",
+      },
+    ],
+  },
+  {
+    heading: "Layanan",
+    menu: [
+      {
+        icon: MdHomeRepairService,
+        title: "Bimbingan",
+        url: "/admin/layanan/bimbingan",
+        prefix: "layanan",
       },
     ],
   },

@@ -76,7 +76,7 @@ const InformasiAdminAdd: NextPage = () => {
                 router.push("/admin/informasi")
                 setFile('')
                 toast({
-                    title: 'Tambah data siswa berhasil',
+                    title: 'Tambah data berhasil',
                     status: 'success',
                     duration: 3000,
                     position: 'top-right',
@@ -86,7 +86,7 @@ const InformasiAdminAdd: NextPage = () => {
                 // console.log(result)
             } else {
                 toast({
-                    title: 'Tambah data siswa gagal',
+                    title: 'Tambah data gagal',
                     status: 'error',
                     duration: 3000,
                     position: 'top-right',
@@ -193,7 +193,7 @@ const InformasiAdminAdd: NextPage = () => {
                                     <FormLabel htmlFor='perihal'>Isi Informasi</FormLabel>
 
                                     <Controller name="isi" control={control} render={({field: {value, onChange}}) => (
-                                        <Editor editor={value} setEditorState={onChange} withImage={false} />
+                                        <Editor editor={value || ''} setEditorState={onChange} withImage={false} />
                                     )} />
                                     <Input
                                         bg={'white'} borderColor={'orange.300'} borderWidth={1}

@@ -59,6 +59,7 @@ import {
   CreatePelanggaranSchema,
 } from "../../../server/schema/pelanggaran.schema";
 import { useSession } from "next-auth/react";
+import { createTerlambatSchema, CreateTerlambatSchema } from "../../../server/schema/terlambat.schema";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
@@ -359,8 +360,8 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
     setValue,
     reset,
     formState: { errors, isSubmitting, isDirty, isValid },
-  } = useForm<CreatePelanggaranSchema>({
-    resolver: zodResolver(createPelanggaranSchema),
+  } = useForm<CreateTerlambatSchema>({
+    resolver: zodResolver(createTerlambatSchema),
     mode: "onChange",
   });
 
@@ -396,35 +397,26 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
     );
   };
 
-  const { mutateAsync: tambahPelanggaran } =
-    trpc.useMutation("pelanggaran.create");
+  const { mutateAsync: tambahTerlambat } =
+    trpc.useMutation("terlambat.create");
 
-  const handleAddPelanggaran = useCallback(
-    async (data: CreatePelanggaranSchema) => {
-      const result: any = await tambahPelanggaran(data);
+  const handleAddTerlambat = useCallback(
+    async (data: CreateTerlambatSchema) => {
+      const result: any = await tambahTerlambat(data);
       if (result.status === 201) {
         onClose();
         reset();
         toast({
-          title: "Tambah Point siswa berhasil",
+          title: "Tambah data terlambat berhasil",
           status: "success",
           duration: 3000,
           position: "top-right",
           isClosable: true,
         });
         refetch();
-      } else if (result.status === 400) {
-        toast({
-          title:
-            "Penghargaan tidak bisa diberikan karena point pelanggaran siswa lebih kecil",
-          status: "error",
-          duration: 3000,
-          position: "top-right",
-          isClosable: true,
-        });
       } else {
         toast({
-          title: "Tambah Point siswa gagal",
+          title: "Tambah data terlambat gagal",
           status: "error",
           duration: 3000,
           position: "top-right",
@@ -432,7 +424,7 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
         });
       }
     },
-    [tambahPelanggaran]
+    [tambahTerlambat]
   );
 
   return (
@@ -447,9 +439,10 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
           onOpen();
           setValue("siswaID", data?.id);
           setValue(
-            "pemeberi",
+            "pencatat",
             stateSession?.user?.name ? stateSession?.user?.name : ""
           );
+          setValue("akumulasi", false)
         }}
         icon={<IoAdd />}
       />
@@ -491,7 +484,7 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
       >
         <div className="pt-5">
           <Heading size={"lg"} mb="5">
-            Tambah point
+            Tambah Terlambat
           </Heading>
           <div className="flex flex-row gap-5">
             <div className="w-[190px] h-[220px] cursor-pointer hover:scale-[1.01] transition-all rounded-md border-[2px] border-orange-300">
@@ -555,7 +548,7 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
           <form
             className="mt-5"
             id="form-update"
-            onSubmit={handleSubmit(handleAddPelanggaran)}
+            onSubmit={handleSubmit(handleAddTerlambat)}
           >
             <Flex w={"full"} flexDirection={"column"} gap={"10px"}>
               <Input
@@ -574,56 +567,49 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
                 id="id"
                 type={"hidden"}
                 // placeholder='Masukan nama guru'
-                {...register("pemeberi")}
+                {...register("pencatat")}
               />
-              <FormControl isInvalid={errors.point != undefined}>
-                <FormLabel htmlFor="point">Point</FormLabel>
+              <FormControl isInvalid={errors.waktu != undefined}>
+                <FormLabel htmlFor="point">Waktu (Menit)</FormLabel>
                 <Input
                   bg={"white"}
                   borderColor={"orange.300"}
                   borderWidth={1}
-                  id="point"
-                  placeholder="Masukan point"
+                  id="waktu"
+                  placeholder="Masukan waktu terlambat"
                   type={"number"}
-                  {...register("point")}
+                  {...register("waktu")}
                 />
                 <FormErrorMessage>
-                  {errors.point && errors.point.message}
+                  {errors.waktu && errors.waktu.message}
                 </FormErrorMessage>
               </FormControl>
-              <FormControl isInvalid={errors.deskripsi != undefined}>
-                <FormLabel htmlFor="deskripsi">Deskripsi</FormLabel>
-                <Textarea
+              <FormControl isInvalid={errors.tanggal != undefined}>
+                <FormLabel htmlFor="deskripsi">Tanggal</FormLabel>
+                <Input
                   bg={"white"}
                   borderColor={"orange.300"}
                   borderWidth={1}
-                  id="deskripsi"
-                  placeholder="Masukan deskripsi"
-                  {...register("deskripsi")}
+                  id="tanggal"
+                  type={"date"}
+                  placeholder="Masukan tanggal"
+                  {...register("tanggal")}
                 />
                 <FormErrorMessage>
-                  {errors.deskripsi && errors.deskripsi.message}
+                  {errors.tanggal && errors.tanggal.message}
                 </FormErrorMessage>
               </FormControl>
-              <FormControl isInvalid={errors.type != undefined}>
-                <FormLabel htmlFor="type">Jenis Tata Tertib</FormLabel>
-                <Select
-                  bg={"white"}
-                  borderColor={"orange.300"}
-                  borderWidth={1}
-                  id="type"
-                  placeholder="Pilih..."
-                  {...register("type")}
-                >
-                  <option value={"Kelakuan"}>Kelakuan</option>
-                  <option value={"Kerajinan"}>Kerajinan</option>
-                  <option value={"Kerapian"}>Kerapian</option>
-                  <option value={"Penghargaan"}>Penghargaan</option>
-                </Select>
-                <FormErrorMessage>
-                  {errors.type && "Jenis tata tertib harus di pilih"}
-                </FormErrorMessage>
-              </FormControl>
+              {/* <Checkbox type={'hidden'} defaultChecked={false}/> */}
+              <Input
+                bg={"white"}
+                borderColor={"orange.300"}
+                borderWidth={1}
+                id="tanggal"
+                defaultValue={'false'}
+                type={"hidden"}
+                placeholder="Masukan akumulasi"
+                {...register("akumulasi")}
+              />
             </Flex>
           </form>
         </div>

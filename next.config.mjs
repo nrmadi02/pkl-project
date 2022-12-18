@@ -13,16 +13,19 @@ function defineNextConfig(config) {
 export default defineNextConfig({
   reactStrictMode: true,
   swcMinify: true,
-  output: 'standalone',
+  output: "standalone",
   // Next.js i18n docs: https://nextjs.org/docs/advanced-features/i18n-routing
   i18n: {
     locales: ["en"],
     defaultLocale: "en",
   },
   images: {
-    domains: [
-      'res.cloudinary.com',
-      'ui-avatars.com'
-    ],
-},
+    domains: ["res.cloudinary.com", "ui-avatars.com"],
+  },
+  webpack5: true,
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false };
+
+    return config;
+  },
 });

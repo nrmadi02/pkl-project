@@ -62,17 +62,15 @@ export const pelanggaranRoutes = createRouter()
         }
     })
     .query('downloadByType', {
-        input: string(),
+        input: object({
+            siswaID: string(),
+            type: string()
+        }),
         resolve: async ({ ctx, input }) => {
             const dataDownload = await ctx.prisma.pelanggaran.findMany({
                 where: {
-                    type: input
-                },
-                select: {
-                    pemberi: true,
-                    deskripsi: true,
-                    point: true,
-                    type: true
+                    type: input.type,
+                    siswaID: input.siswaID,
                 }
             })
             return {
@@ -84,18 +82,14 @@ export const pelanggaranRoutes = createRouter()
 
     })
     .query('downloadPelanggaran', {
-        resolve: async ({ ctx }) => {
+        input: string(),
+        resolve: async ({ ctx, input }) => {
             const dataDownload = await ctx.prisma.pelanggaran.findMany({
                 where: {
+                    siswaID: input,
                     type: {
                         not: "Penghargaan"
                     }
-                },
-                select: {
-                    pemberi: true,
-                    deskripsi: true,
-                    point: true,
-                    type: true
                 }
             })
             return {

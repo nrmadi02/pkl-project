@@ -113,7 +113,7 @@ const Editor: NextPage<Props> = ({setEditorState, editor, withImage}) => {
 
     useEffect(() => {
         if (quill) {
-            editor && quill.clipboard.dangerouslyPasteHTML(editor);
+            quill.clipboard.dangerouslyPasteHTML(editor);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [quill])

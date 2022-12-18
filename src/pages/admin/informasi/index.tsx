@@ -9,6 +9,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
+  IconButton,
   Input,
   Modal,
   ModalBody,
@@ -17,6 +18,12 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Popover,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -30,13 +37,16 @@ import {
 } from "../../../server/schema/periode.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { trpc } from "../../../utils/trpc";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getCookie } from "cookies-next";
-import { IoAdd } from "react-icons/io5";
+import { IoAdd, IoPencil, IoTrash } from "react-icons/io5";
 import Link from "next/link";
 import { Informasi } from "@prisma/client";
 import DataTable from "../../../components/DataTable/DataTable";
 import Image from "next/image";
+import DeleteAlert from "../../../components/Alert/Delete";
+import { updateStatusInformasiSchema, UpdateStatusInformasiSchema } from "../../../server/schema/informasi.schema";
+import { EditIcon } from "@chakra-ui/icons";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
@@ -61,8 +71,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
 const InformasiAdmin: NextPage = () => {
   const toast = useToast();
-  const { data: dataInformasi, isLoading } = trpc.useQuery([
-    "informasi.getAll",
+  const { data: dataInformasi, isLoading, refetch } = trpc.useQuery([
+    "informasi.getAll", 1000000
   ]);
 
   const getData = (data: Informasi[] | undefined) => {
@@ -131,12 +141,12 @@ const InformasiAdmin: NextPage = () => {
           return <Badge colorScheme={ColorSchema(d.status)}>{d.status}</Badge>;
         },
       },
-      // {
-      //   Header: "Action",
-      //   accessor: (d: User) => {
-      //     return <ActionTable key={d?.id} value={d?.id} refetch={refetch} toast={toast} />
-      //   },
-      // }
+      {
+        Header: "Action",
+        accessor: (d: Informasi) => {
+          return <ActionTable key={d?.id} value={d?.id} data={d} refetch={refetch} toast={toast} />
+        },
+      }
     ],
     [dataInformasi?.reuslt]
   );
@@ -199,6 +209,209 @@ const InformasiAdmin: NextPage = () => {
 };
 
 export default InformasiAdmin;
+
+interface ActionValue {
+  value: any;
+  refetch: any;
+  toast: any;
+  data: Informasi | any;
+}
+
+const ActionTable = ({data, refetch, toast, value}: ActionValue) => {
+  const [delLoading, setDelLoading] = useState(false);
+  const { onOpen, onClose, isOpen } = useDisclosure();
+  const {
+    onOpen: onOpenDel,
+    onClose: onCloseDel,
+    isOpen: isOpenDel,
+  } = useDisclosure();
+  const firstFieldRef = useRef(null);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting, isDirty, isValid },
+  } = useForm<UpdateStatusInformasiSchema>({
+    resolver: zodResolver(updateStatusInformasiSchema),
+    mode: "onChange",
+  });
+
+  const {mutateAsync: updateStatus} = trpc.useMutation(['informasi.updateStatus'])
+  const {mutateAsync: deleteInformasi} = trpc.useMutation(['informasi.delete'])
+
+  const handleDeleteInformasi = useCallback(async (id: string) => {
+    const delInformasi = await deleteInformasi(id);
+    if (delInformasi.status === 200) {
+      toast({
+        title: "Hapus data berhasil",
+        status: "success",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+      refetch();
+      setDelLoading(false);
+      onCloseDel();
+    } else {
+      toast({
+        title: "Hapus data gagal",
+        status: "error",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+      setDelLoading(false);
+    }
+  }, []);
+
+  const handleUbahStatus = useCallback(async (status: string, id: string) => {
+    const delPengajuan = await updateStatus({
+      id: id,
+      status: status,
+    });
+    if (delPengajuan.status === 200) {
+      toast({
+        title: "Ubah status berhasil",
+        status: "success",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+      refetch();
+      setDelLoading(false);
+      onClose();
+    } else {
+      toast({
+        title: "Ubah status gagal",
+        status: "error",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+      setDelLoading(false);
+    }
+  }, []);
+
+  return (
+    <Flex alignItems={"center"} gap={"2"}>
+      <Popover
+        isOpen={isOpen}
+        initialFocusRef={firstFieldRef}
+        onOpen={() => {
+          onOpen();
+        }}
+        onClose={onClose}
+        placement="auto-start"
+        closeOnBlur={false}
+      >
+        <PopoverTrigger>
+          <IconButton
+            // isLoading={delLoading}
+            variant="outline"
+            colorScheme="orange"
+            aria-label="edit status"
+            fontSize="20px"
+            size={"sm"}
+            onClick={async () => {
+              onOpen();
+            }}
+            icon={<IoPencil />}
+          />
+        </PopoverTrigger>
+        <PopoverContent p={5}>
+          <PopoverArrow />
+          <PopoverCloseButton />
+          <form
+            onSubmit={handleSubmit((e) => handleUbahStatus(e.status, e.id))}
+          >
+            <Input
+              // ref={firstFieldRef}
+              type={"hidden"}
+              bg={"white"}
+              borderColor={"orange.300"}
+              borderWidth={1}
+              id="id"
+              defaultValue={value}
+              placeholder="Edit nama kelas"
+              {...register("id")}
+            />
+            <FormControl isInvalid={errors.status != undefined}>
+              <FormLabel htmlFor="name">Status</FormLabel>
+              <Select
+                bg={"white"}
+                borderColor={"orange.300"}
+                borderWidth={1}
+                id="status"
+                placeholder="Pilih..."
+                {...register("status")}
+              >
+                <option value="Menunggu">Menunggu</option>
+                <option value="Ditolak">Ditolak</option>
+                <option value="Disetujui">Disetujui</option>
+              </Select>
+              <FormErrorMessage>
+                {errors.status && "Harus dipilih"}
+              </FormErrorMessage>
+            </FormControl>
+            <Button
+              disabled={!isValid}
+              isLoading={isSubmitting}
+              type="submit"
+              fontWeight={600}
+              color={"white"}
+              bg={"orange.400"}
+              _hover={{
+                bg: "orange.300",
+              }}
+              mt={"10px"}
+            >
+              Update
+            </Button>
+          </form>
+        </PopoverContent>
+      </Popover>
+      <Link href={`/admin/informasi/edit/${value}`}>
+        <IconButton
+          // isLoading={delLoading}
+          variant="outline"
+          colorScheme="blue"
+          aria-label="edit"
+          fontSize="20px"
+          size={"sm"}
+          // onClick={async () => {
+          //   onOpenDel();
+          // }}
+          icon={<EditIcon />}
+        />
+      </Link>
+      <IconButton
+        isLoading={delLoading}
+        variant="outline"
+        colorScheme="red"
+        aria-label="delete"
+        fontSize="20px"
+        size={"sm"}
+        onClick={async () => {
+          onOpenDel();
+        }}
+        icon={<IoTrash />}
+      />
+      <DeleteAlert
+        isOpen={isOpenDel}
+        onClick={async () => {
+          setDelLoading(true);
+          await handleDeleteInformasi(value);
+        }}
+        onClose={onCloseDel}
+        onOpen={onOpenDel}
+        isLoading={delLoading}
+        title={"Hapus informasi"}
+        text={"Apa anda yakin ?"}
+      />
+    </Flex>
+  );
+}
 
 interface DetailProps {
   data: Informasi;

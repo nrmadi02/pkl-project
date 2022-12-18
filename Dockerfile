@@ -19,6 +19,7 @@ FROM node:18-alpine as deploy
 WORKDIR /app
 ENV NODE_ENV="production"
 ENV DATABASE_URL="mysql://nrmadi02:Ulalaa2202@103.13.207.10:3306/db_pkl"
+ENV NEXTAUTH_URL_INTERNAL=http://103.13.207.10:3000/
 ENV TZ Asia/Kuala_Lumpur
 
 COPY --from=builder /app/next.config.mjs ./

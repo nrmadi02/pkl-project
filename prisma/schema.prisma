@@ -73,6 +73,7 @@ model Siswa {
     tindaklanjut Tindaklanjut[]
     panggil_ortu Panggilortu[]
     terlambat    Terlambat[]
+    konseling    Konseling[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -101,14 +102,14 @@ model Pelanggaran {
     siswa   Siswa  @relation(fields: [siswaID], references: [id])
     siswaID String
 
-    @@map(name: "pelanggaran")
     @@index([siswaID])
+    @@map(name: "pelanggaran")
 }
 
 model Terlambat {
     id        String   @id @default(uuid())
     waktu     Int      @db.Int
-    point     Int      @db.Int
+    tanggal   DateTime
     pencatat  String   @db.VarChar(255)
     akumulasi Boolean
     createdAt DateTime @default(now())
@@ -117,8 +118,8 @@ model Terlambat {
     siswa   Siswa  @relation(fields: [siswaID], references: [id])
     siswaID String
 
-    @@map(name: "terlambat")
     @@index([siswaID])
+    @@map(name: "terlambat")
 }
 
 model Tindaklanjut {
@@ -135,8 +136,8 @@ model Tindaklanjut {
     siswa   Siswa  @relation(fields: [siswaID], references: [id])
     siswaID String
 
-    @@map(name: "tindaklanjut")
     @@index([siswaID])
+    @@map(name: "tindaklanjut")
 }
 
 model Panggilortu {
@@ -157,8 +158,8 @@ model Panggilortu {
     siswa   Siswa  @relation(fields: [siswaID], references: [id])
     siswaID String
 
-    @@map(name: "panggil_ortu")
     @@index([siswaID])
+    @@map(name: "panggil_ortu")
 }
 
 model Periode {
@@ -184,8 +185,8 @@ model Lab {
     guru   Guru   @relation(fields: [guruID], references: [id])
     guruID String
 
-    @@map(name: "lab")
     @@index([guruID])
+    @@map(name: "lab")
 }
 
 model Informasi {
@@ -202,8 +203,24 @@ model Informasi {
     user   User   @relation(fields: [userID], references: [id])
     userID String
 
-    @@map(name: "informasi")
     @@index([userID])
+    @@map(name: "informasi")
+}
+
+model Konseling {
+    id        String   @id @default(uuid())
+    tanggal String @db.Text
+    jam String @db.Text
+    keluhan String @db.LongText
+    status String @db.VarChar(255)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    siswa   Siswa  @relation(fields: [siswaID], references: [id])
+    siswaID String
+
+    @@index([siswaID])
+    @@map(name: "konseling")
 }
 
 enum RoleEnumType {

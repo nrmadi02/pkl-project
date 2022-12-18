@@ -170,14 +170,51 @@ export const siswaRoutes = createRouter()
           point: true,
         },
       });
+      const terlambat = await ctx.prisma.terlambat.findMany({
+        where: {
+          siswaID: input.id
+        }
+      })
+      const waktuTerlambat = await ctx.prisma.terlambat.aggregate({
+        where: {
+          siswaID: input.id,
+          AND: {
+            akumulasi: {
+              not: true
+            }
+          }
+        },
+        _sum: {
+          waktu: true,
+        },
+      });
+
       return {
         status: 200,
         message: "Data siswa berhasil diambil",
         result: siswaByID,
         points: points._sum.point,
         pelanggaran: pelanggaran,
+        terlambat: terlambat,
+        waktuTerlambat: waktuTerlambat._sum.waktu
       };
     },
+  })
+  .query('detail', {
+    input: string(),
+    resolve: async ({ctx, input}) => {
+      const dataDetail = await ctx.prisma.siswa.findFirst({
+        where: {
+          email: input
+        }
+      })
+
+      return {
+        status: 200,
+        message: "Detail siswa berhasil diambil",
+        result: dataDetail
+      }
+    }
   })
   .mutation("update", {
     input: updateSiswaSchema,

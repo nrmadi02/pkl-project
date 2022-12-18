@@ -1,4 +1,5 @@
 import { CalendarIcon, DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
+import fs from "fs";
 import {
   Badge,
   Breadcrumb,
@@ -33,7 +34,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Pelanggaran, Siswa, Tindaklanjut } from "@prisma/client";
+import { Pelanggaran, Siswa, Terlambat, Tindaklanjut } from "@prisma/client";
 import { RangeDatepicker } from "chakra-dayzed-datepicker";
 import { getCookie } from "cookies-next";
 import moment from "moment";
@@ -48,7 +49,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { IoAdd, IoCalendarClear, IoRemove, IoTrash } from "react-icons/io5";
+import {
+  IoAdd,
+  IoCalculator,
+  IoCalendarClear,
+  IoDownload,
+  IoRemove,
+  IoTrash,
+} from "react-icons/io5";
 import { MdClear } from "react-icons/md";
 import DeleteAlert from "../../../../components/Alert/Delete";
 import DataTable from "../../../../components/DataTable/DataTable";
@@ -69,6 +77,7 @@ import "moment/locale/id";
 import { FaEye } from "react-icons/fa";
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
+import axios, { AxiosRequestConfig } from "axios";
 
 export const getServerSideProps: GetServerSideProps<{ data: Siswa }> = async (
   ctx
@@ -141,9 +150,7 @@ const DetailSiswa: NextPage<
     const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const data = new Blob([excelBuffer], { type: fileType });
-    await setTimeout(() => {
-      FileSaver.saveAs(data, fileName + fileExtension);
-    }, 3000)
+    FileSaver.saveAs(data, fileName + fileExtension);
   };
 
   const {
@@ -201,6 +208,8 @@ const DetailSiswa: NextPage<
         : "",
     },
   ]);
+  const { mutateAsync: mutateAkumulasi, isLoading: isLoadingAkumulasi } =
+    trpc.useMutation(["terlambat.updateAkumulasi"]);
   const {
     data: dataTindakan,
     isLoading: isLoadingTindakan,
@@ -213,11 +222,30 @@ const DetailSiswa: NextPage<
   } = trpc.useQuery(["panggil.getAllByIDSiswa", String(dataSiswa?.result?.id)]);
   const { data: dataDownloadPenghargaan } = trpc.useQuery([
     "pelanggaran.downloadByType",
-    "Penghargaan",
+    {
+      siswaID: String(dataSiswa?.result?.id),
+      type: "Penghargaan",
+    },
   ]);
   const { data: dataDownloadPelanggaran } = trpc.useQuery([
     "pelanggaran.downloadPelanggaran",
+    String(dataSiswa?.result?.id),
   ]);
+
+  const downloadXLSFile = async () => {
+    // Its important to set the 'Content-Type': 'blob' and responseType:'arraybuffer'.
+    await axios
+      .get(`/api/download/pelanggaran`, {
+        responseType: "arraybuffer",
+      })
+      .then((response) => {
+        // console.log(response.data)
+        const blob = new Blob([response.data], {
+          type: fileType,
+        });
+        FileSaver.saveAs(blob, "sheet" + fileExtension);
+      });
+  };
 
   const handleAddPelanggaran = useCallback(
     async (data: CreatePelanggaranSchema) => {
@@ -253,6 +281,31 @@ const DetailSiswa: NextPage<
       }
     },
     [tambahPelanggaran]
+  );
+
+  const handleAkumulasiTerlambat = useCallback(
+    async (id: string) => {
+      const result: any = await mutateAkumulasi(id);
+      if (result.status === 200) {
+        toast({
+          title: "Akumulasi point terlambat berhasil",
+          status: "success",
+          duration: 3000,
+          position: "top-right",
+          isClosable: true,
+        });
+        refetch();
+      } else {
+        toast({
+          title: "Akumulasi point terlambat gagal",
+          status: "error",
+          duration: 3000,
+          position: "top-right",
+          isClosable: true,
+        });
+      }
+    },
+    [mutateAkumulasi]
   );
 
   const handleAddTindakan = useCallback(
@@ -324,6 +377,11 @@ const DetailSiswa: NextPage<
     return dataNew;
   };
 
+  const getDataTerlambat = (data: Terlambat[] | undefined) => {
+    const dataNew = data as Terlambat[];
+    return dataNew;
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -357,7 +415,7 @@ const DetailSiswa: NextPage<
       {
         Header: "Dibuat",
         accessor: (d: Pelanggaran) => {
-          const date = moment(d.createdAt).format("DD/MM/YYYY");
+          const date = moment(d.createdAt).format("dddd, DD/MM/YYYY");
           return <p>{date}</p>;
         },
       },
@@ -430,6 +488,49 @@ const DetailSiswa: NextPage<
     [dataTindakan?.result]
   );
 
+  const columnsTerlambat = useMemo(
+    () => [
+      {
+        Header: "Hari, Tanggal",
+        accessor: (d: Tindaklanjut) => {
+          const date = moment(d.tanggal).format("dddd, DD/MM/YYYY");
+          return <p>{date}</p>;
+        },
+      },
+      {
+        Header: "Waktu Terlambat",
+        accessor: (d: Terlambat) => {
+          return <p>{d.waktu} Menit</p>;
+        },
+      },
+      {
+        Header: "Status Akumulasi",
+        accessor: (d: Terlambat) => {
+          return d.akumulasi ? (
+            <Badge colorScheme={"green"}>Sudah</Badge>
+          ) : (
+            <Badge colorScheme={"yellow"}>Belum</Badge>
+          );
+        },
+      },
+      {
+        Header: "Action",
+        accessor: (d: Tindaklanjut) => {
+          return (
+            <ActionTableTerlambat
+              key={d?.id}
+              value={d?.id}
+              data={d}
+              refetch={refetch}
+              toast={toast}
+            />
+          );
+        },
+      },
+    ],
+    [dataSiswa?.terlambat]
+  );
+
   const dataPelanggaran = useMemo(
     () => getData(dataSiswa?.pelanggaran ? dataSiswa.pelanggaran : []),
     [dataSiswa]
@@ -437,6 +538,10 @@ const DetailSiswa: NextPage<
   const dataPanggil = useMemo(
     () => getDataTindak(dataTindakan?.result ? dataTindakan.result : []),
     [dataTindakan]
+  );
+  const dataTerlambat = useMemo(
+    () => getDataTerlambat(dataSiswa?.terlambat ? dataSiswa?.terlambat : []),
+    [dataSiswa]
   );
 
   return (
@@ -796,7 +901,74 @@ const DetailSiswa: NextPage<
                 <Spinner color="orange.400" />
               )}
             </div>
-            <Heading size={"md"}>Data Point Siswa</Heading>
+            <Heading size={"md"}>Data Terlambat</Heading>
+            <div className="w-full flex justify-end gap-3 items-end">
+              <Button
+                onClick={() => console.log("download")}
+                // ref={firstFieldRef}
+                leftIcon={<IoDownload />}
+                fontWeight={600}
+                color={"white"}
+                bg={"blue.400"}
+                size={"sm"}
+                _hover={{
+                  bg: "blue.300",
+                }}
+              >
+                Download
+              </Button>
+              <Button
+                size={"sm"}
+                onClick={() =>
+                  handleAkumulasiTerlambat(String(dataSiswa?.result?.id))
+                }
+                ref={firstFieldRef}
+                isLoading={isLoadingAkumulasi}
+                leftIcon={<IoCalculator />}
+                disabled={Number(dataSiswa?.waktuTerlambat) < 15}
+                fontWeight={600}
+                color={"white"}
+                bg={"green.400"}
+                _hover={{
+                  bg: "green.300",
+                }}
+              >
+                Akumulasi
+              </Button>
+              {/* <Button
+                onClick={() => {
+                  onOpen();
+                  setValue("siswaID", data?.id);
+                  setValue(
+                    "pemeberi",
+                    stateSession?.user?.name ? stateSession?.user?.name : ""
+                  );
+                }}
+                ref={firstFieldRef}
+                leftIcon={<IoAdd />}
+                fontWeight={600}
+                color={"white"}
+                bg={"orange.400"}
+                _hover={{
+                  bg: "orange.300",
+                }}
+              >
+                Tambah Point
+              </Button> */}
+            </div>
+            <div className="text-[14px]">
+              <DataTable
+                isSearch={false}
+                sizeSet
+                isLoading={isLoading}
+                hiddenColumns={[]}
+                columns={columnsTerlambat}
+                data={dataTerlambat}
+              />
+            </div>
+            <Heading mt={5} size={"md"}>
+              Data Point Siswa
+            </Heading>
             <div className="w-full mb-3 flex justify-end items-end">
               <Button
                 onClick={() => {
@@ -1043,6 +1215,7 @@ const DetailSiswa: NextPage<
                     dataDownloadPelanggaran?.result,
                     `pelanggaran_${dataSiswa?.result?.nama}`
                   );
+                  // await downloadXLSFile();
                 }}
                 leftIcon={<DownloadIcon />}
                 _hover={{
@@ -1052,6 +1225,21 @@ const DetailSiswa: NextPage<
               >
                 Pelanggaran
               </Button>
+              <Link href={`/admin/data/siswa/rekapitulasi/${data.id}`}>
+                <Button
+                  fontWeight={600}
+                  width={"full"}
+                  color={"white"}
+                  bg={"orange.400"}
+                  leftIcon={<DownloadIcon />}
+                  _hover={{
+                    bg: "orange.300",
+                  }}
+                  mt={"10px"}
+                >
+                  Rekapitulasi Pelanggaran
+                </Button>
+              </Link>
             </div>
 
             <Heading mt={5} size={"md"}>
@@ -1213,6 +1401,69 @@ const ActionTableTindak = ({ value, data, refetch, toast }: ActionValue) => {
         onClick={async () => {
           setDelLoading(true);
           await handleDeleteTindak(value);
+        }}
+        onClose={onClose}
+        onOpen={onOpen}
+        isLoading={delLoading}
+        title={"Hapus data"}
+        text={"Apa anda yakin ?"}
+      />
+    </>
+  );
+};
+
+const ActionTableTerlambat = ({ value, data, refetch, toast }: ActionValue) => {
+  const { data: stateSession } = useSession();
+  const { onOpen, onClose, isOpen } = useDisclosure();
+  const [delLoading, setDelLoading] = useState(false);
+
+  const { mutateAsync: hapusTerlambat } = trpc.useMutation([
+    "terlambat.delete",
+  ]);
+
+  const handleDeleteTerlambat = useCallback(async (id: string) => {
+    const delPoint = await hapusTerlambat(id);
+    if (delPoint.status === 200) {
+      toast({
+        title: "Hapus data berhasil",
+        status: "success",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+      refetch();
+      setDelLoading(false);
+      onClose();
+    } else {
+      toast({
+        title: "Hapus data gagal",
+        status: "error",
+        duration: 3000,
+        position: "top-right",
+        isClosable: true,
+      });
+      setDelLoading(false);
+    }
+  }, []);
+
+  return (
+    <>
+      <IconButton
+        isLoading={delLoading}
+        variant="outline"
+        colorScheme="red"
+        aria-label="delete"
+        fontSize="20px"
+        onClick={async () => {
+          onOpen();
+        }}
+        icon={<IoTrash />}
+      />
+      <DeleteAlert
+        isOpen={isOpen}
+        onClick={async () => {
+          setDelLoading(true);
+          await handleDeleteTerlambat(value);
         }}
         onClose={onClose}
         onOpen={onOpen}
