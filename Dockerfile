@@ -1,5 +1,5 @@
 FROM node:18-alpine as dependencies
-RUN apk add --update libc6-compat openssl openssl-dev
+RUN apk add --update --no-cache openssl1.1-compat
 WORKDIR /app
 COPY package.json ./
 COPY prisma ./prisma
