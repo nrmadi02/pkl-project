@@ -22,10 +22,6 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
     setDataPelanggaran(props.data);
   }, [props]);
 
-  useEffect(() => {
-    
-  }, [dataPelanggaran]);
-
   return (
     <div className="font-surat p-5" ref={ref}>
       <div className="flex justify-center flex-row gap-7">

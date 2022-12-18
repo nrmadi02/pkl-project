@@ -60,7 +60,7 @@ export const terlambatRoutes = createRouter()
                 waktu: true,
               },
             });
-            let waktuAkumulasi = Number(waktuTerlambat._sum.waktu)
+            const waktuAkumulasi = Number(waktuTerlambat._sum.waktu)
             if (waktuAkumulasi >= 15) {
                 const update = await ctx.prisma.terlambat.updateMany({
                     where: {
