@@ -10,6 +10,7 @@ ARG NEXT_PUBLIC_DATABASE_URL
 WORKDIR /app
 COPY . .
 COPY --from=dependencies /app/node_modules ./node_modules
+RUN npx prisma generate
 RUN npm run build
 
 # debug
