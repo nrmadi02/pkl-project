@@ -36,7 +36,7 @@ import "moment/locale/id";
 
 const SectionBimbingan: NextPage = () => {
   const { data: state } = useSession();
-  const toast = useToast()
+  const toast = useToast();
   const [delLoading, setDelLoading] = useState(false);
   // const { onOpen, onClose, isOpen } = useDisclosure();
   const {
@@ -44,7 +44,7 @@ const SectionBimbingan: NextPage = () => {
     onClose: onCloseDel,
     isOpen: isOpenDel,
   } = useDisclosure();
-  const [selected, setSelected] = useState("")
+  const [selected, setSelected] = useState("");
 
   const {
     register,
@@ -64,8 +64,10 @@ const SectionBimbingan: NextPage = () => {
     "konseling.getBySiswaID",
     String(dataSiswa?.result?.id),
   ]);
-  const {mutateAsync: tambahKonseling} = trpc.useMutation(['konseling.create'])
-  const {mutateAsync: hapusKonseling} = trpc.useMutation('konseling.delete')
+  const { mutateAsync: tambahKonseling } = trpc.useMutation([
+    "konseling.create",
+  ]);
+  const { mutateAsync: hapusKonseling } = trpc.useMutation("konseling.delete");
 
   const handleAddKonseling = useCallback(
     async (data: CreateKonselingSchema) => {
@@ -78,8 +80,8 @@ const SectionBimbingan: NextPage = () => {
           position: "top-right",
           isClosable: true,
         });
-        refetch()
-        reset({keluhan: '', tanggal: ''})
+        refetch();
+        reset({ keluhan: "", tanggal: "" });
       } else {
         toast({
           title: "Tambah data gagal",
@@ -105,7 +107,7 @@ const SectionBimbingan: NextPage = () => {
           isClosable: true,
         });
         refetch();
-        setDelLoading(false)
+        setDelLoading(false);
         // reset({ keluhan: "", tanggal: "" });
       } else {
         toast({
@@ -124,6 +126,23 @@ const SectionBimbingan: NextPage = () => {
   useEffect(() => {
     setValue("siswaID", String(dataSiswa?.result?.id));
   }, [dataSiswa]);
+
+  if (!state?.role) {
+    return (
+      <Container maxW={"5xl"} py={10}>
+        <Heading textAlign={"center"}>Loading...</Heading>
+      </Container>
+    );
+  }
+
+
+  if (state?.role != "siswa") {
+    return (
+      <Container maxW={"5xl"} py={10}>
+        <Heading textAlign={"center"}>Anda Bukan Siswa</Heading>
+      </Container>
+    );
+  }
 
   return (
     <Container maxW={"5xl"} py={10}>
@@ -199,7 +218,7 @@ const SectionBimbingan: NextPage = () => {
         isOpen={isOpenDel}
         onClick={async () => {
           setDelLoading(true);
-          await handleDeleteKonseling(selected)
+          await handleDeleteKonseling(selected);
         }}
         onClose={onCloseDel}
         onOpen={onOpenDel}

@@ -132,7 +132,9 @@ const Navbar: NextPage = () => {
                 {loading && <Spinner color='orange.500' />}
               </MenuButton>
               <MenuList>
-                <MenuItem _focus={{ color: "orange.500" }}>Admin</MenuItem>
+                <MenuItem onClick={() => {
+                  router.push("/admin")
+                }} _focus={{ color: "orange.500" }}>Admin</MenuItem>
                 <MenuItem onClick={() => {
                   setLoading(true)
                   handleLogOut()
@@ -365,10 +367,10 @@ const NAV_ITEMS: Array<NavItem> = [
     label: 'Informasi',
     href: '/informasi',
   },
-  {
-    label: 'Admin',
-    href: '/admin',
-  },
+  // {
+  //   label: 'Admin',
+  //   href: '/admin',
+  // },
 ];
 
 export default Navbar;

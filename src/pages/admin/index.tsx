@@ -13,11 +13,37 @@ import { IoBook, IoPeople, IoSchool } from "react-icons/io5";
 import AdminLayout from "../../components/Layout/AdminLayout";
 import { trpc } from "../../utils/trpc";
 import { getCookie } from "cookies-next";
+import {
+  Chart as ChartJs,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import { useEffect, useState } from "react";
+
+ChartJs.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
   const token = getCookie(
-    proto == "http" ? "next-auth.session-token" : "__Secure-next-auth.session-token",
+    proto == "http"
+      ? "next-auth.session-token"
+      : "__Secure-next-auth.session-token",
     { req: ctx.req, res: ctx.res }
   );
   if (!token) {
@@ -36,6 +62,23 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 const Admin: NextPage = () => {
   const { data: Users } = trpc.useQuery(["user.getAllUsers"]);
   const { data: Guru } = trpc.useQuery(["guru.getAll"]);
+  const { data: Kelas } = trpc.useQuery(["kelas.getAll"]);
+  const { data: Siswa } = trpc.useQuery(["siswa.getAll", ""]);
+  const { data: DataStats } = trpc.useQuery(["pelanggaran.getStats"]);
+
+  const [dataStats, setDataStats] = useState({
+    last: [] as number[] | undefined,
+    before: [] as number[] | undefined
+  })
+
+  useEffect(() => {
+    setDataStats({
+      ...dataStats,
+      before: DataStats?.result.before,
+      last: DataStats?.result.last,
+    });
+  }, [DataStats])
+  
 
   return (
     <AdminLayout
@@ -72,7 +115,7 @@ const Admin: NextPage = () => {
             <GridItem w="100%">
               <ItemInfo
                 icon={<IoSchool color="white" size="25px" />}
-                amount={"20"}
+                amount={Siswa?.result.length.toString()}
                 title={"Total Siswa"}
               />
             </GridItem>
@@ -86,11 +129,105 @@ const Admin: NextPage = () => {
             <GridItem w="100%">
               <ItemInfo
                 icon={<IoBook color="white" size="25px" />}
-                amount={"13"}
-                title={"Total Buku"}
+                amount={Kelas?.result.length.toString()}
+                title={"Total Kelas"}
               />
             </GridItem>
           </Grid>
+          <Heading size={'md'} className="font-bold mt-5 mb-3">Data Pelanggaran</Heading>
+          <div className="bg-white p-5 rounded-xl shadow-md mt-5">
+            <div className="h-[350px]">
+              <Line
+                data={{
+                  labels: [
+                    "Januari",
+                    "Februari",
+                    "Maret",
+                    "April",
+                    "Mei",
+                    "Juni",
+                    "Juli",
+                    "Agustus",
+                    "September",
+                    "Oktober",
+                    "November",
+                    "Desember",
+                  ],
+                  datasets: [
+                    {
+                      label: new Date().getFullYear().toString(),
+                      backgroundColor: "#3182ce",
+                      borderColor: "#3182ce",
+                      data: dataStats.last,
+                      fill: false,
+                      pointRadius: 5,
+                      tension: 0.28,
+                      yAxisID: "y",
+                      xAxisID: "x",
+                    },
+                    {
+                      label: String(new Date().getFullYear() - 1),
+                      fill: false,
+                      backgroundColor: "#FF9113",
+                      borderColor: "#FF9113",
+                      pointRadius: 5,
+                      tension: 0.28,
+                      data: dataStats.before,
+                      yAxisID: "y",
+                      // xAxisID: "x",
+                    },
+                  ],
+                }}
+                options={{
+                  maintainAspectRatio: false,
+                  responsive: true,
+                  hover: {
+                    mode: "nearest",
+                    intersect: true,
+                  },
+                  plugins: {
+                    title: {
+                      display: false,
+                      text: "Pelanggaran",
+                      color: "black",
+                    },
+                    legend: {
+                      labels: {
+                        // color: "black",
+                      },
+                      align: "end",
+                      position: "bottom",
+                    },
+                    tooltip: {
+                      mode: "index",
+                      intersect: false,
+                    },
+                  },
+                  scales: {
+                    y: {
+                      type: "linear" as const,
+                      display: true,
+                      position: "left" as const,
+                      grid: {
+                        display: true,
+                        tickBorderDash: [2],
+                        tickBorderDashOffset: 3,
+                        // color: "red",
+                      },
+                    },
+                    x: {
+                      grid: {
+                        display: false,
+                        tickBorderDash: [2],
+                        tickBorderDashOffset: 3,
+                        color: "red",
+                      },
+                    },
+                  },
+                }}
+              />
+            </div>
+          </div>
         </div>
       </>
     </AdminLayout>

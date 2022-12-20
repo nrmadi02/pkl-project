@@ -75,7 +75,7 @@ export const siswaRoutes = createRouter()
     },
   })
   .query("getAll", {
-    input: z.string(),
+    input: z.string().nullable(),
     resolve: async ({ ctx, input }) => {
       const dataSiswa = input
         ? ((await ctx.prisma.siswa.findMany({
@@ -101,6 +101,33 @@ export const siswaRoutes = createRouter()
       };
     },
   })
+  // .query("getAllLength", {
+  //   input: z.string().nullable(),
+  //   resolve: async ({ ctx, input }) => {
+  //     const dataSiswa = input
+  //       ? ((await ctx.prisma.siswa.findMany({
+  //           where: {
+  //             OR: {
+  //               kelas: input,
+  //             },
+  //           },
+  //           include: {
+  //             pelanggaran: true,
+  //           },
+  //         })) as Siswa[])
+  //       : await ctx.prisma.siswa.findMany({
+  //           include: {
+  //             pelanggaran: true,
+  //           },
+  //         });
+
+  //     return {
+  //       status: 200,
+  //       message: "Data siswa berhasil diambil",
+  //       result: dataSiswa,
+  //     };
+  //   },
+  // })
   .mutation("delete", {
     input: z.object({
       id: z.string(),
@@ -172,17 +199,17 @@ export const siswaRoutes = createRouter()
       });
       const terlambat = await ctx.prisma.terlambat.findMany({
         where: {
-          siswaID: input.id
-        }
-      })
+          siswaID: input.id,
+        },
+      });
       const waktuTerlambat = await ctx.prisma.terlambat.aggregate({
         where: {
           siswaID: input.id,
           AND: {
             akumulasi: {
-              not: true
-            }
-          }
+              not: true,
+            },
+          },
         },
         _sum: {
           waktu: true,
@@ -196,25 +223,25 @@ export const siswaRoutes = createRouter()
         points: points._sum.point,
         pelanggaran: pelanggaran,
         terlambat: terlambat,
-        waktuTerlambat: waktuTerlambat._sum.waktu
+        waktuTerlambat: waktuTerlambat._sum.waktu,
       };
     },
   })
-  .query('detail', {
+  .query("detail", {
     input: string(),
-    resolve: async ({ctx, input}) => {
+    resolve: async ({ ctx, input }) => {
       const dataDetail = await ctx.prisma.siswa.findFirst({
         where: {
-          email: input
-        }
-      })
+          email: input,
+        },
+      });
 
       return {
         status: 200,
         message: "Detail siswa berhasil diambil",
-        result: dataDetail
-      }
-    }
+        result: dataDetail,
+      };
+    },
   })
   .mutation("update", {
     input: updateSiswaSchema,

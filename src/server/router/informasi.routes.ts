@@ -151,6 +151,9 @@ export const informasiRoutes = createRouter()
           },
         },
         take: input,
+        orderBy: {
+          createdAt: "desc",
+        },
       });
       return {
         status: 200,
