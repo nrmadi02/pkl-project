@@ -3,13 +3,12 @@
 
 generator client {
     provider        = "prisma-client-js"
-    previewFeatures = ["referentialIntegrity"]
+    binaryTargets   = ["native", "linux-musl", "linux-arm-openssl-1.1.x"]
 }
 
 datasource db {
     provider             = "mysql"
     url                  = env("DATABASE_URL")
-    referentialIntegrity = "prisma"
 }
 
 model Example {
@@ -209,10 +208,10 @@ model Informasi {
 
 model Konseling {
     id        String   @id @default(uuid())
-    tanggal String @db.Text
-    jam String @db.Text
-    keluhan String @db.LongText
-    status String @db.VarChar(255)
+    tanggal   String   @db.Text
+    jam       String   @db.Text
+    keluhan   String   @db.LongText
+    status    String   @db.VarChar(255)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
