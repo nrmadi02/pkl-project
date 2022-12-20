@@ -61,10 +61,6 @@ const Login: NextPage = () => {
     return () => subs.unsubscribe()
   }, [watch])
 
-  useEffect(() => {
-    console.log(process.env.NODE_ENV)
-  }, [router])
-
   return (
     <>
       <Head>
