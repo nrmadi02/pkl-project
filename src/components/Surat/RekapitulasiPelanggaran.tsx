@@ -11,7 +11,7 @@ import _ from "lodash";
 interface Props {
   children?: ReactNode;
   data: Pelanggaran[] | undefined;
-  siswa: Siswa
+  siswa: Siswa;
 }
 
 export type Ref = HTMLDivElement;
@@ -108,10 +108,38 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                           : " "}
                       </td>
                       <td className="border text-center">
-                        {dataPelanggaran[i] ? <p>&#10004;</p> : " "}
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
                       </td>
-                      <td className="border text-center"></td>
-                      <td className="border text-center"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td className="border font-bold text-center" colSpan={2}>
                         Panggilan{" "}
                         {(i == 0 && "I") ||
@@ -134,10 +162,38 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                           : " "}
                       </td>
                       <td className="border text-center">
-                        {dataPelanggaran[i] ? <p>&#10004;</p> : " "}
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td className="border px-1" colSpan={2}>
                         JUMLAH SKOR :
                       </td>
@@ -157,10 +213,38 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                           : " "}
                       </td>
                       <td className="border text-center">
-                        {dataPelanggaran[i] ? <p>&#10004;</p> : " "}
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td className="border px-1" colSpan={2}>
                         TGL SURAT PANGGILAN :
                       </td>
@@ -180,10 +264,38 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                           : " "}
                       </td>
                       <td className="border text-center">
-                        {dataPelanggaran[i] ? <p>&#10004;</p> : " "}
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td className="border text-center px-1" colSpan={2}>
                         (.. / ../ 20..)
                       </td>
@@ -203,10 +315,38 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                           : " "}
                       </td>
                       <td className="border text-center">
-                        {dataPelanggaran[i] ? <p>&#10004;</p> : " "}
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td className="border px-1" colSpan={2}>
                         TGL KEDATANGAN ORTU
                       </td>
@@ -226,10 +366,38 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                           : " "}
                       </td>
                       <td className="border text-center">
-                        {dataPelanggaran[i] ? <p>&#10004;</p> : " "}
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td className="border text-center px-1" colSpan={2}>
                         (.. / ../ 20..)
                       </td>
@@ -249,10 +417,38 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                           : " "}
                       </td>
                       <td className="border text-center">
-                        {dataPelanggaran[i] ? <p>&#10004;</p> : " "}
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td
                         className="border font-bold text-center px-1"
                         colSpan={2}
@@ -274,9 +470,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td className="border text-center px-1">Guru BK</td>
                       <td className="border text-center px-1">ORANG TUA</td>
                     </tr>
@@ -294,9 +520,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td className="border" rowSpan={3}></td>
                       <td className="border" rowSpan={3}></td>
                     </tr>
@@ -314,9 +570,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
                   );
                 }
@@ -332,9 +618,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
                   );
                 }
@@ -350,9 +666,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td className="border" colSpan={2}>
                         <div className="w-full h-1 bg-black"></div>
                       </td>
@@ -371,9 +717,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td className="border font-bold text-center" colSpan={2}>
                         PEMBERHENTIAN / DO
                       </td>
@@ -392,9 +768,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                       <td
                         className="border align-top px-1"
                         colSpan={2}
@@ -444,9 +850,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
                   );
                 }
@@ -462,9 +898,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
                   );
                 }
@@ -480,9 +946,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
                   );
                 }
@@ -498,9 +994,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
                   );
                 }
@@ -516,9 +1042,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
                   );
                 }
@@ -534,9 +1090,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
                   );
                 }
@@ -552,9 +1138,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
                   );
                 }
@@ -570,9 +1186,39 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                             )})`
                           : " "}
                       </td>
-                      <td className="border"></td>
-                      <td className="border"></td>
-                      <td className="border"></td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kelakuan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerajinan" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td className="border text-center">
+                        {dataPelanggaran[i] ? (
+                          dataPelanggaran[i]?.type == "Kerapian" ? (
+                            <p>&#10004;</p>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
                   );
                 }
@@ -594,7 +1240,7 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
           </div>
           <div>
             <div>
-              <p>Bati-Bati, 20 Juli 2022</p>
+              <p>Bati-Bati, {moment().format("dddd, DD  MMMM  YYYY")}</p>
               <p>Penanggung Jawab Program</p>
               <p>Wakasek Kesiswaan,</p>
             </div>

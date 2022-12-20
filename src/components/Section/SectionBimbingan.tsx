@@ -149,70 +149,72 @@ const SectionBimbingan: NextPage = () => {
       <Heading textAlign={"center"}>Jadwalkan Bimbingan BK</Heading>
       <Stack mt={"10"}>
         <Heading size={"md"}>Bimbingan anda sebelumnya</Heading>
-        <Table className="text-[12px]">
-          <Thead>
-            <Tr>
-              <Th>Nama</Th>
-              <Th>Jadwal</Th>
-              <Th>Jam</Th>
-              <Th>Keluhan</Th>
-              <Th>Status</Th>
-              <Th>Aksi</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {dataKonseling?.result.length != 0 ? (
-              dataKonseling?.result.map((item, idx) => {
-                return (
-                  <Tr key={idx}>
-                    <Td>{item.siswa.nama}</Td>
-                    <Td>{moment(item.tanggal).format("dddd, DD/MM/YYYY")}</Td>
-                    <Td>{item.jam ? item.jam : "-"}</Td>
-                    <Td>
-                      <p className="whitespace-pre-wrap">{item.keluhan}</p>
-                    </Td>
-                    <Td>
-                      {item.status == "Disetujui" && (
-                        <Badge size={"sm"} colorScheme="green">
-                          Disetujui
-                        </Badge>
-                      )}
-                      {item.status == "Menunggu" && (
-                        <Badge size={"sm"} colorScheme="orange">
-                          Menunggu
-                        </Badge>
-                      )}
-                      {item.status == "Ditolak" && (
-                        <Badge size={"sm"} colorScheme="red">
-                          Ditolak
-                        </Badge>
-                      )}
-                    </Td>
-                    <Td>
-                      <IconButton
-                        // isLoading={delLoading}
-                        variant="outline"
-                        colorScheme="red"
-                        aria-label="delete"
-                        // fontSize="20px"
-                        size={"sm"}
-                        onClick={async () => {
-                          onOpenDel();
-                          setSelected(item.id);
-                        }}
-                        icon={<IoTrash />}
-                      />
-                    </Td>
-                  </Tr>
-                );
-              })
-            ) : (
+        <div className="max-w-5xl overflow-auto">
+          <Table className="text-[12px]">
+            <Thead>
               <Tr>
-                <Td>Data belum ada</Td>
+                <Th>Nama</Th>
+                <Th>Jadwal</Th>
+                <Th>Jam</Th>
+                <Th>Keluhan</Th>
+                <Th>Status</Th>
+                <Th>Aksi</Th>
               </Tr>
-            )}
-          </Tbody>
-        </Table>
+            </Thead>
+            <Tbody>
+              {dataKonseling?.result.length != 0 ? (
+                dataKonseling?.result.map((item, idx) => {
+                  return (
+                    <Tr key={idx}>
+                      <Td>{item.siswa.nama}</Td>
+                      <Td>{moment(item.tanggal).format("dddd, DD/MM/YYYY")}</Td>
+                      <Td>{item.jam ? item.jam : "-"}</Td>
+                      <Td>
+                        <p className="whitespace-pre-wrap">{item.keluhan}</p>
+                      </Td>
+                      <Td>
+                        {item.status == "Disetujui" && (
+                          <Badge size={"sm"} colorScheme="green">
+                            Disetujui
+                          </Badge>
+                        )}
+                        {item.status == "Menunggu" && (
+                          <Badge size={"sm"} colorScheme="orange">
+                            Menunggu
+                          </Badge>
+                        )}
+                        {item.status == "Ditolak" && (
+                          <Badge size={"sm"} colorScheme="red">
+                            Ditolak
+                          </Badge>
+                        )}
+                      </Td>
+                      <Td>
+                        <IconButton
+                          // isLoading={delLoading}
+                          variant="outline"
+                          colorScheme="red"
+                          aria-label="delete"
+                          // fontSize="20px"
+                          size={"sm"}
+                          onClick={async () => {
+                            onOpenDel();
+                            setSelected(item.id);
+                          }}
+                          icon={<IoTrash />}
+                        />
+                      </Td>
+                    </Tr>
+                  );
+                })
+              ) : (
+                <Tr>
+                  <Td>Data belum ada</Td>
+                </Tr>
+              )}
+            </Tbody>
+          </Table>
+        </div>
       </Stack>
       <DeleteAlert
         isOpen={isOpenDel}
@@ -265,7 +267,7 @@ const SectionBimbingan: NextPage = () => {
                 id="kelas"
                 placeholder="Masukan kelas"
                 disabled
-                defaultValue={String(dataSiswa?.result?.kelas)}
+                defaultValue={dataSiswa?.result?.kelas || ""}
                 // {...register('nomorInduk')}
               />
             </FormControl>

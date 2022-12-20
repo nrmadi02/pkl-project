@@ -24,7 +24,7 @@ const AdminLayout: NextPage<Props> = ({ children, breadcrumb, title }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = useRef<HTMLDivElement>(null)
 
-  const [width, setWidth] = useState(0);
+  const [width, setWidth] = useState<any>();
   const [isShow, setIsShow] = useState(true)
 
   const handleWindowSizeChange = () => {
@@ -39,7 +39,7 @@ const AdminLayout: NextPage<Props> = ({ children, breadcrumb, title }) => {
       window.removeEventListener('resize', handleWindowSizeChange);
     }
   }, []);
-  const isMobile = width <= 1000
+  const isMobile = parseInt(width) <= 1000
   useEffect(() => {
     isMobile ? setIsShow(false) : setIsShow(true)
   }, [isMobile])

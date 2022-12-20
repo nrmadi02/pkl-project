@@ -78,6 +78,7 @@ import { FaEye } from "react-icons/fa";
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
 import axios, { AxiosRequestConfig } from "axios";
+import { useRouter } from "next/router";
 
 export const getServerSideProps: GetServerSideProps<{ data: Siswa }> = async (
   ctx
@@ -126,6 +127,7 @@ const DetailSiswa: NextPage<
   const { data: stateSession } = useSession();
   const { onOpen, onClose, isOpen } = useDisclosure();
   const firstFieldRef = useRef(null);
+  const router = useRouter();
   const {
     onOpen: onOpenTindak,
     onClose: onCloseTindak,
@@ -834,69 +836,73 @@ const DetailSiswa: NextPage<
             <Heading size={"md"}>Data Panggilan Orang tua</Heading>
             <div className="p-5 overflow-auto my-5 bg-white rounded shadow">
               {dataPanggilortu ? (
-                dataPanggilortu.result.map((item, idx) => {
-                  return item ? (
-                    <div className="flex gap-2 items-center" key={idx}>
-                      <p>{idx + 1}.</p>
-                      <p>{item.perihal}</p>
-                      <p>-</p>
-                      <p>{moment(item.tanggal).format("DD/MM/YYYY")}</p>
-                      <Link
-                        href={`/admin/data/siswa/panggil/detail/${item.id}`}
-                      >
+                dataPanggilortu.result.length != 0 ? (
+                  dataPanggilortu.result.map((item, idx) => {
+                    return (
+                      <div className="flex gap-2 items-center" key={idx}>
+                        <p>{idx + 1}.</p>
+                        <p>{item.perihal}</p>
+                        <p>-</p>
+                        <p>{moment(item.tanggal).format("DD/MM/YYYY")}</p>
+                        <Link
+                          href={`/admin/data/siswa/panggil/detail/${item.id}`}
+                        >
+                          <IconButton
+                            color={"orange.300"}
+                            size={"sm"}
+                            variant={"ghost"}
+                            aria-label={""}
+                          >
+                            <FaEye />
+                          </IconButton>
+                        </Link>
                         <IconButton
-                          color={"orange.300"}
+                          onClick={onOpenPanggil}
                           size={"sm"}
+                          colorScheme={"red"}
                           variant={"ghost"}
                           aria-label={""}
                         >
-                          <FaEye />
+                          <DeleteIcon />
                         </IconButton>
-                      </Link>
-                      <IconButton
-                        onClick={onOpenPanggil}
-                        size={"sm"}
-                        colorScheme={"red"}
-                        variant={"ghost"}
-                        aria-label={""}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                      <DeleteAlert
-                        isOpen={isOpenPanggil}
-                        onClick={async () => {
-                          const delPanggil = await hapusPanggil(item.id);
-                          if (delPanggil.status === 200) {
-                            toast({
-                              title: "Hapus data berhasil",
-                              status: "success",
-                              duration: 3000,
-                              position: "top-right",
-                              isClosable: true,
-                            });
-                            refetchPanggil();
-                            onClosePanggil();
-                          } else {
-                            toast({
-                              title: "Hapus data gagal",
-                              status: "error",
-                              duration: 3000,
-                              position: "top-right",
-                              isClosable: true,
-                            });
-                          }
-                        }}
-                        onClose={onClosePanggil}
-                        onOpen={onOpenPanggil}
-                        isLoading={isLoadingDelPanggil}
-                        title={"Hapus Panggilan"}
-                        text={"Apa anda yakin ?"}
-                      />
-                    </div>
-                  ) : (
-                    <p key={idx}>-</p>
-                  );
-                })
+                        <DeleteAlert
+                          isOpen={isOpenPanggil}
+                          onClick={async () => {
+                            const delPanggil = await hapusPanggil(item.id);
+                            if (delPanggil.status === 200) {
+                              toast({
+                                title: "Hapus data berhasil",
+                                status: "success",
+                                duration: 3000,
+                                position: "top-right",
+                                isClosable: true,
+                              });
+                              refetchPanggil();
+                              onClosePanggil();
+                            } else {
+                              toast({
+                                title: "Hapus data gagal",
+                                status: "error",
+                                duration: 3000,
+                                position: "top-right",
+                                isClosable: true,
+                              });
+                            }
+                          }}
+                          onClose={onClosePanggil}
+                          onOpen={onOpenPanggil}
+                          isLoading={isLoadingDelPanggil}
+                          title={"Hapus Panggilan"}
+                          text={"Apa anda yakin ?"}
+                        />
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="flex gap-2 items-center">
+                    <p>Belum ada data</p>
+                  </div>
+                )
               ) : (
                 <Spinner color="orange.400" />
               )}
@@ -1259,10 +1265,7 @@ const DetailSiswa: NextPage<
               color={"white"}
               bg={"green.400"}
               onClick={async () => {
-                await exportToCSV(
-                  dataPanggil,
-                  `kartu_bimbingan_${dataSiswa?.result?.nama}`
-                );
+                router.push(`/admin/data/siswa/rekap/panggilan/${data.id}`);
               }}
               leftIcon={<DownloadIcon />}
               _hover={{
@@ -1270,7 +1273,7 @@ const DetailSiswa: NextPage<
               }}
               mt={"10px"}
             >
-              Download Bimbingan
+              Rekap Bimbingan
             </Button>
           </div>
         </div>
