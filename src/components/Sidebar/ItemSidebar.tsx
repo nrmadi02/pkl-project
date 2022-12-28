@@ -1,4 +1,4 @@
-import { Flex, Heading, Icon, Stack, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, Icon, Stack, Text } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -13,7 +13,14 @@ import {
   IoSettings,
   IoTime,
 } from "react-icons/io5";
-import { MdComputer, MdDoNotTouch, MdHomeRepairService, MdMedicalServices, MdRoomService } from "react-icons/md";
+import {
+  MdComputer,
+  MdDoNotTouch,
+  MdHomeRepairService,
+  MdMedicalServices,
+  MdRoomService,
+} from "react-icons/md";
+import { renderThumb, renderTrack, renderView } from "../Scrollbar";
 
 interface FeatureProps {
   text: string;
@@ -28,7 +35,7 @@ const Feature = ({ text, icon, iconBg, active, url }: FeatureProps) => {
     <Link href={url}>
       <Stack
         direction={"row"}
-        className="hover:scale-[1.02] group transition-all active:scale-100 cursor-pointer"
+        className="group transition-all cursor-pointer"
         align={"center"}
       >
         <Flex
@@ -185,95 +192,89 @@ const ItemSidebar = () => {
   // };
 
   return (
-    <div className="w-full text-[14px]">
-      {isServer && (
-        <Scrollbars ref={ref} style={{ height: "550px" }}>
-          <div className="flex flex-col pl-[30px] w-full pb-5">
-            {dataUser?.role == "admin" &&
-              adminItems.map((item, idx) => {
-                return (
-                  <div className="mt-[20px]" key={idx}>
-                    <Heading size={"sm"}>{item.heading}</Heading>
-                    <div className="flex flex-col mt-[10px] gap-[10px]">
-                      {item.menu.map((itm, ind) => (
-                        <div key={ind}>
-                          <Feature
-                            icon={
-                              <Icon
-                                as={itm.icon}
-                                color={
-                                  itm.url == router.pathname ||
-                                  router.pathname.includes(itm.prefix)
-                                    ? "orange.500"
-                                    : "orange.200"
-                                }
-                                w={5}
-                                h={5}
-                              />
-                            }
-                            url={itm.url}
-                            active={
-                              itm.url == router.pathname ||
-                              router.pathname.includes(itm.prefix)
-                            }
-                            iconBg={
-                              itm.url == router.pathname ||
-                              router.pathname.includes(itm.prefix)
-                                ? "orange.200"
-                                : ""
-                            }
-                            text={itm.title}
-                          />
-                        </div>
-                      ))}
-                    </div>
+    <div className="flex overflow-auto flex-col pl-[30px] w-full pb-5">
+      {dataUser?.role == "admin" &&
+        adminItems.map((item, idx) => {
+          return (
+            <div className="mt-[20px]" key={idx}>
+              <Heading size={"sm"}>{item.heading}</Heading>
+              <div className="flex flex-col mt-[10px] gap-[10px]">
+                {item.menu.map((itm, ind) => (
+                  <div key={ind}>
+                    <Feature
+                      icon={
+                        <Icon
+                          as={itm.icon}
+                          color={
+                            itm.url == router.pathname ||
+                            router.pathname.includes(itm.prefix)
+                              ? "orange.500"
+                              : "orange.200"
+                          }
+                          w={5}
+                          h={5}
+                        />
+                      }
+                      url={itm.url}
+                      active={
+                        itm.url == router.pathname ||
+                        router.pathname.includes(itm.prefix)
+                      }
+                      iconBg={
+                        itm.url == router.pathname ||
+                        router.pathname.includes(itm.prefix)
+                          ? "orange.200"
+                          : ""
+                      }
+                      text={itm.title}
+                    />
                   </div>
-                );
-              })}
-            {dataUser?.role == "guru" &&
-              guruItems.map((item, idx) => {
-                return (
-                  <div className="mt-[20px]" key={idx}>
-                    <Heading size={"md"}>{item.heading}</Heading>
-                    <div className="flex flex-col mt-[10px] gap-[10px]">
-                      {item.menu.map((itm, ind) => (
-                        <div key={ind}>
-                          <Feature
-                            icon={
-                              <Icon
-                                as={itm.icon}
-                                color={
-                                  itm.url == router.pathname ||
-                                  router.pathname.includes(itm.prefix)
-                                    ? "orange.500"
-                                    : "orange.200"
-                                }
-                                w={4}
-                                h={4}
-                              />
-                            }
-                            url={itm.url}
-                            active={
-                              itm.url == router.pathname ||
-                              router.pathname.includes(itm.prefix)
-                            }
-                            iconBg={
-                              itm.url == router.pathname ||
-                              router.pathname.includes(itm.prefix)
-                                ? "orange.200"
-                                : ""
-                            }
-                            text={itm.title}
-                          />
-                        </div>
-                      ))}
-                    </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      {dataUser?.role == "guru" &&
+        guruItems.map((item, idx) => {
+          return (
+            <div className="mt-[20px]" key={idx}>
+              <Heading size={"md"}>{item.heading}</Heading>
+              <div className="flex flex-col mt-[10px] gap-[10px]">
+                {item.menu.map((itm, ind) => (
+                  <div key={ind}>
+                    <Feature
+                      icon={
+                        <Icon
+                          as={itm.icon}
+                          color={
+                            itm.url == router.pathname ||
+                            router.pathname.includes(itm.prefix)
+                              ? "orange.500"
+                              : "orange.200"
+                          }
+                          w={4}
+                          h={4}
+                        />
+                      }
+                      url={itm.url}
+                      active={
+                        itm.url == router.pathname ||
+                        router.pathname.includes(itm.prefix)
+                      }
+                      iconBg={
+                        itm.url == router.pathname ||
+                        router.pathname.includes(itm.prefix)
+                          ? "orange.200"
+                          : ""
+                      }
+                      text={itm.title}
+                    />
                   </div>
-                );
-              })}
-          </div>
-        </Scrollbars>
-      )}
+                ))}
+              </div>
+            </div>
+          );
+        })}
     </div>
   );
 };

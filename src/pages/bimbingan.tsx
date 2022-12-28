@@ -36,7 +36,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 }
 
-
 const Bimbingan: NextPage = () => {
   const { data } = useSession();
 

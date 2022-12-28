@@ -49,6 +49,9 @@ export const konselingRoutes = createRouter()
         include: {
           siswa: true,
         },
+        orderBy: {
+          updatedAt: "desc",
+        },
       });
       return {
         status: 200,

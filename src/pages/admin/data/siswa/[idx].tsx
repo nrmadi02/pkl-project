@@ -910,7 +910,7 @@ const DetailSiswa: NextPage<
             <Heading size={"md"}>Data Terlambat</Heading>
             <div className="w-full flex justify-end gap-3 items-end">
               <Button
-                onClick={() => console.log("download")}
+                onClick={() => router.push(`/admin/data/siswa/rekap/lambat/${dataSiswa?.result?.id}`)}
                 // ref={firstFieldRef}
                 leftIcon={<IoDownload />}
                 fontWeight={600}

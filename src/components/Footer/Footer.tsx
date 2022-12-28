@@ -79,7 +79,7 @@ const FooterHome: NextPage = () => {
         <Logo />
         <Text>© 2022 SMA Negeri 1 Bati-bati. All rights reserved</Text>
         <Stack direction={'row'} spacing={6}>
-          <SocialButton label={'Twitter'} href={'#'}>
+          {/* <SocialButton label={'Twitter'} href={'#'}>
             <FaTwitter />
           </SocialButton>
           <SocialButton label={'YouTube'} href={'#'}>
@@ -87,7 +87,7 @@ const FooterHome: NextPage = () => {
           </SocialButton>
           <SocialButton label={'Instagram'} href={'#'}>
             <FaInstagram />
-          </SocialButton>
+          </SocialButton> */}
         </Stack>
       </Container>
     </Box>

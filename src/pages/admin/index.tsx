@@ -5,6 +5,7 @@ import {
   Grid,
   GridItem,
   Heading,
+  Skeleton,
   Text,
 } from "@chakra-ui/react";
 import { GetServerSideProps, NextPage } from "next";
@@ -60,16 +61,25 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 const Admin: NextPage = () => {
-  const { data: Users } = trpc.useQuery(["user.getAllUsers"]);
-  const { data: Guru } = trpc.useQuery(["guru.getAll"]);
-  const { data: Kelas } = trpc.useQuery(["kelas.getAll"]);
-  const { data: Siswa } = trpc.useQuery(["siswa.getAll", ""]);
-  const { data: DataStats } = trpc.useQuery(["pelanggaran.getStats"]);
+  const { data: Users, isLoading: loadingUsers } = trpc.useQuery([
+    "user.getAllUsers",
+  ]);
+  const { data: Guru, isLoading: loadingGuru } = trpc.useQuery(["guru.getAll"]);
+  const { data: Kelas, isLoading: loadingKelas } = trpc.useQuery([
+    "kelas.getAll",
+  ]);
+  const { data: Siswa, isLoading: loadingSiswa } = trpc.useQuery([
+    "siswa.getAll",
+    "",
+  ]);
+  const { data: DataStats, isLoading: loadingStats } = trpc.useQuery([
+    "pelanggaran.getStats",
+  ]);
 
   const [dataStats, setDataStats] = useState({
     last: [] as number[] | undefined,
-    before: [] as number[] | undefined
-  })
+    before: [] as number[] | undefined,
+  });
 
   useEffect(() => {
     setDataStats({
@@ -77,8 +87,7 @@ const Admin: NextPage = () => {
       before: DataStats?.result.before,
       last: DataStats?.result.last,
     });
-  }, [DataStats])
-  
+  }, [DataStats]);
 
   return (
     <AdminLayout
@@ -106,127 +115,139 @@ const Admin: NextPage = () => {
             gap={6}
           >
             <GridItem w="100%">
-              <ItemInfo
-                icon={<IoPeople color="white" size="25px" />}
-                amount={Users?.result.length.toString()}
-                title={"Total Users"}
-              />
+              <Skeleton height="100%" isLoaded={!loadingUsers} fadeDuration={4}>
+                <ItemInfo
+                  icon={<IoPeople color="white" size="25px" />}
+                  amount={Users?.result.length.toString()}
+                  title={"Total Users"}
+                />
+              </Skeleton>
             </GridItem>
             <GridItem w="100%">
-              <ItemInfo
-                icon={<IoSchool color="white" size="25px" />}
-                amount={Siswa?.result.length.toString()}
-                title={"Total Siswa"}
-              />
+              <Skeleton height="100%" isLoaded={!loadingSiswa} fadeDuration={4}>
+                <ItemInfo
+                  icon={<IoSchool color="white" size="25px" />}
+                  amount={Siswa?.result.length.toString()}
+                  title={"Total Siswa"}
+                />
+              </Skeleton>
             </GridItem>
             <GridItem w="100%">
-              <ItemInfo
-                icon={<IoSchool color="white" size="25px" />}
-                amount={Guru?.result.length.toString()}
-                title={"Total Guru"}
-              />
+              <Skeleton height="100%" isLoaded={!loadingGuru} fadeDuration={4}>
+                <ItemInfo
+                  icon={<IoSchool color="white" size="25px" />}
+                  amount={Guru?.result.length.toString()}
+                  title={"Total Guru"}
+                />
+              </Skeleton>
             </GridItem>
             <GridItem w="100%">
-              <ItemInfo
-                icon={<IoBook color="white" size="25px" />}
-                amount={Kelas?.result.length.toString()}
-                title={"Total Kelas"}
-              />
+              <Skeleton height="100%" isLoaded={!loadingKelas} fadeDuration={4}>
+                <ItemInfo
+                  icon={<IoBook color="white" size="25px" />}
+                  amount={Kelas?.result.length.toString()}
+                  title={"Total Kelas"}
+                />
+              </Skeleton>
             </GridItem>
           </Grid>
-          <Heading size={'md'} className="font-bold mt-5 mb-3">Data Pelanggaran</Heading>
+          <Heading size={"md"} className="font-bold mt-5 mb-3">
+            Data Pelanggaran
+          </Heading>
           <div className="bg-white p-5 rounded-xl shadow-md mt-5">
-            <div className="h-[350px]">
-              <Line
-                data={{
-                  labels: [
-                    "Januari",
-                    "Februari",
-                    "Maret",
-                    "April",
-                    "Mei",
-                    "Juni",
-                    "Juli",
-                    "Agustus",
-                    "September",
-                    "Oktober",
-                    "November",
-                    "Desember",
-                  ],
-                  datasets: [
-                    {
-                      label: new Date().getFullYear().toString(),
-                      backgroundColor: "#3182ce",
-                      borderColor: "#3182ce",
-                      data: dataStats.last,
-                      fill: false,
-                      pointRadius: 5,
-                      tension: 0.28,
-                      yAxisID: "y",
-                      xAxisID: "x",
-                    },
-                    {
-                      label: String(new Date().getFullYear() - 1),
-                      fill: false,
-                      backgroundColor: "#FF9113",
-                      borderColor: "#FF9113",
-                      pointRadius: 5,
-                      tension: 0.28,
-                      data: dataStats.before,
-                      yAxisID: "y",
-                      // xAxisID: "x",
-                    },
-                  ],
-                }}
-                options={{
-                  maintainAspectRatio: false,
-                  responsive: true,
-                  hover: {
-                    mode: "nearest",
-                    intersect: true,
-                  },
-                  plugins: {
-                    title: {
-                      display: false,
-                      text: "Pelanggaran",
-                      color: "black",
-                    },
-                    legend: {
-                      labels: {
-                        // color: "black",
+            <Skeleton height="350px" isLoaded={!loadingStats} fadeDuration={4}>
+              <div className="h-[350px]">
+                <Line
+                  data={{
+                    labels: [
+                      "Januari",
+                      "Februari",
+                      "Maret",
+                      "April",
+                      "Mei",
+                      "Juni",
+                      "Juli",
+                      "Agustus",
+                      "September",
+                      "Oktober",
+                      "November",
+                      "Desember",
+                    ],
+                    datasets: [
+                      {
+                        label: new Date().getFullYear().toString(),
+                        backgroundColor: "#3182ce",
+                        borderColor: "#3182ce",
+                        data: dataStats.last,
+                        fill: false,
+                        pointRadius: 5,
+                        tension: 0.28,
+                        yAxisID: "y",
+                        xAxisID: "x",
                       },
-                      align: "end",
-                      position: "bottom",
-                    },
-                    tooltip: {
-                      mode: "index",
-                      intersect: false,
-                    },
-                  },
-                  scales: {
-                    y: {
-                      type: "linear" as const,
-                      display: true,
-                      position: "left" as const,
-                      grid: {
-                        display: true,
-                        tickBorderDash: [2],
-                        tickBorderDashOffset: 3,
-                        // color: "red",
+                      {
+                        label: String(new Date().getFullYear() - 1),
+                        fill: false,
+                        backgroundColor: "#FF9113",
+                        borderColor: "#FF9113",
+                        pointRadius: 5,
+                        tension: 0.28,
+                        data: dataStats.before,
+                        yAxisID: "y",
+                        // xAxisID: "x",
                       },
+                    ],
+                  }}
+                  options={{
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    hover: {
+                      mode: "nearest",
+                      intersect: true,
                     },
-                    x: {
-                      grid: {
+                    plugins: {
+                      title: {
                         display: false,
-                        tickBorderDash: [2],
-                        tickBorderDashOffset: 3,
-                        color: "red",
+                        text: "Pelanggaran",
+                        color: "black",
+                      },
+                      legend: {
+                        labels: {
+                          // color: "black",
+                        },
+                        align: "end",
+                        position: "bottom",
+                      },
+                      tooltip: {
+                        mode: "index",
+                        intersect: false,
                       },
                     },
-                  },
-                }}
-              />
-            </div>
+                    scales: {
+                      y: {
+                        type: "linear" as const,
+                        display: true,
+                        position: "left" as const,
+                        grid: {
+                          display: true,
+                          tickBorderDash: [2],
+                          tickBorderDashOffset: 3,
+                          // color: "red",
+                        },
+                      },
+                      x: {
+                        grid: {
+                          display: false,
+                          tickBorderDash: [2],
+                          tickBorderDashOffset: 3,
+                          color: "red",
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            </Skeleton>
           </div>
         </div>
       </>

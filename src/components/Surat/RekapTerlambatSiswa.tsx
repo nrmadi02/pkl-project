@@ -1,4 +1,4 @@
-import { Panggilortu, Siswa, Tindaklanjut } from "@prisma/client";
+import { Guru, Panggilortu, Siswa, Terlambat, Tindaklanjut } from "@prisma/client";
 import moment from "moment";
 import { NextPage } from "next";
 import Image from "next/image";
@@ -9,14 +9,14 @@ import "moment/locale/id";
 
 interface Props {
   children?: ReactNode;
-  data: Tindaklanjut[] | undefined;
-  dataSiswa: Siswa;
+  siswa: Siswa | undefined;
+  dataTerlambat: Terlambat[] | undefined;
 }
 
 export type Ref = HTMLDivElement;
 
 const Surat = (props: Props, ref: LegacyRef<Ref>) => {
-  console.log(props.data);
+//   console.log(props.data);
   return (
     <div className="font-surat p-5" ref={ref}>
       <div className="flex justify-center flex-row gap-7">
@@ -24,7 +24,7 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
           <Image src={LogoKALSEL} alt="_logo" width={50} height={60} />
         </div>
         <div className="text-center tracking-wide text-[14px]">
-          <p className="font-bold">KARTU BIMBINGAN SISWA</p>
+          <p className="font-bold">LAPORAN DATA TERLAMBAT SISWA</p>
           <p className="font-bold">SMA NEGERI 1 BATI-BATI</p>
           <p className="font-bold">TAHUN AJARAN 2022/2023</p>
         </div>
@@ -33,7 +33,7 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
         </div>
       </div>
       <div className="mt-5">
-        <div className="w-full flex flex-col items-center justify-center gap-3">
+        <div className="w-full flex flex-col gap-3">
           <table className="table text-[12px]">
             <tbody>
               <tr>
@@ -43,16 +43,16 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                 <td width={30} className="align-top">
                   :
                 </td>
-                <td>{props.dataSiswa.nama}</td>
+                <td>{props.siswa?.nama}</td>
               </tr>
               <tr>
                 <td width={200} className="align-top font-bold">
-                  NIS
+                   NIS
                 </td>
                 <td width={30} className="align-top">
                   :
                 </td>
-                <td>{props.dataSiswa.nis}</td>
+                <td>{props.siswa?.nis}</td>
               </tr>
               <tr>
                 <td width={200} className="align-top font-bold">
@@ -61,38 +61,30 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                 <td width={30} className="align-top">
                   :
                 </td>
-                <td>{props.dataSiswa.kelas}</td>
+                <td>{props.siswa?.kelas}</td>
               </tr>
             </tbody>
           </table>
-          <table className="table text-[12px] table-auto border border-collapse">
+          <table className="table text-[12px] w-full table-auto border border-collapse">
             <thead>
               <tr>
-                <th className="border px-2">HARI, TANGGAL</th>
-                <th className="border px-2">BIDANG BIMBINGAN</th>
-                <th className="border px-2">PERMASALAHAN</th>
-                <th className="border px-2">PENANGANAN</th>
-                <th className="border px-2">TINDAK LANJUT</th>
+                <th className="border px-2">No</th>
+                <th className="border px-2">Hari, Tanggal</th>
+                <th className="border px-2">Waktu Terlambat</th>
+                <th className="border px-2">Status</th>
               </tr>
             </thead>
             <tbody>
-              {props.data?.map((item, idx) => {
+              {props.dataTerlambat?.map((item, idx) => {
                 return (
                   <tr key={idx}>
+                    <td className="border text-center px-2">{idx + 1}</td>
                     <td className="border px-2">
                       {moment(item.tanggal).format("dddd, DD/MM/YYYY")}
                     </td>
-                    <td className="border px-2">{item.type}</td>
-                    <td className="border px-2">{item.deskripsi}</td>
+                    <td className="border px-2">{item.waktu} Menit</td>
                     <td className="border px-2">
-                      <p className="whitespace-pre-wrap w-[100px]">
-                        {item.penanganan}
-                      </p>
-                    </td>
-                    <td className="border px-2">
-                      <p className="whitespace-pre-wrap w-[100px]">
-                        {item.tindakan}
-                      </p>
+                      {item.akumulasi ? "Sudah" : "Belum"}
                     </td>
                   </tr>
                 );
@@ -100,33 +92,9 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
             </tbody>
           </table>
         </div>
-        <div className="mt-14 text-[12px] flex pr-20 flex-row justify-between">
-          <div>
-            {/* <div>
-              <p>Mengetahui</p>
-              <p>Wali Kelas</p>
-            </div>
-            <div className="mt-16">
-              <p>{props.data?.wali_kelas}</p>
-              <p>NIP. {props.data?.nip_wali}</p>
-            </div> */}
-          </div>
-          <div>
-            <div>
-              <p>Bati-Bati, {moment().format("dddd, DD  MMMM  YYYY")}</p>
-              <p>Guru BK,</p>
-            </div>
-            <div className="mt-16">
-              <p>Nama :</p>
-              <p>NIP :</p>
-              {/* <p>{props.data?.nama_bk}</p>
-              <p>{props.data?.nip_bk}</p> */}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
 };
 
-export const RekapitulasiPanggilan = forwardRef<Ref, Props>(Surat);
+export const RekapTerlambatSiswa = forwardRef<Ref, Props>(Surat);

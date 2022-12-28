@@ -44,6 +44,22 @@ export const terlambatRoutes = createRouter()
             };
         }
     })
+    .query('getByIDSiswa', {
+      input: string(),
+      resolve: async ({ctx, input}) => {
+        const data = await ctx.prisma.terlambat.findMany({
+          where: {
+            siswaID: input
+          }
+        })
+
+        return {
+          status: 200,
+          message: "Data terlambat berhasil diambil",
+          result: data
+        };
+      }
+    })
     .mutation('updateAkumulasi', {
         input: string(),
         resolve: async ({ctx, input}) => {
@@ -75,16 +91,26 @@ export const terlambatRoutes = createRouter()
                         akumulasi: true
                     }
                 })
-                if(waktuAkumulasi >= 15 && waktuAkumulasi <= 25) {
-                    const addPoint = await ctx.prisma.pelanggaran.create({
-                      data: {
-                        deskripsi: "Terlambat",
-                        pemberi: "BK",
-                        point: 1,
-                        type: "Kerajinan",
-                        siswaID: input,
-                      },
-                    });
+                if (waktuAkumulasi >= 15 && waktuAkumulasi <= 25) {
+                  const addPoint = await ctx.prisma.pelanggaran.create({
+                    data: {
+                      deskripsi: "Terlambat",
+                      pemberi: "BK",
+                      point: 1,
+                      type: "Kerajinan",
+                      siswaID: input,
+                    },
+                  });
+                } else if (waktuAkumulasi > 25 ) {
+                  const addPoint = await ctx.prisma.pelanggaran.create({
+                    data: {
+                      deskripsi: "Terlambat",
+                      pemberi: "BK",
+                      point: 2,
+                      type: "Kerajinan",
+                      siswaID: input,
+                    },
+                  });
                 }
 
                 return {
