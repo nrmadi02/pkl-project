@@ -146,7 +146,7 @@ const Navbar: NextPage = () => {
                 fontSize={{ base: "small", md: "medium" }}
                 fontWeight={600}
               >
-                {!loading && data?.user?.name}
+                {!loading && <p className="whitespace-nowrap">{data?.user?.name}</p>}
                 {loading && <Spinner color="orange.500" />}
               </MenuButton>
               <MenuList>

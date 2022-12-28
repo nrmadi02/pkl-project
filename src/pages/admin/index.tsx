@@ -61,18 +61,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 const Admin: NextPage = () => {
-  const { data: Users, isLoading: loadingUsers } = trpc.useQuery([
+  const { data: Users, isFetched: loadingUsers } = trpc.useQuery([
     "user.getAllUsers",
   ]);
-  const { data: Guru, isLoading: loadingGuru } = trpc.useQuery(["guru.getAll"]);
-  const { data: Kelas, isLoading: loadingKelas } = trpc.useQuery([
+  const { data: Guru, isFetched: loadingGuru } = trpc.useQuery(["guru.getAll"]);
+  const { data: Kelas, isFetched: loadingKelas } = trpc.useQuery([
     "kelas.getAll",
   ]);
-  const { data: Siswa, isLoading: loadingSiswa } = trpc.useQuery([
+  const { data: Siswa, isFetched: loadingSiswa } = trpc.useQuery([
     "siswa.getAll",
     "",
   ]);
-  const { data: DataStats, isLoading: loadingStats } = trpc.useQuery([
+  const { data: DataStats, isFetched: loadingStats } = trpc.useQuery([
     "pelanggaran.getStats",
   ]);
 
@@ -115,7 +115,7 @@ const Admin: NextPage = () => {
             gap={6}
           >
             <GridItem w="100%">
-              <Skeleton height="100%" isLoaded={!loadingUsers} fadeDuration={4}>
+              <Skeleton height="100%" isLoaded={loadingUsers} fadeDuration={4}>
                 <ItemInfo
                   icon={<IoPeople color="white" size="25px" />}
                   amount={Users?.result.length.toString()}
@@ -124,7 +124,7 @@ const Admin: NextPage = () => {
               </Skeleton>
             </GridItem>
             <GridItem w="100%">
-              <Skeleton height="100%" isLoaded={!loadingSiswa} fadeDuration={4}>
+              <Skeleton height="100%" isLoaded={loadingSiswa} fadeDuration={4}>
                 <ItemInfo
                   icon={<IoSchool color="white" size="25px" />}
                   amount={Siswa?.result.length.toString()}
@@ -133,7 +133,7 @@ const Admin: NextPage = () => {
               </Skeleton>
             </GridItem>
             <GridItem w="100%">
-              <Skeleton height="100%" isLoaded={!loadingGuru} fadeDuration={4}>
+              <Skeleton height="100%" isLoaded={loadingGuru} fadeDuration={4}>
                 <ItemInfo
                   icon={<IoSchool color="white" size="25px" />}
                   amount={Guru?.result.length.toString()}
@@ -142,7 +142,7 @@ const Admin: NextPage = () => {
               </Skeleton>
             </GridItem>
             <GridItem w="100%">
-              <Skeleton height="100%" isLoaded={!loadingKelas} fadeDuration={4}>
+              <Skeleton height="100%" isLoaded={loadingKelas} fadeDuration={4}>
                 <ItemInfo
                   icon={<IoBook color="white" size="25px" />}
                   amount={Kelas?.result.length.toString()}
@@ -155,7 +155,7 @@ const Admin: NextPage = () => {
             Data Pelanggaran
           </Heading>
           <div className="bg-white p-5 rounded-xl shadow-md mt-5">
-            <Skeleton height="350px" isLoaded={!loadingStats} fadeDuration={4}>
+            <Skeleton height="350px" isLoaded={loadingStats} fadeDuration={4}>
               <div className="h-[350px]">
                 <Line
                   data={{

@@ -11,7 +11,7 @@ import { trpc } from "../utils/trpc";
 
 const Informasi: NextPage = () => {
   const { data } = useSession();
-  const { data: dataInformasi, isLoading } = trpc.useQuery([
+  const { data: dataInformasi, isFetched } = trpc.useQuery([
     "informasi.getAllAccept",
     100000,
   ]);
@@ -25,9 +25,9 @@ const Informasi: NextPage = () => {
       </Head>
       <Box>
         <Navbar />
-        <Container maxW={"5xl"} minH={'100vh'} pb={10}>
+        <Container maxW={"5xl"} minH={"100vh"} pb={10}>
           <Heading textAlign={"center"}>Pusat Informasi</Heading>
-          <Skeleton mt={"5"} isLoaded={!isLoading} height="400px">
+          <Skeleton mt={"5"} isLoaded={isFetched} height="400px">
             <Flex flexDirection={"column"} width="full" alignItems={"center"}>
               {dataInformasi?.reuslt &&
                 dataInformasi.reuslt.map((item, idx) => {

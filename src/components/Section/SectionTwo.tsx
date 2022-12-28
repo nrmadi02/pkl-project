@@ -15,11 +15,11 @@ import Link from "next/link";
 import { trpc } from "../../utils/trpc";
 
 const SectionTwo: NextPage = () => {
-  const { data: dataInformasi, isLoading } = trpc.useQuery(["informasi.getAllAccept", 5]);
+  const { data: dataInformasi, isFetched } = trpc.useQuery(["informasi.getAllAccept", 5]);
   return (
     <Container maxW={"5xl"} pb={10}>
       <Heading textAlign={"center"}>Pusat Informasi</Heading>
-      <Skeleton mt={"5"} isLoaded={!isLoading} height="100%">
+      <Skeleton mt={"5"} isLoaded={isFetched} height="100%">
         <Flex flexDirection={"column"} width="full" alignItems={"center"}>
           {dataInformasi?.reuslt &&
             dataInformasi.reuslt.map((item, idx) => {
@@ -96,7 +96,7 @@ const SectionTwo: NextPage = () => {
           justifyContent={"center"}
           alignItems={"center"}
         >
-          <Link href={'/informasi'}>
+          <Link href={"/informasi"}>
             <Button
               fontSize={"sm"}
               fontWeight={600}
