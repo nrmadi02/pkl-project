@@ -47,16 +47,16 @@ const Login: NextPage = () => {
         isClosable: true,
       })
       if(router.query?.referer){
-        router.replace(router.query.referer?.toString() || '/')
+        await router.replace(router.query.referer?.toString() || '/')
       } else {
-        router.replace('/')
+        await router.replace('/')
       }
       
     }
   }, [router, toast]);
 
   useEffect(() => {
-    const subs = watch((e) => {
+    const subs = watch(() => {
       setMessage("")
     })
 

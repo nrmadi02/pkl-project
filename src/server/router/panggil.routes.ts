@@ -66,10 +66,10 @@ export const panggilRoutes = createRouter()
             const getAll = await ctx.prisma.panggilortu.findMany({
                 where: {
                     siswaID: input,
-                    createdAt: {
-                        gte: new Date(moment().startOf('month').format('YYYY-MM-DD')),
-                        lte: new Date(moment().endOf('month').format('YYYY-MM-DD'))
-                    }
+                    // createdAt: {
+                    //     gte: new Date(moment().startOf('month').format('YYYY-MM-DD')),
+                    //     lte: new Date(moment().endOf('month').format('YYYY-MM-DD'))
+                    // }
                 },
                 include: {
                     siswa: true

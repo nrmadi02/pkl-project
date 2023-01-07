@@ -1,21 +1,12 @@
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import { useSession } from "next-auth/react";
 import Head from "next/head";
-import { requireAuth } from "../common/requireAuth";
-import { useEffect } from 'react';
 import Navbar from "../components/Navbar";
 import SectionOne from "../components/Section/SectionOne";
 import SectionTwo from "../components/Section/SectionTwo";
 import FooterHome from "../components/Footer/Footer";
 
-// export const getServerSideProps = requireAuth(async (ctx) => {
-//   return { props: {} };
-// });
-
-
 const Home: NextPage = () => {
-  const { data } = useSession();
   return (
     <>
       <Head>

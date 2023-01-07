@@ -1,19 +1,9 @@
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import type { GetServerSideProps, NextPage } from "next";
-import { useSession } from "next-auth/react";
 import Head from "next/head";
-import { requireAuth } from "../common/requireAuth";
-import { trpc } from "../utils/trpc";
-import { useEffect } from 'react';
 import Navbar from "../components/Navbar";
-import FooterHome from "../components/Footer/Footer";
 import SectionBimbingan from "../components/Section/SectionBimbingan";
 import { getCookie } from 'cookies-next';
-
-// export const getServerSideProps = requireAuth(async (ctx) => {
-//   return { props: {} };
-// });
-
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
   const token = getCookie(
@@ -37,8 +27,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 }
 
 const Bimbingan: NextPage = () => {
-  const { data } = useSession();
-
   return (
     <>
       <Head>
@@ -49,7 +37,6 @@ const Bimbingan: NextPage = () => {
       <Box>
         <Navbar />
         <SectionBimbingan />
-        {/* <FooterHome /> */}
       </Box>
     </>
   );

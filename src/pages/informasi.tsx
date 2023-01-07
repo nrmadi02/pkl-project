@@ -1,16 +1,13 @@
 import { Box, Button, Container, Flex, Heading, Image, SimpleGrid, Skeleton, Stack, Text } from "@chakra-ui/react";
 import moment from "moment";
 import { NextPage } from "next";
-import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 import FooterHome from "../components/Footer/Footer";
 import Navbar from "../components/Navbar";
-import SectionTwo from "../components/Section/SectionTwo";
 import { trpc } from "../utils/trpc";
 
 const Informasi: NextPage = () => {
-  const { data } = useSession();
   const { data: dataInformasi, isFetched } = trpc.useQuery([
     "informasi.getAllAccept",
     100000,
