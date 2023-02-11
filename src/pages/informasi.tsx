@@ -22,8 +22,8 @@ const Informasi: NextPage = () => {
       </Head>
       <Box>
         <Navbar />
-        <Container maxW={"5xl"} minH={"100vh"} pb={10}>
-          <Heading textAlign={"center"}>Pusat Informasi</Heading>
+        <Container maxW={"5xl"} h={'full'} pb={20}>
+          <Heading textAlign={"center"} marginTop={'5'}>Pusat Informasi</Heading>
           <Skeleton mt={"5"} isLoaded={isFetched} height="400px">
             <Flex flexDirection={"column"} width="full" alignItems={"center"}>
               {dataInformasi?.reuslt &&
@@ -96,7 +96,7 @@ const Informasi: NextPage = () => {
             </Flex>
           </Skeleton>
         </Container>
-        <FooterHome />
+        {/* <FooterHome /> */}
       </Box>
     </>
   );

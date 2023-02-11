@@ -102,7 +102,7 @@ const adminItems = [
     menu: [
       {
         icon: FaPenAlt,
-        title: "Point",
+        title: "Poin",
         url: "/admin/tatib/point",
         prefix: "point",
       },
@@ -160,7 +160,94 @@ const adminItems = [
   },
 ];
 
+const bkItems = [
+  {
+    heading: "Home",
+    menu: [
+      {
+        icon: IoHome,
+        title: "Dashboard",
+        url: "/admin",
+        prefix: "home",
+      },
+    ],
+  },
+  {
+    heading: "Pendataan",
+    menu: [
+      {
+        icon: IoPeople,
+        title: "Siswa",
+        url: "/admin/data/siswa",
+        prefix: "siswa",
+      },
+      {
+        icon: IoSchool,
+        title: "Kelas",
+        url: "/admin/data/kelas",
+        prefix: "kelas",
+      },
+    ],
+  },
+  {
+    heading: "Tata Tertib",
+    menu: [
+      {
+        icon: FaPenAlt,
+        title: "Poin",
+        url: "/admin/tatib/point",
+        prefix: "point",
+      },
+      {
+        icon: MdDoNotTouch,
+        title: "Terlambat",
+        url: "/admin/tatib/terlambat",
+        prefix: "terlambat",
+      },
+    ],
+  },
+  {
+    heading: "Layanan",
+    menu: [
+      {
+        icon: MdHomeRepairService,
+        title: "Bimbingan",
+        url: "/admin/layanan/bimbingan",
+        prefix: "layanan",
+      },
+    ],
+  },
+];
+
 const guruItems = [
+  {
+    heading: "Home",
+    menu: [
+      {
+        icon: IoHome,
+        title: "Dashboard",
+        url: "/admin",
+        prefix: "home",
+      },
+    ],
+  },
+  {
+    heading: "Pendataan",
+    menu: [
+      {
+        icon: IoPeople,
+        title: "Siswa",
+        url: "/admin/data/siswa",
+        prefix: "siswa",
+      },
+      {
+        icon: IoSchool,
+        title: "Kelas",
+        url: "/admin/data/kelas",
+        prefix: "kelas",
+      },
+    ],
+  },
   {
     heading: "Labkom",
     menu: [
@@ -236,6 +323,47 @@ const ItemSidebar = () => {
         })}
       {dataUser?.role == "guru" &&
         guruItems.map((item, idx) => {
+          return (
+            <div className="mt-[20px]" key={idx}>
+              <Heading size={"md"}>{item.heading}</Heading>
+              <div className="flex flex-col mt-[10px] gap-[10px]">
+                {item.menu.map((itm, ind) => (
+                  <div key={ind}>
+                    <Feature
+                      icon={
+                        <Icon
+                          as={itm.icon}
+                          color={
+                            itm.url == router.pathname ||
+                            router.pathname.includes(itm.prefix)
+                              ? "orange.500"
+                              : "orange.200"
+                          }
+                          w={4}
+                          h={4}
+                        />
+                      }
+                      url={itm.url}
+                      active={
+                        itm.url == router.pathname ||
+                        router.pathname.includes(itm.prefix)
+                      }
+                      iconBg={
+                        itm.url == router.pathname ||
+                        router.pathname.includes(itm.prefix)
+                          ? "orange.200"
+                          : ""
+                      }
+                      text={itm.title}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      {dataUser?.role == "bk" &&
+        bkItems.map((item, idx) => {
           return (
             <div className="mt-[20px]" key={idx}>
               <Heading size={"md"}>{item.heading}</Heading>

@@ -179,7 +179,7 @@ const InformasiEdit: NextPage = () => {
             Kembali
           </Button>
           <Heading size={"md"} mt={"3"}>
-            Tambah Informasi
+            Edit Informasi
           </Heading>
           <div className="my-5 p-5 bg-white shadow-md rounded ">
             <form onSubmit={handleSubmit(handleAddInformasi)}>

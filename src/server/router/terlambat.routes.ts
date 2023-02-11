@@ -33,7 +33,7 @@ export const terlambatRoutes = createRouter()
         resolve: async ({input, ctx}) => {
             const deleteTerlambat = await ctx.prisma.terlambat.delete({
                 where: {
-                    id: input
+                    id: input,
                 }
             })
 
@@ -49,7 +49,10 @@ export const terlambatRoutes = createRouter()
       resolve: async ({ctx, input}) => {
         const data = await ctx.prisma.terlambat.findMany({
           where: {
-            siswaID: input
+            siswaID: input,
+          },
+          orderBy: {
+            createdAt: 'desc'
           }
         })
 

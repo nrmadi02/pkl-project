@@ -201,6 +201,9 @@ export const siswaRoutes = createRouter()
         where: {
           siswaID: input.id,
         },
+        orderBy: {
+          createdAt: "desc",
+        },
       });
       const waktuTerlambat = await ctx.prisma.terlambat.aggregate({
         where: {

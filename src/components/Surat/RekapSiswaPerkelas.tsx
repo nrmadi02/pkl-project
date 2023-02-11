@@ -7,9 +7,16 @@ import LogoSMA from "../../assets/logo/logo-smabat.png";
 import LogoKALSEL from "../../assets/logo/logo_kalsel.png";
 import "moment/locale/id";
 
+interface DataSiswa {
+  nama: string;
+  jenisKelamin: string;
+  nis: string;
+  point: number;
+}
+
 interface Props {
   children?: ReactNode;
-  data: Siswa[] | undefined;
+  data: DataSiswa[] | undefined;
   dataGuru: Guru
 }
 
@@ -74,6 +81,7 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                 <th className="border px-2">Nama Siswa</th>
                 <th className="border px-2">NIS</th>
                 <th className="border px-2">Jenis Kelamin</th>
+                <th className="border px-2">Poin</th>
               </tr>
             </thead>
             <tbody>
@@ -84,13 +92,13 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                     <td className="border px-2">{item.nama}</td>
                     <td className="border px-2">{item.nis}</td>
                     <td className="border px-2">{item.jenisKelamin}</td>
+                    <td className="border px-2 text-center">{item.point}</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
-       
       </div>
     </div>
   );

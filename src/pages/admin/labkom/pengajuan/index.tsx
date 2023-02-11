@@ -186,14 +186,14 @@ const PengajuanLab: NextPage = () => {
                             }}>
                             Ajukan
                         </Button>
-                        <Button ref={btnRef} leftIcon={<IoDownload />} fontWeight={600}
+                        {/* <Button ref={btnRef} leftIcon={<IoDownload />} fontWeight={600}
                             color={'white'}
                             bg={'green.400'}
                             _hover={{
                                 bg: 'green.300',
                             }}>
                             Download
-                        </Button>
+                        </Button> */}
                     </div>
                     <div className="text-[12px]">
                         <DataTable isSearch sizeSet hiddenColumns={['status']} isLoading={isLoading} columns={columns} data={data} />

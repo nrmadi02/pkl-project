@@ -9,6 +9,7 @@ import {
   FormLabel,
   Heading,
   Input,
+  Select,
   useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -94,6 +95,7 @@ const PanggilOrangTua: NextPage<
   });
 
   const { mutateAsync: tambahPanggil } = trpc.useMutation(["panggil.create"]);
+  const { data: dataWali } = trpc.useQuery(['guru.getWaliKelas'])
 
   const handleAddPanggil = useCallback(
     async (data: CreatePanggilSchema) => {
@@ -266,9 +268,38 @@ const PanggilOrangTua: NextPage<
                   borderColor={"orange.300"}
                   borderWidth={1}
                   id="wali_kelas"
-                  placeholder="Masukan nama wali kelas"
+                  type={"hidden"}
+                  placeholder="Masukan tempat"
                   {...register("wali_kelas")}
                 />
+                <Select
+                  bg={"white"}
+                  borderColor={"orange.300"}
+                  borderWidth={1}
+                  placeholder="Masukan nama wali kelas"
+                  onChange={(e) => {
+                    if (e.target.value !== "") {
+                      dataWali?.result.map((itm, idx) => {
+                        if (itm.id === e.target.value) {
+                          setValue("wali_kelas", itm.nama);
+                          setValue("nip_wali", itm.nip);
+                        }
+                      });
+                    } else {
+                      setValue("wali_kelas", "");
+                      setValue("nip_wali", "");
+                    }
+                  }}
+                >
+                  {dataWali &&
+                    dataWali.result.map((itm, idx) => {
+                      return (
+                        <option key={idx} value={itm.id}>
+                          {itm.nama} ({itm.namaKelas})
+                        </option>
+                      );
+                    })}
+                </Select>
                 <FormErrorMessage>
                   {errors.wali_kelas && errors.wali_kelas.message}
                 </FormErrorMessage>
@@ -279,6 +310,7 @@ const PanggilOrangTua: NextPage<
                   bg={"white"}
                   borderColor={"orange.300"}
                   borderWidth={1}
+                  disabled
                   id="nip_wali"
                   placeholder="Masukan NIP wali kelas"
                   {...register("nip_wali")}

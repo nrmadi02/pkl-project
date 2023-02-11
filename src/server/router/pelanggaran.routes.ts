@@ -126,7 +126,7 @@ export const pelanggaranRoutes = createRouter()
       const resultArrLast: number[] = [];
       for (let index = 1; index <= 12; index++) {
         dataArrLast.length != 0  ?dataArrLast.map((item, idx) => {
-          if (item.Month == index.toString()) {
+          if (parseInt(item.Month) == index) {
             resultArrLast.push(parseInt(item.Total));
           } else {
             resultArrLast.push(0);
@@ -137,13 +137,14 @@ export const pelanggaranRoutes = createRouter()
       const resultArrBefore: number[] = [];
       for (let index = 1; index <= 12; index++) {
         dataArrBefore.length != 0 ? dataArrBefore.map((item, idx) => {
-          if (item.Month == index.toString()) {
+          if (parseInt(item.Month) == index) {
             resultArrBefore.push(parseInt(item.Total));
           } else {
             resultArrBefore.push(0);
           }
         }) : resultArrBefore.push(0);
       }
+      // console.log(statsDataBefore, statsDataLast);
       return {
         status: 200,
         message: "Data berhasil diambil",

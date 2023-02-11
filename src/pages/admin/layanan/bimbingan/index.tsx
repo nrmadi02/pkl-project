@@ -17,6 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Select,
+  Tooltip,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -40,10 +41,12 @@ import {
   updateStatusKonselingSchema,
   UpdateStatusKonselingSchema,
 } from "../../../../server/schema/konseling.schema";
-import { IoPencil } from "react-icons/io5";
+import { IoDownload, IoPencil } from "react-icons/io5";
 import { DownloadIcon } from "@chakra-ui/icons";
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
@@ -67,6 +70,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 const LayananBimbingan: NextPage = () => {
+  const router = useRouter()
+  const { data: stateSession} = useSession()
   const toast = useToast();
   const {
     data: dataKonseling,
@@ -153,7 +158,7 @@ const LayananBimbingan: NextPage = () => {
       {
         Header: "Action",
         accessor: (d: Konseling) => {
-          return (
+          return stateSession?.role == "bk" ? (
             <ActionTable
               key={d?.id}
               value={d?.id}
@@ -161,7 +166,7 @@ const LayananBimbingan: NextPage = () => {
               refetch={refetch}
               toast={toast}
             />
-          );
+          ) : <p>-</p>;
         },
       },
     ],
@@ -194,6 +199,24 @@ const LayananBimbingan: NextPage = () => {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <div className="p-5">
+          <Tooltip label="Print Jadwal" fontSize="sm">
+            <Button
+            onClick={() => {
+              router.push('/admin/layanan/bimbingan/rekap/setuju')
+            }}
+              leftIcon={<IoDownload />}
+              fontWeight={600}
+              marginBottom="20px"
+              color={"white"}
+              bg={"blue.400"}
+              size={"sm"}
+              _hover={{
+                bg: "blue.300",
+              }}
+            >
+              Print Jadwal
+            </Button>
+          </Tooltip>
           <div className="text-[12px]">
             <DataTable
               isSearch
@@ -216,7 +239,7 @@ const LayananBimbingan: NextPage = () => {
             _hover={{
               bg: "green.300",
             }}
-            mt={"10px"}
+            mt={"20px"}
           >
             Download Data
           </Button>

@@ -148,7 +148,7 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
               </div>
               <div className="mt-16">
                 <p>{props.data?.nama_bk}</p>
-                <p>{props.data?.nip_bk}</p>
+                <p>NIP. {props.data?.nip_bk}</p>
               </div>
             </div>
           </div>

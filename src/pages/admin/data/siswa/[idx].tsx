@@ -640,6 +640,10 @@ const DetailSiswa: NextPage<
                 <Button
                   fontWeight={600}
                   color={"white"}
+                  hidden={
+                    stateSession?.role !== "admin" &&
+                    stateSession?.role !== "bk"
+                  }
                   bg={"orange.400"}
                   onClick={() => {
                     onOpenTindak();
@@ -661,6 +665,10 @@ const DetailSiswa: NextPage<
                     fontWeight={600}
                     color={"white"}
                     bg={"red.400"}
+                    hidden={
+                      stateSession?.role !== "admin" &&
+                      stateSession?.role !== "bk"
+                    }
                     _hover={{
                       bg: "red.300",
                     }}
@@ -910,7 +918,11 @@ const DetailSiswa: NextPage<
             <Heading size={"md"}>Data Terlambat</Heading>
             <div className="w-full flex justify-end gap-3 items-end">
               <Button
-                onClick={() => router.push(`/admin/data/siswa/rekap/lambat/${dataSiswa?.result?.id}`)}
+                onClick={() =>
+                  router.push(
+                    `/admin/data/siswa/rekap/lambat/${dataSiswa?.result?.id}`
+                  )
+                }
                 // ref={firstFieldRef}
                 leftIcon={<IoDownload />}
                 fontWeight={600}
@@ -931,6 +943,9 @@ const DetailSiswa: NextPage<
                 ref={firstFieldRef}
                 isLoading={isLoadingAkumulasi}
                 leftIcon={<IoCalculator />}
+                hidden={
+                  stateSession?.role !== "admin" && stateSession?.role !== "bk"
+                }
                 disabled={Number(dataSiswa?.waktuTerlambat) < 15}
                 fontWeight={600}
                 color={"white"}

@@ -172,7 +172,7 @@ const DataSiswa: NextPage = () => {
         {
             Header: "Action",
             accessor: (d: Siswa) => {
-                return <ActionTable key={d?.id} dataKelas={dataKelas?.result} value={d?.id} data={d} refetch={refetch} toast={toast} />
+                return stateSession?.role !== "admin" ? <p>-</p> : <ActionTable key={d?.id} dataKelas={dataKelas?.result} value={d?.id} data={d} refetch={refetch} toast={toast} />
             },
         }
     ], [dataSiswa?.result])
@@ -307,6 +307,7 @@ const DataSiswa: NextPage = () => {
                 <Button
                   onClick={onOpenModal}
                   ref={btnRef}
+                  hidden={stateSession?.role !== "admin"}
                   leftIcon={<FaFileExcel />}
                   fontWeight={600}
                   color={"white"}
@@ -320,6 +321,7 @@ const DataSiswa: NextPage = () => {
                 <Button
                   onClick={onOpen}
                   ref={btnRef}
+                  hidden={stateSession?.role !== "admin"}
                   leftIcon={<IoAdd />}
                   fontWeight={600}
                   color={"white"}
@@ -355,12 +357,14 @@ const DataSiswa: NextPage = () => {
                 _hover={{
                   bg: "green.300",
                 }}
-                mt={"10px"}
+                mt={"20px"}
               >
                 Download data siswa
               </Button>
             ) : (
-              <NextLink href={`/admin/data/siswa/rekap/perkelas/${selectKelas}`}>
+              <NextLink
+                href={`/admin/data/siswa/rekap/perkelas/${selectKelas}`}
+              >
                 <Button
                   fontWeight={600}
                   width={"full"}
@@ -370,7 +374,7 @@ const DataSiswa: NextPage = () => {
                   _hover={{
                     bg: "green.300",
                   }}
-                  mt={"10px"}
+                  mt={"20px"}
                 >
                   {`Print Data Siswa Kelas ${selectKelas}`}
                 </Button>

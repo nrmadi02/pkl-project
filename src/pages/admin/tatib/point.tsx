@@ -11,7 +11,6 @@ import { trpc } from "../../../utils/trpc";
 import Image from "next/image";
 import { Guru, Kelas, Pelanggaran, Siswa } from "@prisma/client";
 import DataTable from "../../../components/DataTable/DataTable";
-import { createSiswaSchema, CreateSiswaSchema, } from "../../../server/schema/siswa.schema";
 import { getCookie } from "cookies-next";
 import NextLink from 'next/link'
 import { createPelanggaranSchema, CreatePelanggaranSchema } from "../../../server/schema/pelanggaran.schema";
@@ -175,7 +174,6 @@ const Pelanggaran: NextPage = () => {
     ], [dataSiswa?.result])
 
     const data = useMemo(() => getData(dataSiswa?.result ? dataSiswa.result : []), [dataSiswa]);
-
 
     return (
       <AdminLayout

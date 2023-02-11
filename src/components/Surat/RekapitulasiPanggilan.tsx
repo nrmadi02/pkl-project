@@ -65,7 +65,7 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
               </tr>
             </tbody>
           </table>
-          <table className="table text-[12px] table-auto border border-collapse">
+          <table className="table w-full text-[12px] table-auto border border-collapse">
             <thead>
               <tr>
                 <th className="border px-2">HARI, TANGGAL</th>
