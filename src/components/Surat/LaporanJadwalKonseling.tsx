@@ -55,7 +55,7 @@ const Surat = (props: Props, ref: LegacyRef<Ref>) => {
                   <td className="border px-2">{item.siswa?.kelas}</td>
                   <td className="border px-2">{item.jam} WITA</td>
                   <td width={200} className="border px-2">
-                    <p className="whitespace-pre-wrap w-[100px]">
+                    <p className="whitespace-pre-wrap w-[200px]">
                       {item.keluhan}
                     </p>
                   </td>
