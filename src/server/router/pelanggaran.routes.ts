@@ -124,27 +124,23 @@ export const pelanggaranRoutes = createRouter()
             `;
       const dataArrLast = statsDataLast;
       const resultArrLast: number[] = [];
-      for (let index = 1; index <= 12; index++) {
-        dataArrLast.length != 0  ?dataArrLast.map((item, idx) => {
-          if (parseInt(item.Month) == index) {
-            resultArrLast.push(parseInt(item.Total));
-          } else {
-            resultArrLast.push(0);
-          }
-        }) : resultArrLast.push(0);
+      for (let index = 0; index <= 11; index++) {
+        if(dataArrLast[index]?.Month){
+          resultArrLast.push(parseInt(dataArrLast[index]?.Total!));
+        } else {
+          resultArrLast.push(0);
+        }
       }
       const dataArrBefore = statsDataBefore;
       const resultArrBefore: number[] = [];
       for (let index = 1; index <= 12; index++) {
-        dataArrBefore.length != 0 ? dataArrBefore.map((item, idx) => {
-          if (parseInt(item.Month) == index) {
-            resultArrBefore.push(parseInt(item.Total));
-          } else {
-            resultArrBefore.push(0);
-          }
-        }) : resultArrBefore.push(0);
+        if (dataArrBefore[index]?.Month) {
+          resultArrBefore.push(parseInt(dataArrBefore[index]?.Total!));
+        } else {
+          resultArrBefore.push(0);
+        }
       }
-      // console.log(statsDataBefore, statsDataLast);
+      // console.log(resultArrBefore, resultArrLast);
       return {
         status: 200,
         message: "Data berhasil diambil",

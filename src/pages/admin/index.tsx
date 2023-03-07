@@ -82,6 +82,7 @@ const Admin: NextPage = () => {
   });
 
   useEffect(() => {
+    console.log(dataStats)
     setDataStats({
       ...dataStats,
       before: DataStats?.result.before,
