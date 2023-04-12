@@ -59,7 +59,10 @@ import {
   CreatePelanggaranSchema,
 } from "../../../server/schema/pelanggaran.schema";
 import { useSession } from "next-auth/react";
-import { createTerlambatSchema, CreateTerlambatSchema } from "../../../server/schema/terlambat.schema";
+import {
+  createTerlambatSchema,
+  CreateTerlambatSchema,
+} from "../../../server/schema/terlambat.schema";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const proto = ctx.req.headers["x-forwarded-proto"] ? "https" : "http";
@@ -397,8 +400,7 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
     );
   };
 
-  const { mutateAsync: tambahTerlambat } =
-    trpc.useMutation("terlambat.create");
+  const { mutateAsync: tambahTerlambat } = trpc.useMutation("terlambat.create");
 
   const handleAddTerlambat = useCallback(
     async (data: CreateTerlambatSchema) => {
@@ -442,7 +444,7 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
             "pencatat",
             stateSession?.user?.name ? stateSession?.user?.name : ""
           );
-          setValue("akumulasi", false)
+          setValue("akumulasi", false);
         }}
         icon={<IoAdd />}
       />
@@ -605,7 +607,7 @@ const ActionTable = ({ value, data, refetch, toast, point }: ActionValue) => {
                 borderColor={"orange.300"}
                 borderWidth={1}
                 id="tanggal"
-                defaultValue={'false'}
+                defaultValue={"false"}
                 type={"hidden"}
                 placeholder="Masukan akumulasi"
                 {...register("akumulasi")}

@@ -22,7 +22,6 @@ export const pelanggaranRoutes = createRouter()
 
       if (type == "Penghargaan") {
         if (Number(point) > Number(totalPoint._sum.point)) {
-          console.log(point);
           return {
             status: 400,
             message:
@@ -126,7 +125,7 @@ export const pelanggaranRoutes = createRouter()
       const resultArrLast: number[] = [];
       for (let index = 0; index <= 11; index++) {
         if(dataArrLast[index]?.Month){
-          resultArrLast.push(parseInt(dataArrLast[index]?.Total!));
+          resultArrLast.push(parseInt(String(dataArrLast[index]?.Total)));
         } else {
           resultArrLast.push(0);
         }
@@ -135,7 +134,7 @@ export const pelanggaranRoutes = createRouter()
       const resultArrBefore: number[] = [];
       for (let index = 1; index <= 12; index++) {
         if (dataArrBefore[index]?.Month) {
-          resultArrBefore.push(parseInt(dataArrBefore[index]?.Total!));
+          resultArrBefore.push(parseInt(String(dataArrBefore[index]?.Total)));
         } else {
           resultArrBefore.push(0);
         }

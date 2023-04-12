@@ -82,7 +82,6 @@ const Admin: NextPage = () => {
   });
 
   useEffect(() => {
-    console.log(dataStats)
     setDataStats({
       ...dataStats,
       before: DataStats?.result.before,
@@ -153,7 +152,7 @@ const Admin: NextPage = () => {
             </GridItem>
           </Grid>
           <Heading size={"md"} className="font-bold mt-5 mb-3">
-            Data Pelanggaran
+            Jumlah Pelanggaran Siswa
           </Heading>
           <div className="bg-white p-5 rounded-xl shadow-md mt-5">
             <Skeleton height="350px" isLoaded={loadingStats} fadeDuration={4}>

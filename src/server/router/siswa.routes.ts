@@ -178,8 +178,8 @@ export const siswaRoutes = createRouter()
             input.star_date != "" && input.end_date != ""
               ? {
                   createdAt: {
-                    lte: new Date(input.end_date),
-                    gte: new Date(input.star_date),
+                    lte: new Date(input.end_date).toISOString(),
+                    gte: new Date(input.star_date).toISOString(),
                   },
                 }
               : {},

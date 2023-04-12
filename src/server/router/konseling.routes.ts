@@ -1,6 +1,9 @@
 import moment from "moment";
 import { object, string } from "zod";
-import { createKonselingSchema, updateStatusKonselingSchema } from "../schema/konseling.schema";
+import {
+  createKonselingSchema,
+  updateStatusKonselingSchema,
+} from "../schema/konseling.schema";
 import { createPengajuanLabSchema } from "../schema/lab.schema";
 import { createRouter } from "./context";
 
@@ -13,7 +16,7 @@ export const konselingRoutes = createRouter()
           jam: "",
           keluhan: input.keluhan,
           status: "Menunggu",
-          tanggal: input.tanggal,
+          tanggal: new Date(input.tanggal),
           siswaID: input.siswaID,
         },
       });
@@ -60,31 +63,68 @@ export const konselingRoutes = createRouter()
       };
     },
   })
+  .query("getAllWithFilter", {
+    input: object({
+      star_date: string(),
+      end_date: string(),
+      status: string(),
+    }),
+    resolve: async ({ ctx, input }) => {
+      const allData = await ctx.prisma.konseling.findMany({
+        include: {
+          siswa: true,
+        },
+        where: {
+          status: {
+            contains: input.status,
+          },
+          AND: [
+            input.star_date != "" && input.end_date != ""
+              ? {
+                  tanggal: {
+                    lte: new Date(input.end_date).toISOString(),
+                    gte: new Date(input.star_date).toISOString(),
+                  },
+                }
+              : {},
+          ],
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+      });
+      return {
+        status: 200,
+        message: "Data berhasil diambil",
+        result: allData,
+      };
+    },
+  })
   .query("downloadData", {
     resolve: async ({ ctx }) => {
       const allData = await ctx.prisma.konseling.findMany({
         where: {
-            status: {
-                equals: "Disetujui"
-            }
+          status: {
+            equals: "Disetujui",
+          },
         },
         include: {
           siswa: true,
         },
       });
 
-      const dataDownload: any = []
+      const dataDownload: any = [];
 
       allData.map((item, idx) => {
         const data = {
-            nama: item.siswa.nama,
-            kelas: item.siswa.kelas,
-            keluhan: item.keluhan,
-            jam: item.jam,
-            tanggal: moment(item.tanggal).format("DD/MM/YYYY"),
-        }
-        dataDownload.push(data)
-      })
+          nama: item.siswa.nama,
+          kelas: item.siswa.kelas,
+          keluhan: item.keluhan,
+          jam: item.jam,
+          tanggal: moment(item.tanggal).format("DD/MM/YYYY"),
+        };
+        dataDownload.push(data);
+      });
 
       return {
         status: 200,

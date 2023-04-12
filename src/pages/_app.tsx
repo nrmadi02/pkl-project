@@ -12,13 +12,16 @@ import { AppProps } from "next/app";
 import { Session } from "next-auth";
 import "@fontsource/inter";
 import NextNProgress from "nextjs-progressbar";
+import BaseLayout from "../components/Layout/BaseLayout";
 
 const MyApp = ({ Component, pageProps: { session, ...pageProps }}: AppProps<{session: Session}>) => {
   return (
     <SessionProvider session={session}>
       <NextNProgress color="#ED8936" />
       <ChakraProvider theme={theme}>
-        <Component {...pageProps} />
+        <BaseLayout>
+          <Component {...pageProps} />
+        </BaseLayout>
       </ChakraProvider>
     </SessionProvider>
   );

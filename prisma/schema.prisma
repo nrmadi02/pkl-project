@@ -72,11 +72,25 @@ model Siswa {
     panggil_ortu Panggilortu[]
     terlambat    Terlambat[]
     konseling    Konseling[]
+    profile      ProfileSiswa?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+    PemimjamanBuku PemimjamanBuku[]
 
     @@map(name: "siswa")
+}
+
+model ProfileSiswa {
+    id           String   @id @default(uuid())
+    alamat       String   @db.LongText
+    nomorHP      String   @db.VarChar(255)
+    tempatLahir  String   @db.VarChar(255)
+    tanggalLahir DateTime
+    siswa        Siswa    @relation(fields: [siswaID], references: [id])
+    siswaID      String   @unique
+
+    @@index([siswaID])
 }
 
 model Kelas {
@@ -207,7 +221,7 @@ model Informasi {
 
 model Konseling {
     id        String   @id @default(uuid())
-    tanggal   String   @db.Text
+    tanggal   DateTime?
     jam       String   @db.Text
     keluhan   String   @db.LongText
     status    String   @db.VarChar(255)
@@ -219,6 +233,35 @@ model Konseling {
 
     @@index([siswaID])
     @@map(name: "konseling")
+}
+
+model Buku {
+    id             String           @id @default(uuid())
+    judul          String           @db.Text
+    pengarang      String           @db.Text
+    sampul         String           @db.LongText
+    tahun          String           @db.VarChar(255)
+    kategori       String           @db.VarChar(255)
+    noBuku         String           @unique @db.VarChar(255)
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+    PemimjamanBuku PemimjamanBuku[]
+
+    @@map(name: "buku")
+}
+
+model PemimjamanBuku {
+    buku        Buku     @relation(fields: [bukuID], references: [id])
+    bukuID      String
+    siswa       Siswa    @relation(fields: [siswaID], references: [id])
+    siswaID     String
+    status      String   @db.VarChar(255)
+    keterangan  String   @db.LongText
+    waktuAcc    DateTime @default(now())
+    persetujuan String
+
+    @@id([bukuID, siswaID])
+    @@map(name: "pemimjaman_buku")
 }
 
 enum RoleEnumType {

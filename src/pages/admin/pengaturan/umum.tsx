@@ -97,7 +97,6 @@ const PengaturanUmum: NextPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log(Periode?.result);
     Periode?.result && setValue("periode", Periode?.result);
   }, [Periode]);
 
